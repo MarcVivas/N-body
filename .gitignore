@@ -1,0 +1,17 @@
+# CLion files and directories
+.idea/
+cmake-build-debug/
+
+# VSCode files and directories
+.vscode/
+
+# C++ object files
+*.o
+*.out
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+build/
