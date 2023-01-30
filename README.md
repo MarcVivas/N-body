@@ -25,7 +25,12 @@ sudo apt-get install libglm-dev
 ```bash
 sudo apt-get install libglfw3-dev
 ```
-##### 5. Run the project.  
+##### 5. Install `glad`.
+```bash
+sudo cp -R lib/glad/ /usr/include/
+```
+
+##### 6. Run the project.  
 Do the next step only once. This command will create a new directory titled `build` and change the location to it.
 ```bash
 mkdir build && cd build
@@ -63,7 +68,13 @@ sudo pacman -S glfw-x11
 ```bash
 sudo pacman -S glm
 ```
-##### 5. Run the project.  
+
+##### 5. Install `glad`.
+```bash
+sudo cp -R lib/glad/ /usr/include/
+```
+
+##### 6. Run the project.  
 
 Do the next step only once. This command will create a new directory titled `build` and change the location to it.
 ```bash
