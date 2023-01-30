@@ -9,7 +9,39 @@ In this chapter you will find what I did to run the project in the next OS.
 2. [Arch Linux](#arch-linux)
 
 ### Ubuntu
-
+##### 1. Update the system. 
+```bash
+sudo apt-get update
+```
+##### 2. Install `cmake`.
+```bash
+sudo apt-get install cmake
+```
+##### 3. Install `glm`.
+```bash
+sudo apt-get install libglm-dev
+```
+##### 4. Install `glfw`.
+```bash
+sudo apt-get install libglfw3-dev
+```
+##### 5. Run the project.  
+Do the next step only once. This command will create a new directory titled `build` and change the location to it.
+```bash
+mkdir build && cd build
+``` 
+Build a `Makefile` using CMake.
+```bash
+cmake ..
+```
+Compile the program using the `Makefile`.
+```bash
+make
+```
+Now you should be able to run the compiled program.
+```bash
+./N-body
+```
 
 ### Arch Linux
 
