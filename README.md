@@ -1,9 +1,21 @@
-# N-body
-N-body simulation
+# N-body simulation
+
+
+## Table of contents
+[Controls](#controls)
+[How to run the project](#how-to-run-the-project)
+
+## Controls
+| Key      | Action             |
+|----------|--------------------|
+| Esc      | Closes the program |
+
+
+
 
 ## How to run the project
 
-In this chapter you will find what I did to run the project in the next OS.
+In this section you will find what I did to run the project in the next OS.
 
 1. [Ubuntu](#ubuntu)
 2. [Arch Linux](#arch-linux)
@@ -37,7 +49,7 @@ mkdir build && cd build
 ``` 
 Build a `Makefile` using CMake.
 ```bash
-cmake ..
+cmake ../src/main/
 ```
 Compile the program using the `Makefile`.
 ```bash
@@ -83,7 +95,7 @@ mkdir build && cd build
 
 Build a `Makefile` using CMake.
 ```bash
-cmake ..
+cmake ../src/main/
 ```
 Compile the program using the `Makefile`.
 ```bash
