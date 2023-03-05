@@ -17,7 +17,7 @@ public:
     ~OpenGLRenderer();
 
     // Render loop
-    void render_loop(std::function<void()> update, std::function<void()> draw);
+    void render_loop(ParticleSystem* particleSystem);
 
     // Getters and setters
 

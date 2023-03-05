@@ -1,7 +1,6 @@
 //
 // Created by marc on 4/03/23.
 //
-#include <functional>
 #include "OpenGLRenderer.h"
 
 /**
@@ -36,7 +35,7 @@ OpenGLRenderer::~OpenGLRenderer(){
  * @tparam Function
  * @param display
  */
-void OpenGLRenderer::render_loop(std::function<void()> update, std::function<void()> draw) {
+void OpenGLRenderer::render_loop(ParticleSystem* particleSystem) {
 
     // Render stats variables
     // ========================
@@ -55,8 +54,8 @@ void OpenGLRenderer::render_loop(std::function<void()> update, std::function<voi
         // Compute time between 2 frames
         this->updateDeltaTime(lastFrameTime);
 
-        update();
-        draw();
+        particleSystem->update(this->getDeltaTime());
+        particleSystem->draw();
 
         // ======================
         // Swap buffers: Front buffer(render) and back buffer (next render)
