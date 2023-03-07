@@ -12,7 +12,7 @@ public:
     void update(double deltaTime) override;
     void draw() override;
 
-    ParticleSystemCPU(size_t numParticles);
+    ParticleSystemCPU(size_t numParticles, InitializationType initType);
 
 };
 

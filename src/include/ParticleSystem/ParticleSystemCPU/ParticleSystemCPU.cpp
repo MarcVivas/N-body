@@ -13,6 +13,6 @@ void ParticleSystemCPU::update(double deltaTime) {
 }
 
 
-ParticleSystemCPU::ParticleSystemCPU(size_t numParticles): ParticleSystem(numParticles){
+ParticleSystemCPU::ParticleSystemCPU(size_t numParticles, InitializationType initType): ParticleSystem(numParticles, initType){
     std::cout << "constructor CPU " << numParticles << " particles\n";
 }
