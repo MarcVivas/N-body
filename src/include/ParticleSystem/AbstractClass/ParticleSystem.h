@@ -14,7 +14,7 @@ public:
     ParticleSystem(size_t numParticles, InitializationType initType);
     virtual ~ParticleSystem();
     std::vector<Particle> particles;
-protected:
+private:
     void generateCubeSystem();
     void generateGalaxySystem();
 

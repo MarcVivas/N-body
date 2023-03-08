@@ -2,9 +2,11 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <getopt.h>
 #include <vector>
+#include "../include/Shader/Shader.cpp"
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"
 #include "../include/ParticleSystem/AbstractClass/ParticleSystem.cpp"
@@ -12,6 +14,7 @@
 #include "../include/ParticleSystem/ParticleSystemCPU/ParticleSystemCPU.cpp"
 #include "../include/ParticleSystem/ParticleSystemGPU/ParticleSystemGPU.cpp"
 #include "../include/ArgumentsParser/ArgumentsParser.cpp"
+
 
 int main(int argc, char *argv[])
 {

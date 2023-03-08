@@ -14,5 +14,17 @@ void ParticleSystemCPU::update(double deltaTime) {
 
 
 ParticleSystemCPU::ParticleSystemCPU(size_t numParticles, InitializationType initType): ParticleSystem(numParticles, initType){
-    std::cout << "constructor CPU " << numParticles << " particles\n";
+    float vertices[] = {
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.0f,  0.5f, 0.0f
+    };
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+    
+
+
 }
