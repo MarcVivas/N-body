@@ -6,6 +6,7 @@
 #include <sstream>
 #include <getopt.h>
 #include <vector>
+#include <algorithm>
 #include "../include/Shader/Shader.cpp"
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"
@@ -39,7 +40,6 @@ int main(int argc, char *argv[])
         default:
             exit(EXIT_FAILURE);
     }
-    std::cout << *particleSystem;
 
 
     renderer.render_loop(particleSystem);

@@ -16,6 +16,8 @@ public:
 
     Shader(const char *vertexPath, const char *fragmentPath);
 
+    Shader();
+
     // activate the shader
     // ------------------------------------------------------------------------
     void use() const;

@@ -12,8 +12,13 @@ public:
     void update(double deltaTime) override;
     void draw() override;
 
+    virtual ~ParticleSystemCPU();
     ParticleSystemCPU(size_t numParticles, InitializationType initType);
-
+protected:
+    Shader *renderShader;
+    unsigned int VAO;
+    unsigned int VBO;
+    unsigned int ID;
 };
 
 
