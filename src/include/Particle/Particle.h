@@ -10,9 +10,12 @@ class Particle {
 public:
     glm::vec3 position;
     glm::vec3 velocity;
+    glm::vec3 acceleration;
     float mass;
     Particle(glm::vec3 pos, glm::vec3 vel, float mass);
     ~Particle();
+
+    void updatePosition(float deltaTime, glm::vec3 newAcceleration);
 
     friend std::ostream& operator<<(std::ostream& os, const Particle& p) {
         os << "Particle {" << std::endl
