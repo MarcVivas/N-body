@@ -13,11 +13,17 @@ public:
     void draw() override;
 
     virtual ~ParticleSystemCPU();
-    ParticleSystemCPU(size_t numParticles, InitializationType initType);
+    ParticleSystemCPU(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver);
 protected:
     Shader *renderShader;
     unsigned int VAO;
     unsigned int VBO;
+    GLsync gSync = nullptr;
+    Particle* particlesPinnedMemory;
+
+    void lockParticlesBuffer();
+    void waitParticlesBuffer();
+    void copyParticlesToGPU();
 };
 
 

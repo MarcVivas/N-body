@@ -11,7 +11,7 @@ public:
     virtual void update(double deltaTime) = 0;
     virtual void draw() = 0;
 
-    ParticleSystem(size_t numParticles, InitializationType initType);
+    ParticleSystem(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver);
     virtual ~ParticleSystem();
     std::vector<Particle> particles;
 private:
@@ -28,5 +28,8 @@ private:
         os << "}";
         return os;
     }
+
+protected:
+    ParticleSolver *particleSolver;
 };
 #endif // PARTICLESYSTEM_H

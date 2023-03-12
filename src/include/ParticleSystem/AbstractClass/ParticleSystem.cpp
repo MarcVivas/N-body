@@ -5,7 +5,7 @@
 // ParticleSystem Abstract Class
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem(size_t numParticles, InitializationType initType) {
+ParticleSystem::ParticleSystem(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver) :particleSolver(particleSysSolver){
     this->particles.reserve(numParticles);
 
     switch(initType){
@@ -18,7 +18,9 @@ ParticleSystem::ParticleSystem(size_t numParticles, InitializationType initType)
     }
 }
 
-ParticleSystem::~ParticleSystem() = default;
+ParticleSystem::~ParticleSystem(){
+    delete this->particleSolver;
+}
 
 void ParticleSystem::generateCubeSystem() {
     std::random_device randomDevice;
