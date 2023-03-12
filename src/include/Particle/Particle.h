@@ -12,6 +12,7 @@ public:
     glm::vec3 velocity;
     glm::vec3 acceleration;
     float mass;
+    Particle();
     Particle(glm::vec3 pos, glm::vec3 vel, float mass);
     ~Particle();
 

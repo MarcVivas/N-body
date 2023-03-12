@@ -11,7 +11,3 @@ void ParticleSystemGPU::draw() {
 void ParticleSystemGPU::update(double deltaTime) {
     std::cout << "update GPU " << deltaTime << '\n';
 }
-
-ParticleSystemGPU::ParticleSystemGPU(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver): ParticleSystem(numParticles, initType, particleSysSolver){
-    std::cout << "constructor GPU " << numParticles << " particles\n";
-}

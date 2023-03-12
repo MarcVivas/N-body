@@ -12,7 +12,6 @@ public:
     void update(double deltaTime) override;
     void draw() override;
 
-    ParticleSystemGPU(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver);
 
 
 };

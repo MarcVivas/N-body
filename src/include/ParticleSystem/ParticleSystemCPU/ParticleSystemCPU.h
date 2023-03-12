@@ -13,7 +13,7 @@ public:
     void draw() override;
 
     virtual ~ParticleSystemCPU();
-    ParticleSystemCPU(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver);
+    ParticleSystemCPU(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver);
 protected:
     Shader *renderShader;
     unsigned int VAO;

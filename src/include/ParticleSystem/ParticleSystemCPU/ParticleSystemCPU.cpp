@@ -30,9 +30,8 @@ void ParticleSystemCPU::update(double deltaTime) {
     this->copyParticlesToGPU();
 }
 
-
-ParticleSystemCPU::ParticleSystemCPU(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver): ParticleSystem(numParticles, initType, particleSysSolver){
-
+ParticleSystemCPU::ParticleSystemCPU(ParticleSystemInitializer *particleSystemInitializer,
+                                     ParticleSolver *particleSysSolver): ParticleSystem(particleSystemInitializer, particleSysSolver) {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
@@ -58,9 +57,7 @@ ParticleSystemCPU::ParticleSystemCPU(size_t numParticles, InitializationType ini
     std::replace(fragmentShaderPath.begin(), fragmentShaderPath.end(), '/', '\\');
 #endif
 
-   this->renderShader = new Shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
-
-
+    this->renderShader = new Shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
 }
 
 

@@ -5,18 +5,13 @@
 // ParticleSystem Abstract Class
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem(size_t numParticles, InitializationType initType, ParticleSolver *particleSysSolver) :particleSolver(particleSysSolver){
-    this->particles.reserve(numParticles);
 
-    switch(initType){
-        case InitializationType::CUBE:
-            this->generateCubeSystem();
-            break;
-        case InitializationType::GALAXY:
-            this->generateGalaxySystem();
-            break;
-    }
+ParticleSystem::ParticleSystem(ParticleSystemInitializer *particleSystemInitializer,
+                               ParticleSolver *particleSysSolver) :particleSolver(particleSysSolver) {
+    this->particles = particleSystemInitializer->generateParticles();
+
 }
+
 
 ParticleSystem::~ParticleSystem(){
     delete this->particleSolver;

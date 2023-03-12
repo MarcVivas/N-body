@@ -17,6 +17,7 @@
 #include "../include/Particle/Particle.cpp"
 #include "../include/ParticleSystemSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
 #include "../include/ParticleSystemSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
+#include "../include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp"
 #include "../include/ParticleSystem/AbstractClass/ParticleSystem.cpp"
 #include "../include/OpenGLRenderer/OpenGLRenderer.cpp"
 #include "../include/ParticleSystem/ParticleSystemCPU/ParticleSystemCPU.cpp"
@@ -35,10 +36,10 @@ int main(int argc, char *argv[])
     ParticleSystem* particleSystem;
     switch (args.getVersion()){
         case Version::PP_CPU_SEQUENTIAL:
-            particleSystem = new ParticleSystemCPU(args.getNumParticles(), args.getInitializationType(), new ParticleSolverCPUSequential());
+            particleSystem = new ParticleSystemCPU(new ParticleSystemCubeInitializer(args.getNumParticles()),  new ParticleSolverCPUSequential());
             break;
         case Version::PP_CPU_PARALLEL:
-            particleSystem = new ParticleSystemCPU(args.getNumParticles(), args.getInitializationType(), new ParticleSolverCPUParallel());
+            particleSystem = new ParticleSystemCPU(new ParticleSystemCubeInitializer(args.getNumParticles()), new ParticleSolverCPUParallel());
             break;
         case Version::PP_GPU_PARALLEL:
             //particleSystem = new ParticleSystemGPU(args.getNumParticles(), args.getInitializationType());

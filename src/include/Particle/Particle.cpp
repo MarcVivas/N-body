@@ -7,6 +7,7 @@
 
 Particle::Particle(glm::vec3 pos, glm::vec3 vel, float m) :position(pos), velocity(vel), mass(m), acceleration(glm::vec3(0, 0, 0)){};
 
+Particle::Particle() = default;
 Particle::~Particle() = default;
 
 /**
