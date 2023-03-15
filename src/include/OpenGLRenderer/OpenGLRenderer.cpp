@@ -11,7 +11,7 @@
  * @param VSync
  * @param showFramesPerSecond
  */
-OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_height, const char *title, bool VSync, bool showFramesPerSecond) : showFPS(showFramesPerSecond), pauseSimulation(false) {
+OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_height, const char *title, bool VSync, bool showFramesPerSecond) : showFPS(showFramesPerSecond), pauseSimulation(true) {
     this->init_glfw();
     this->createWindow(window_width, window_height, title);
     this->init_glad();
@@ -57,8 +57,8 @@ void OpenGLRenderer::render_loop(ParticleSystem* particleSystem) {
 
         if(!this->pauseSimulation){
             particleSystem->update(this->getDeltaTime());
-            particleSystem->draw();
         }
+        particleSystem->draw();
 
         // ======================
         // Swap buffers: Front buffer(render) and back buffer (next render)
