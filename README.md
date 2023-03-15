@@ -6,9 +6,10 @@
 [How to run the project](#how-to-run-the-project)
 
 ## Controls
-| Key      | Action             |
-|----------|--------------------|
-| Esc      | Closes the program |
+| Key | Action                       |
+|-----|------------------------------|
+| Esc | Closes the program           |
+ | p   | Pauses/starts the simulation | 
 
 
 

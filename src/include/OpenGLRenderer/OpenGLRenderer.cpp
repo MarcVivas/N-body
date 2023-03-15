@@ -11,12 +11,13 @@
  * @param VSync
  * @param showFramesPerSecond
  */
-OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_height, const char *title, bool VSync, bool showFramesPerSecond) : showFPS(showFramesPerSecond) {
+OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_height, const char *title, bool VSync, bool showFramesPerSecond) : showFPS(showFramesPerSecond), pauseSimulation(false) {
     this->init_glfw();
     this->createWindow(window_width, window_height, title);
     this->init_glad();
     glEnable(GL_DEPTH_TEST);
     this->setFramebufferSizeCallback();
+    this->setKeyCallback();
     if(!VSync){
         // Disable Vsync
         glfwSwapInterval(0);
@@ -49,14 +50,15 @@ void OpenGLRenderer::render_loop(ParticleSystem* particleSystem) {
 
     while (!glfwWindowShouldClose(window))
     {
-
         this->updateFPS(previousTime, frameCount);
 
         // Compute time between 2 frames
         this->updateDeltaTime(lastFrameTime);
 
-        particleSystem->update(this->getDeltaTime());
-        particleSystem->draw();
+        if(!this->pauseSimulation){
+            particleSystem->update(this->getDeltaTime());
+            particleSystem->draw();
+        }
 
         // ======================
         // Swap buffers: Front buffer(render) and back buffer (next render)
@@ -66,7 +68,6 @@ void OpenGLRenderer::render_loop(ParticleSystem* particleSystem) {
         // ======================
         // Checks if any events are triggered (keys pressed/released, mouse moved etc.) and calls the corresponding functions
         glfwPollEvents();
-        this->processKeyBoardInput();
         // ======================
 
     }
@@ -166,6 +167,26 @@ void OpenGLRenderer::setMouseButtonCallback() {
 }
 
 /**
+ * Set callback functions for when relevant keys are pressed/released to react accordingly
+ */
+void OpenGLRenderer::setKeyCallback() {
+    // Whenever the window changes in size, GLFW calls this function and fills in the proper arguments for you to process.
+    glfwSetWindowUserPointer(this->getWindow(), this);
+    glfwSetKeyCallback(this->getWindow(), [](GLFWwindow* window, int key, int scancode, int action, int mods) -> void
+    {
+        auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
+        if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+            glfwSetWindowShouldClose(renderer->getWindow(), true);
+        }
+        if (key == GLFW_KEY_P && action == GLFW_PRESS){
+            renderer->pauseSimulation = !renderer->pauseSimulation;
+            usleep(150000);
+        }
+    }
+    );
+}
+
+/**
  * Resizeable window callback
  */
 void OpenGLRenderer::setFramebufferSizeCallback() {
@@ -188,17 +209,6 @@ void OpenGLRenderer::setCursorPosCallback() {
 void OpenGLRenderer::setScrollCallback(){
     //glfwSetScrollCallback(window, scroll_callback);
 }
-
-
-/**
- * Query GLFW whether relevant keys are pressed/released this frame and react accordingly
- */
-void OpenGLRenderer::processKeyBoardInput() {
-    if(glfwGetKey(this->getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS){
-        glfwSetWindowShouldClose(this->getWindow(), true);
-    }
-}
-
 
 /**
  * Getter for deltaTime

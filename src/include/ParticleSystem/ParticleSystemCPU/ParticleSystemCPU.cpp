@@ -26,6 +26,7 @@ void ParticleSystemCPU::draw() {
     glm::mat4 projection = glm::perspective(glm::radians(90.f), (float)600 / (float)600, 0.1f, 100.0f);
 
     glm::mat4 modelViewProjection = projection * view * model;
+
     this->renderShader->setMat4("modelViewProjection", modelViewProjection);
 
     glDrawArrays(GL_POINTS, 0, this->particles.size());

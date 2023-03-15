@@ -38,6 +38,7 @@ private:
     int WINDOW_WIDTH;
     double deltaTime;
     bool showFPS;
+    bool pauseSimulation;
 
     void init_glfw();
 
@@ -48,6 +49,8 @@ private:
     void updateFPS(double &previousTime, size_t &frameCount);
 
     void updateDeltaTime(double &lastFrameTime);
+
+    void setKeyCallback();
 
     void setMouseButtonCallback();
 
@@ -63,9 +66,6 @@ private:
     bool getShowFPS();
 
     GLFWwindow* getWindow();
-
-    void processKeyBoardInput();
-
 
 };
 

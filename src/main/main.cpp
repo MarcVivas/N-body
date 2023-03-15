@@ -11,6 +11,11 @@
 #include <random>
 #include <omp.h>
 #include <cstring>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../include/Shader/Shader.cpp"
