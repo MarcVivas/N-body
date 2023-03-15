@@ -15,6 +15,7 @@ OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_he
     this->init_glfw();
     this->createWindow(window_width, window_height, title);
     this->init_glad();
+    glEnable(GL_DEPTH_TEST);
     this->setFramebufferSizeCallback();
     if(!VSync){
         // Disable Vsync

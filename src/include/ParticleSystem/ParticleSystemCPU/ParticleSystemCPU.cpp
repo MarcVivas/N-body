@@ -13,8 +13,21 @@ ParticleSystemCPU::~ParticleSystemCPU() {
 void ParticleSystemCPU::draw() {
 
     glClearColor(1.f, 1.f, 1.f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->renderShader->use();
+
+    // create transformations
+    glm::mat4 model = glm::mat4(1.0f);
+
+    // camera/view transformation
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
+
+    // projection matrix
+    glm::mat4 projection = glm::perspective(glm::radians(90.f), (float)600 / (float)600, 0.1f, 100.0f);
+
+    glm::mat4 modelViewProjection = projection * view * model;
+    this->renderShader->setMat4("modelViewProjection", modelViewProjection);
+
     glDrawArrays(GL_POINTS, 0, this->particles.size());
 
     // Place a fence which will be removed when the draw command has finished

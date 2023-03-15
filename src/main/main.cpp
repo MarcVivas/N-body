@@ -12,6 +12,7 @@
 #include <omp.h>
 #include <cstring>
 #include <glm/gtc/random.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "../include/Shader/Shader.cpp"
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"

@@ -5,8 +5,12 @@ layout (location = 1) in vec3 velocity; // the velocity variable has attribute p
 
 out vec3 vel;
 
+// 3d view stuff
+uniform mat4 modelViewProjection;
+
+
 void main()
 {
-    gl_Position = vec4(particlePosition, 1.0);
+    gl_Position = modelViewProjection * vec4(particlePosition, 1.0);
     vel = velocity; // pass the velocity to the fragment shader
 }
