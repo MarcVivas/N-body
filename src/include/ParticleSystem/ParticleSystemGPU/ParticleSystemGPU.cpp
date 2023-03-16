@@ -4,7 +4,7 @@
 
 #include "ParticleSystemGPU.h"
 
-void ParticleSystemGPU::draw() {
+void ParticleSystemGPU::draw(Camera* camera) {
     std::cout << "draw GPU \n";
 }
 

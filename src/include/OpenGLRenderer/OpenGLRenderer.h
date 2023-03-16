@@ -12,6 +12,7 @@ public:
 
     // Constructor
     OpenGLRenderer(unsigned int window_width, unsigned int window_height, const char * title, bool VSync, bool showFPS);
+    OpenGLRenderer(Camera *camera, const char * title, bool VSync, bool showFPS);
 
     // Destructor
     ~OpenGLRenderer();
@@ -25,10 +26,6 @@ public:
 
     double getDeltaTime();
 
-    void setWindowWidth(int window_width);
-
-    void setWindowHeight(int window_height);
-
 
 
 private:
@@ -39,12 +36,13 @@ private:
     double deltaTime;
     bool showFPS;
     bool pauseSimulation;
+    Camera *camera;
 
     void init_glfw();
 
     void init_glad();
 
-    void createWindow(int window_width, int window_height, const char * title);
+    void createWindow(unsigned int window_width, unsigned int window_height, const char * title);
 
     void updateFPS(double &previousTime, size_t &frameCount);
 

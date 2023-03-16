@@ -10,7 +10,7 @@
 class ParticleSystemGPU: public ParticleSystem{
 public:
     void update(double deltaTime) override;
-    void draw() override;
+    void draw(Camera* camera) override;
 
 
 

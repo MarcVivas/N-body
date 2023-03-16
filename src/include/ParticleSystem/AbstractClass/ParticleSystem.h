@@ -9,14 +9,12 @@
 class ParticleSystem {
 public:
     virtual void update(double deltaTime) = 0;
-    virtual void draw() = 0;
+    virtual void draw(Camera* camera) = 0;
 
-    ParticleSystem(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver);
+    ParticleSystem(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim);
     virtual ~ParticleSystem();
     std::vector<Particle> particles;
 private:
-    void generateCubeSystem();
-    void generateGalaxySystem();
 
     friend std::ostream& operator<<(std::ostream& os, const ParticleSystem& ps) {
         os << "ParticleSystem {" << std::endl
@@ -31,5 +29,6 @@ private:
 
 protected:
     ParticleSolver *particleSolver;
+    glm::vec3 worldDimensions;
 };
 #endif // PARTICLESYSTEM_H

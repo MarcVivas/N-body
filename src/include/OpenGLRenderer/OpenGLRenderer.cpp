@@ -24,10 +24,35 @@ OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_he
     }
 }
 
+
+/**
+ * 3D renderer constructor
+ * @param camera
+ * @param title
+ * @param VSync
+ * @param showFPS
+ */
+OpenGLRenderer::OpenGLRenderer(Camera *cam, const char *title, bool VSync, bool showFramesPerSecond): camera(cam), showFPS(showFramesPerSecond), pauseSimulation(true) {
+    this->camera = cam;
+    this->init_glfw();
+    this->createWindow(this->camera->getWindowWidth(), this->camera->getWindowHeight(), title);
+    this->init_glad();
+    glEnable(GL_DEPTH_TEST);
+    this->setFramebufferSizeCallback();
+    this->setKeyCallback();
+    this->setScrollCallback();
+    if(!VSync){
+        // Disable Vsync
+        glfwSwapInterval(0);
+    }
+}
+
+
 /**
  * Destructor
  */
 OpenGLRenderer::~OpenGLRenderer(){
+    delete this->camera;
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
 }
@@ -58,7 +83,8 @@ void OpenGLRenderer::render_loop(ParticleSystem* particleSystem) {
         if(!this->pauseSimulation){
             particleSystem->update(this->getDeltaTime());
         }
-        particleSystem->draw();
+
+        particleSystem->draw(this->camera);
 
         // ======================
         // Swap buffers: Front buffer(render) and back buffer (next render)
@@ -140,11 +166,9 @@ void OpenGLRenderer::init_glad() {
     }
 }
 
-void OpenGLRenderer::createWindow(int window_width, int window_height, const char *title) {
+void OpenGLRenderer::createWindow(unsigned int window_width, unsigned int window_height, const char *title) {
     // glfw window creation
     this->window_title = std::string(title).append(" ");
-    this->setWindowWidth(window_width);
-    this->setWindowHeight(window_height);
 
     window = glfwCreateWindow(window_width, window_height, title, nullptr, nullptr);
 
@@ -195,8 +219,7 @@ void OpenGLRenderer::setFramebufferSizeCallback() {
     glfwSetFramebufferSizeCallback(this->getWindow(), [](GLFWwindow* window, int width, int height)->void
     {
         auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
-        renderer->setWindowWidth(width); // update the width
-        renderer->setWindowHeight(height); // update the height
+        renderer->camera->setAspectRatio(width, height); // update the width
         glViewport(0, 0, width, height); // The first two parameters of glViewport set the location of the lower left corner of the window.
     });
 }
@@ -207,7 +230,12 @@ void OpenGLRenderer::setCursorPosCallback() {
 }
 
 void OpenGLRenderer::setScrollCallback(){
-    //glfwSetScrollCallback(window, scroll_callback);
+    glfwSetWindowUserPointer(this->getWindow(), this);
+    glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)->void
+    {
+        auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
+        renderer->camera->zoomCallback(renderer->getDeltaTime(), xoffset, yoffset);
+    });
 }
 
 /**
@@ -240,14 +268,6 @@ bool OpenGLRenderer::getShowFPS() {
  */
 GLFWwindow* OpenGLRenderer::getWindow() {
     return this->window;
-}
-
-void OpenGLRenderer::setWindowHeight(int window_height) {
-    this->WINDOW_HEIGHT = window_height;
-}
-
-void OpenGLRenderer::setWindowWidth(int window_width) {
-    this->WINDOW_WIDTH = window_width;
 }
 
 
