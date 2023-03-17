@@ -2,14 +2,17 @@
 
 
 ## Table of contents
-[Controls](#controls)
+[Controls](#controls)  
 [How to run the project](#how-to-run-the-project)
 
 ## Controls
-| Key | Action                       |
-|-----|------------------------------|
-| Esc | Closes the program           |
- | p   | Pauses/starts the simulation | 
+| Key/Input      | Action                       |
+|----------------|------------------------------|
+| Esc            | Closes the program           |
+| Space          | Pauses/starts the simulation |
+| Mouse scroll   | Zoom in/out                  |
+| Click and drag | Moves the camera             |
+  
 
 
 

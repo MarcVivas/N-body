@@ -12,7 +12,7 @@ public:
 
     // Constructor
     OpenGLRenderer(unsigned int window_width, unsigned int window_height, const char * title, bool VSync, bool showFPS);
-    OpenGLRenderer(Camera *camera, const char * title, bool VSync, bool showFPS);
+    OpenGLRenderer(glm::vec2 window, glm::vec3 worldDim, const char * title, bool VSync, bool showFPS);
 
     // Destructor
     ~OpenGLRenderer();
@@ -26,13 +26,16 @@ public:
 
     double getDeltaTime();
 
+    unsigned int getWindowWidth() const;
 
+    unsigned int getWindowHeight() const;
+
+    void updateWindowSize(int width, int height);
 
 private:
     GLFWwindow* window;
     std::string window_title;
-    int WINDOW_HEIGHT;
-    int WINDOW_WIDTH;
+    unsigned int windowWidth, windowHeight;
     double deltaTime;
     bool showFPS;
     bool pauseSimulation;
@@ -56,7 +59,7 @@ private:
     void setFramebufferSizeCallback();
 
     // Cursor movement
-    void setCursorPosCallback();
+    void setMouseMovementCallback();
 
     // Mouse scroll callback
     void setScrollCallback();

@@ -32,15 +32,19 @@ OpenGLRenderer::OpenGLRenderer(unsigned int window_width, unsigned int window_he
  * @param VSync
  * @param showFPS
  */
-OpenGLRenderer::OpenGLRenderer(Camera *cam, const char *title, bool VSync, bool showFramesPerSecond): camera(cam), showFPS(showFramesPerSecond), pauseSimulation(true) {
-    this->camera = cam;
+OpenGLRenderer::OpenGLRenderer(glm::vec2 window, glm::vec3 worldDim, const char *title, bool VSync, bool showFramesPerSecond): showFPS(showFramesPerSecond), pauseSimulation(true) {
+    this->camera = new Camera(window, worldDim);
+    this->windowHeight = window.y;
+    this->windowWidth = window.x;
     this->init_glfw();
-    this->createWindow(this->camera->getWindowWidth(), this->camera->getWindowHeight(), title);
+    this->createWindow(this->getWindowWidth(), this->getWindowHeight(), title);
     this->init_glad();
     glEnable(GL_DEPTH_TEST);
     this->setFramebufferSizeCallback();
     this->setKeyCallback();
     this->setScrollCallback();
+    this->setMouseButtonCallback();
+    this->setMouseMovementCallback();
     if(!VSync){
         // Disable Vsync
         glfwSwapInterval(0);
@@ -187,7 +191,19 @@ void OpenGLRenderer::createWindow(unsigned int window_width, unsigned int window
 }
 
 void OpenGLRenderer::setMouseButtonCallback() {
-    //glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetWindowUserPointer(this->getWindow(), this);
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)->void
+    {
+        auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            renderer->camera->setIsDragging(true);
+            double prevMouseXPos, prevMouseYPos;
+            glfwGetCursorPos(window, &prevMouseXPos, &prevMouseYPos);
+            renderer->camera->setPreviousMousePos(glm::vec2(prevMouseXPos, prevMouseYPos));
+        } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+            renderer->camera->setIsDragging(false);
+        }
+    });
 }
 
 /**
@@ -202,7 +218,7 @@ void OpenGLRenderer::setKeyCallback() {
         if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
             glfwSetWindowShouldClose(renderer->getWindow(), true);
         }
-        if (key == GLFW_KEY_P && action == GLFW_PRESS){
+        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
             renderer->pauseSimulation = !renderer->pauseSimulation;
             usleep(150000);
         }
@@ -218,15 +234,23 @@ void OpenGLRenderer::setFramebufferSizeCallback() {
     glfwSetWindowUserPointer(this->getWindow(), this);
     glfwSetFramebufferSizeCallback(this->getWindow(), [](GLFWwindow* window, int width, int height)->void
     {
-        auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
-        renderer->camera->setAspectRatio(width, height); // update the width
-        glViewport(0, 0, width, height); // The first two parameters of glViewport set the location of the lower left corner of the window.
+        // retrieve the pointer to the instance
+        auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window));
+        // update the window size
+        renderer->updateWindowSize(width, height);
+        // update the aspect ratio
+        renderer->camera->setAspectRatio(width, height);
     });
 }
 
 // Cursor/mouse movement
-void OpenGLRenderer::setCursorPosCallback() {
-    //glfwSetCursorPosCallback(window, mouse_callback);
+void OpenGLRenderer::setMouseMovementCallback() {
+    glfwSetWindowUserPointer(this->getWindow(), this);
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xPos, double yPos)->void
+    {
+        auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
+        renderer->camera->rotateCallback(glm::vec2(xPos, yPos));
+    });
 }
 
 void OpenGLRenderer::setScrollCallback(){
@@ -239,11 +263,40 @@ void OpenGLRenderer::setScrollCallback(){
 }
 
 /**
+ * Updates the window height and width
+ * @param width
+ * @param height
+ */
+void OpenGLRenderer::updateWindowSize(int width, int height) {
+    this->windowWidth = width;
+    this->windowHeight = height;
+    // The first two parameters of glViewport set the location of the lower left corner of the window.
+    glViewport(0, 0, width, height);
+}
+
+
+/**
  * Getter for deltaTime
  * @return deltaTime
  */
 double OpenGLRenderer::getDeltaTime() {
     return this->deltaTime;
+}
+
+/**
+ * Get the window width
+ * @return windowWidth
+ */
+unsigned int OpenGLRenderer::getWindowWidth() const {
+    return this->windowWidth;
+}
+
+/**
+* Get the window height
+*  @return windowHeight
+*/
+unsigned int OpenGLRenderer::getWindowHeight() const {
+    return this->windowHeight;
 }
 
 /**

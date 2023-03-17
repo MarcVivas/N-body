@@ -18,7 +18,7 @@
 #endif
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../include/Camera3D/Camera.h"
+#include "../include/Camera/Camera.cpp"
 #include "../include/Shader/Shader.cpp"
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"
@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
     ArgumentsParser args(argc, argv);
 
     // In meters
-    glm::vec3 worldDimensions(44458.f, 44458.f, 44458.f);
-
-    OpenGLRenderer renderer(new Camera(600, 600, worldDimensions), "N-body simulation", false, true);
+    glm::vec3 worldDimensions(4445.f, 4445.f, 4445.f);
+    glm::vec2 window(600, 600);
+    OpenGLRenderer renderer(window, worldDimensions, "N-body simulation", false, true);
 
 
     ParticleSystem* particleSystem;
