@@ -234,7 +234,7 @@ void OpenGLRenderer::setScrollCallback(){
     glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)->void
     {
         auto renderer = static_cast<OpenGLRenderer*>(glfwGetWindowUserPointer(window)); // retrieve the pointer to the instance
-        renderer->camera->zoomCallback(renderer->getDeltaTime(), xoffset, yoffset);
+        renderer->camera->zoomCallback(renderer->getDeltaTime(), yoffset);
     });
 }
 

@@ -17,10 +17,10 @@ public:
         this->prevMousePos = glm::vec2(0.0f);
 
         // The initial position of the camera in 3D space
-        this->position = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, worldDimensions.y * 2.0f);
+        this->position = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, worldDimensions.z * 1.8f);
 
         // The center of the world that the camera is looking at
-        this->worldCenter = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, 0.0f);
+        this->worldCenter = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, worldDimensions.z / 2.f);
 
         // The up vector of the camera, used for determining orientation
         this->up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -72,14 +72,32 @@ public:
 
 
     // Zoom the camera in/out
-    void zoomCallback(float deltaTime, float x_offset, float y_offset) {
-        this->fov -= (float)y_offset;
-        if (this->fov < 1.0f){
-            this->fov = 1.0f;
+    void zoomCallback(float deltaTime, float mouseWheelYOffset) {
+        // Define the new world dimensions based on the mouse wheel offset
+        const float zoomFactor = 1.0f + mouseWheelYOffset * 0.1f;
+        glm::vec3 newWorldDimensions = this->worldDimensions * zoomFactor;
+
+        // Define the camera speed based on the ratio between the old and new world dimensions
+        const float cameraSpeed = 0.04f * glm::length(newWorldDimensions) / glm::length(this->worldDimensions);
+
+        // Update the camera position based on the mouse wheel offset and camera speed
+        if (mouseWheelYOffset > 0.f) {
+            // Zoom in
+            // Update position and direction
+            this->position += cameraSpeed * (this->worldCenter - this->position);
+        } else {
+            // Zoom out
+            // Update camera position and direction
+            this->position -= cameraSpeed * (this->worldCenter - this->position);
         }
-        if (this->fov > 100.0f){
-            this->fov = 100.0f;
-        }
+
+        // Update near and far clip planes based on camera position
+        float distanceToCenter = glm::distance(this->position, this->worldCenter);
+        this->nearClipPlane = distanceToCenter * 0.1f;
+        this->farClipPlane = distanceToCenter * 10.0f;
+
+        // Update the world dimensions
+        this->worldDimensions = newWorldDimensions;
     }
 
     // Rotate the camera based on mouse movement
