@@ -34,7 +34,7 @@ std::vector<Particle> ParticleSystemGalaxyInitializer::generateParticles(glm::ve
     for (size_t i = 0; i < totalParticles; i++) {
         float radius = randRadius(mt);
         float theta = randTheta(mt) * 2.f * glm::pi<float>();
-        float height = randRadius(mt) - worldDimensions.x / 2.f;
+        float height = (worldDimensions.z == 0) ? 0 : randRadius(mt) - worldDimensions.x / 2.f;
         glm::vec3 particlePos = center + glm::vec3(radius * std::cos(theta), radius * std::sin(theta), height);
 
         // Compute the mass based on the particle's position

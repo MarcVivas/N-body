@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     ArgumentsParser args(argc, argv);
 
     // In meters
-    glm::vec3 worldDimensions(4445.f, 4445.f, 4445.f);
+    glm::vec3 worldDimensions(8000.f, 8000.f, 8000.f);
     glm::vec2 window(600, 600);
     OpenGLRenderer renderer(window, worldDimensions, "N-body simulation", false, true);
 

@@ -19,8 +19,8 @@ Camera::Camera(glm::vec2 window, glm::vec3 worldDim) {
     this->isDragging = false;
     this->prevMousePos = glm::vec2(0.0f);
 
-    // The initial position of the camera in 3D space
-    this->position = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, worldDimensions.z * 1.8f);
+    // The initial position of the camera in a 3D space
+    this->position = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, (this->worldDimensions.x + this->worldDimensions.y + this->worldDimensions.z) / 2.f);
 
     // The center of the world that the camera is looking at
     this->worldCenter = glm::vec3(worldDimensions.x / 2.0f, worldDimensions.y / 2.0f, worldDimensions.z / 2.f);
