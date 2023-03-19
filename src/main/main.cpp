@@ -22,30 +22,33 @@
 #include "../include/Shader/Shader.cpp"
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"
-#include "../include/ParticleSystemSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
-#include "../include/ParticleSystemSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
+#include "../include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
+#include "../include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
 #include "../include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp"
 #include "../include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp"
 #include "../include/ParticleSystemInitializer/interface/ParticleSystemInitializer.h"
-#include "../include/ParticleSystem/AbstractClass/ParticleSystem.cpp"
-#include "../include/OpenGLRenderer/OpenGLRenderer.cpp"
-#include "../include/ParticleSystem/ParticleSystemCPU/ParticleSystemCPU.cpp"
-#include "../include/ParticleSystem/ParticleSystemGPU/ParticleSystemGPU.cpp"
 #include "../include/ArgumentsParser/ArgumentsParser.cpp"
 
+#include "../include/Window/Window.cpp"
+#include "../include/RenderTimer/RenderTimer.cpp"
+#include "../include/ParticleSimulation/ParticleSimulation.cpp"
+#include "../include/RenderLoop/RenderLoop.cpp"
+#include "../include/WindowInputManager/WindowInputManager.cpp"
 
 int main(int argc, char *argv[])
 {
     // Get the arguments
     ArgumentsParser args(argc, argv);
 
-    // In meters
+
+    // Using meters
     glm::vec3 worldDimensions(8000.f, 8000.f, 8000.f);
-    glm::vec2 window(600, 600);
-    OpenGLRenderer renderer(window, worldDimensions, "N-body simulation", false, true);
 
+    // Using pixels
+    glm::vec2 windowDim(600, 600);
+    Window window(windowDim, "N-body simulation");
+    RenderLoop renderLoop(window, true, false);
 
-    ParticleSystem* particleSystem;
     ParticleSystemInitializer* particleSystemInitializer;
 
     switch (args.getInitializationType()) {
@@ -60,13 +63,14 @@ int main(int argc, char *argv[])
     }
 
 
+    ParticleSimulation* particleSimulation;
 
     switch (args.getVersion()){
         case Version::PP_CPU_SEQUENTIAL:
-            particleSystem = new ParticleSystemCPU(particleSystemInitializer,  new ParticleSolverCPUSequential(), worldDimensions);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverCPUSequential(), worldDimensions, windowDim);
             break;
         case Version::PP_CPU_PARALLEL:
-            particleSystem = new ParticleSystemCPU(particleSystemInitializer, new ParticleSolverCPUParallel(), worldDimensions);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(), worldDimensions, windowDim);
             break;
         case Version::PP_GPU_PARALLEL:
             //particleSystem = new ParticleSystemGPU(args.getNumParticles(), args.getInitializationType(), worldDimensions);
@@ -75,15 +79,13 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
     }
 
+
+    WindowInputManager windowInputManager(&window, &renderLoop, particleSimulation);
+
+    renderLoop.runLoop(particleSimulation);
+
     //std::cout << *particleSystem << std::endl;
 
-
-    renderer.render_loop(particleSystem);
-
-    delete particleSystem;
+    delete particleSimulation;
     delete particleSystemInitializer;
-
-
-
-
 }

@@ -18,7 +18,7 @@ public:
     glm::mat4 getModelViewProjection() const;
 
     // Zoom the camera in/out
-    void zoomCallback(float deltaTime, float mouseWheelYOffset);
+    void zoomCallback(float mouseWheelYOffset);
 
     // Rotate the camera based on mouse movement
     void rotateCallback(glm::vec2 mousePos);

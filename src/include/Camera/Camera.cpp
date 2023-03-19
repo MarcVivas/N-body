@@ -122,10 +122,9 @@ glm::mat4 Camera::getModelViewProjection() const {
 
 /**
  * Zoom the camera in/out
- * @param deltaTime
  * @param mouseWheelYOffset
  */
-void Camera::zoomCallback(float deltaTime, float mouseWheelYOffset) {
+void Camera::zoomCallback(float mouseWheelYOffset) {
     // Define the new world dimensions based on the mouse wheel offset
     const float zoomFactor = 1.0f + mouseWheelYOffset * 0.1f;
     glm::vec3 newWorldDimensions = this->worldDimensions * zoomFactor;

@@ -2,21 +2,24 @@
 // Created by marc on 5/03/23.
 //
 
-#include "ParticleSystemCPU.h"
+// ParticleSystem Abstract Class
+#include "ParticleSimulation.h"
 
-ParticleSystemCPU::~ParticleSystemCPU() {
+ParticleSimulation::~ParticleSimulation() {
     delete this->renderShader;
+    delete this->camera;
+    delete this->particleSolver;
     glDeleteVertexArrays(1, &this->VAO);
     glDeleteBuffers(1, &this->VBO);
 }
 
-void ParticleSystemCPU::draw(Camera* camera) {
+void ParticleSimulation::draw() {
 
     glClearColor(1.f, 1.f, 1.f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    this->renderShader->use();
 
-    this->renderShader->setMat4("modelViewProjection", camera->getModelViewProjection());
+    this->renderShader->use();
+    this->renderShader->setMat4("modelViewProjection", this->camera->getModelViewProjection());
 
     glDrawArrays(GL_POINTS, 0, this->particles.size());
 
@@ -24,7 +27,7 @@ void ParticleSystemCPU::draw(Camera* camera) {
     this->lockParticlesBuffer();
 }
 
-void ParticleSystemCPU::update(double deltaTime) {
+void ParticleSimulation::update(double deltaTime) {
     // Wait until the gpu is no longer using the particles buffer
     this->waitParticlesBuffer();
 
@@ -33,14 +36,16 @@ void ParticleSystemCPU::update(double deltaTime) {
     this->copyParticlesToGPU();
 }
 
-ParticleSystemCPU::ParticleSystemCPU(ParticleSystemInitializer *particleSystemInitializer,
-                                     ParticleSolver *particleSysSolver, glm::vec3 worldDim): ParticleSystem(particleSystemInitializer, particleSysSolver, worldDim) {
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+
+ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
+                               ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim) :particleSolver(particleSysSolver), worldDimensions(worldDim), camera(new Camera(windowDim, worldDim)) {
+    this->particles = particleSystemInitializer->generateParticles(worldDimensions);
+    glGenVertexArrays(1, &this->VAO);
+    glBindVertexArray(this->VAO);
 
     // Persistent mapped buffer
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glGenBuffers(1, &this->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
     glBufferStorage(GL_ARRAY_BUFFER, this->particles.size() * sizeof(Particle), &this->particles[0], GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
     this->particlesPinnedMemory = (Particle *)glMapBufferRange(GL_ARRAY_BUFFER, 0, this->particles.size() * sizeof(Particle), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
@@ -63,12 +68,12 @@ ParticleSystemCPU::ParticleSystemCPU(ParticleSystemInitializer *particleSystemIn
 }
 
 
-void ParticleSystemCPU::copyParticlesToGPU() {
+void ParticleSimulation::copyParticlesToGPU() {
     std::memcpy(this->particlesPinnedMemory, &this->particles[0], this->particles.size() * sizeof(Particle));
 }
 
 
-void ParticleSystemCPU::lockParticlesBuffer()
+void ParticleSimulation::lockParticlesBuffer()
 {
     if( this->gSync )
     {
@@ -77,7 +82,7 @@ void ParticleSystemCPU::lockParticlesBuffer()
     this->gSync = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
 }
 
-void ParticleSystemCPU::waitParticlesBuffer()
+void ParticleSimulation::waitParticlesBuffer()
 {
     if( this->gSync )
     {
@@ -89,3 +94,8 @@ void ParticleSystemCPU::waitParticlesBuffer()
         }
     }
 }
+
+Camera* ParticleSimulation::getCamera(){
+    return this->camera;
+}
+
