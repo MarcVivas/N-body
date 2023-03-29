@@ -49,7 +49,7 @@ std::vector<Particle> ParticleSystemGalaxyInitializer::generateParticles(glm::ve
         if (radius < armRadius) {
             float armVelocityMagnitude = length * radius / armRadius;
             glm::vec3 armVelocity = glm::vec3(armVelocityMagnitude * -cos(theta), armVelocityMagnitude * -sin(theta), 0.f);
-            particles[i].velocity += armVelocity;
+            particles[i].setVelocity(armVelocity);
         }
     }
 

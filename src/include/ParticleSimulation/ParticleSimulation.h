@@ -9,6 +9,8 @@ public:
     virtual void update(double deltaTime);
     virtual void draw();
     virtual Camera* getCamera();
+    virtual std::vector<glm::vec4> getPositions();
+    virtual std::vector<glm::vec4> getVelocities();
     ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim);
     ~ParticleSimulation();
 private:
@@ -29,11 +31,14 @@ protected:
     glm::vec3 worldDimensions;
     std::vector<Particle> particles;
     Shader *renderShader;
-    unsigned int VAO;
-    unsigned int VBO;
+    GLuint VAO;
+    GLuint VBO;
     GLsync gSync = nullptr;
-    Particle* particlesPinnedMemory;
+    glm::vec4* particlesPositions;
+    glm::vec4* particlesVelocities;
     Camera* camera;
+    GLuint postitions_SSBO, velocities_SSBO;
+
 
     void lockParticlesBuffer();
     void waitParticlesBuffer();

@@ -9,7 +9,7 @@
 
 
 class ParticleSolverCPUSequential: public ParticleSolver  {
-    void updateParticlePositions(std::vector<Particle> &particles, float deltaTime) override;
+    void updateParticlePositions(std::vector<Particle> &particles, glm::vec4* positions, glm::vec4* velocities,  float deltaTime) override;
 
 };
 

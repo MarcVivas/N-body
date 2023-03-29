@@ -1,7 +1,14 @@
 #version 440 core
 
-layout (location = 0) in vec3 particlePosition;   // the position variable has attribute position 0
-layout (location = 1) in vec3 velocity; // the velocity variable has attribute position 1
+layout(std430, binding=0) buffer positionsBuffer
+{
+    vec4 positions[];
+};
+
+layout(std430, binding=1) buffer velocitiesBuffer
+{
+    vec4 velocities[];
+};
 
 out vec3 vel;
 
@@ -11,6 +18,6 @@ uniform mat4 modelViewProjection;
 
 void main()
 {
-    gl_Position = modelViewProjection * vec4(particlePosition, 1.0);
-    vel = velocity; // pass the velocity to the fragment shader
+    gl_Position = modelViewProjection * vec4(positions[gl_VertexID].xyz, 1.0);
+    vel = velocities[gl_VertexID].xyz; // pass the velocity to the fragment shader
 }

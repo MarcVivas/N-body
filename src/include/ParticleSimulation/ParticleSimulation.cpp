@@ -23,38 +23,40 @@ void ParticleSimulation::draw() {
 
     glDrawArrays(GL_POINTS, 0, this->particles.size());
 
-    // Place a fence which will be removed when the draw command has finished
     this->lockParticlesBuffer();
 }
 
 void ParticleSimulation::update(double deltaTime) {
-    // Wait until the gpu is no longer using the particles buffer
+    this->particleSolver->updateParticlePositions(this->particles, this->particlesPositions, this->particlesVelocities, deltaTime);
     this->waitParticlesBuffer();
-
-    this->particleSolver->updateParticlePositions(this->particles, deltaTime);
-
-    this->copyParticlesToGPU();
 }
 
 
 ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
                                ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim) :particleSolver(particleSysSolver), worldDimensions(worldDim), camera(new Camera(windowDim, worldDim)) {
+
     this->particles = particleSystemInitializer->generateParticles(worldDimensions);
+
+
     glGenVertexArrays(1, &this->VAO);
     glBindVertexArray(this->VAO);
 
-    // Persistent mapped buffer
-    glGenBuffers(1, &this->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-    glBufferStorage(GL_ARRAY_BUFFER, this->particles.size() * sizeof(Particle), &this->particles[0], GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+    // Shader storage buffer objects
+    // This SSBO stores particles positions
+    glGenBuffers(1, &this->postitions_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, this->postitions_SSBO);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getPositions()[0], GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
-    this->particlesPinnedMemory = (Particle *)glMapBufferRange(GL_ARRAY_BUFFER, 0, this->particles.size() * sizeof(Particle), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+    // This SSBO stores particles velocities
+    glGenBuffers(1, &this->velocities_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, this->velocities_SSBO);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getVelocities()[0], GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void *)offsetof(Particle, position));
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
+    this->particlesPositions = (glm::vec4*) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particles.size(), GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void *)offsetof(Particle, velocity));
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->velocities_SSBO);
+    this->particlesVelocities = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particles.size(), GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
     std::string vertexShaderPath("../src/shaders/vertexShader.glsl");
     std::string fragmentShaderPath("../src/shaders/fragmentShader.glsl");
@@ -65,11 +67,13 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
 #endif
 
     this->renderShader = new Shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
+
 }
 
 
 void ParticleSimulation::copyParticlesToGPU() {
-    std::memcpy(this->particlesPinnedMemory, &this->particles[0], this->particles.size() * sizeof(Particle));
+    std::memcpy(this->particlesPositions, &this->getPositions()[0], this->particles.size() * sizeof(glm::vec4));
+    std::memcpy(this->particlesVelocities, &this->getVelocities()[0], this->particles.size() * sizeof(glm::vec4));
 }
 
 
@@ -84,6 +88,8 @@ void ParticleSimulation::lockParticlesBuffer()
 
 void ParticleSimulation::waitParticlesBuffer()
 {
+    // Insert a memory barrier to ensure synchronization between CPU and GPU
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     if( this->gSync )
     {
         while(true)
@@ -99,3 +105,21 @@ Camera* ParticleSimulation::getCamera(){
     return this->camera;
 }
 
+
+std::vector<glm::vec4> ParticleSimulation::getPositions() {
+    std::vector<glm::vec4> positions(this->particles.size());
+
+    std::transform(this->particles.begin(), this->particles.end(), positions.begin(),
+                   [](const Particle& p) { return p.position; });
+
+    return positions;
+}
+
+std::vector<glm::vec4> ParticleSimulation::getVelocities() {
+    std::vector<glm::vec4> velocities(this->particles.size());
+
+    std::transform(particles.begin(), particles.end(), velocities.begin(),
+                   [](const Particle& p) { return p.velocity; });
+
+    return velocities;
+}
