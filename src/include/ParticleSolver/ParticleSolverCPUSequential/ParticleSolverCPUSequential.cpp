@@ -13,3 +13,5 @@ void ParticleSolverCPUSequential::updateParticlePositions(std::vector<Particle> 
         velocities[i] = particles[i].velocity;
     }
 }
+
+bool ParticleSolverCPUSequential::usesGPU() {return false;}

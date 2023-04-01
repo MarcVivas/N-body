@@ -15,6 +15,7 @@ public:
     ~Shader();
 
     Shader(const char *vertexPath, const char *fragmentPath);
+    Shader(const char *computeShaderPath);
 
     Shader();
 

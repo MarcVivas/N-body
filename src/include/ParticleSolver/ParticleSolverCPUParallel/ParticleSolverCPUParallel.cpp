@@ -14,3 +14,6 @@ void ParticleSolverCPUParallel::updateParticlePositions(std::vector<Particle> &p
         velocities[i] = particles[i].velocity;
     }
 }
+
+
+bool ParticleSolverCPUParallel::usesGPU() {return false;}

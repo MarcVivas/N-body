@@ -11,6 +11,7 @@ public:
     virtual Camera* getCamera();
     virtual std::vector<glm::vec4> getPositions();
     virtual std::vector<glm::vec4> getVelocities();
+    virtual std::vector<glm::vec4> getAccelerations();
     ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim);
     ~ParticleSimulation();
 private:
@@ -36,13 +37,17 @@ protected:
     GLsync gSync = nullptr;
     glm::vec4* particlesPositions;
     glm::vec4* particlesVelocities;
+    glm::vec4* particlesAccelerations;
     Camera* camera;
-    GLuint postitions_SSBO, velocities_SSBO;
+    GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO;
 
 
     void lockParticlesBuffer();
     void waitParticlesBuffer();
     void copyParticlesToGPU();
+    void createBuffers(bool usesGPU);
+    void configureGpuBuffers();
+    void configureCpuBuffers();
 
 };
 #endif // PARTICLESIMULATION_H

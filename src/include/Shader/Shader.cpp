@@ -13,6 +13,50 @@ Shader::~Shader(){
     glDeleteProgram(this->ID);
 }
 
+
+Shader::Shader(const char *computeShaderPath) {
+    // 1. retrieve the shader/fragment source code from filePath
+    std::string code;
+    std::ifstream file;
+
+    // ensure ifstream objects can throw exceptions:
+    file.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    try
+    {
+        // open files
+        file.open(computeShaderPath);
+        std::stringstream stream;
+        // read file's buffer contents into streams
+        stream << file.rdbuf();
+        // close file handlers
+        file.close();
+        // convert stream into string
+        code   = stream.str();
+    }
+    catch (std::ifstream::failure& e)
+    {
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
+    }
+    const char* vShaderCode = code.c_str();
+    // 2. compile shaders
+    unsigned int shader;
+    // shader shader
+    shader = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(shader, 1, &vShaderCode, NULL);
+    glCompileShader(shader);
+    checkCompileErrors(shader, "COMPUTE");
+
+    // shader Program
+    ID = glCreateProgram();
+    glAttachShader(ID, shader);
+    glLinkProgram(ID);
+    checkCompileErrors(ID, "PROGRAM");
+    // delete the shaders as they're linked into our program now and no longer necessary
+    glDeleteShader(shader);
+}
+
+
+
 /**
  * Constructor
  * @param vertexPath

@@ -24,6 +24,7 @@
 #include "../include/Particle/Particle.cpp"
 #include "../include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
 #include "../include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
+#include "../include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp"
 #include "../include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp"
 #include "../include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp"
 #include "../include/ParticleSystemInitializer/interface/ParticleSystemInitializer.h"
@@ -73,10 +74,9 @@ int main(int argc, char *argv[])
             particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(), worldDimensions, windowDim);
             break;
         case Version::PP_GPU_PARALLEL:
-            //particleSystem = new ParticleSystemGPU(args.getNumParticles(), args.getInitializationType(), worldDimensions);
+            std::string computeShader("../src/shaders/ComputeShaders/updateParticles.glsl");
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(computeShader), worldDimensions, windowDim);
             break;
-        default:
-            exit(EXIT_FAILURE);
     }
 
 
