@@ -105,7 +105,7 @@ void ParticleSimulation::configureGpuBuffers() {
 void ParticleSimulation::configureCpuBuffers() {
     GLbitfield bufferStorageFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);  
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
     glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getPositions()[0], bufferStorageFlags);
     this->particlesPositions = (glm::vec4*) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particles.size(), bufferStorageFlags);
 

@@ -40,7 +40,6 @@ void updatePosition(uint index) {
 
     // Compute next velocity (i + 1)
     velocities[index] += accelerations[index] * dtDividedBy2;
-
 }
 
 

@@ -41,7 +41,7 @@ Camera::Camera(glm::vec2 window, glm::vec3 worldDim) {
     this->nearClipPlane = 0.01f;
 
     // The distance from the camera to the far clipping plane, used for culling objects that are too far away
-    this->farClipPlane = worldDimensions.z * 4.0f;
+    this->farClipPlane = worldDimensions.z * 100.0f;
 }
 //====================================================
 
@@ -125,7 +125,7 @@ glm::mat4 Camera::getModelViewProjection() const {
  * @param mouseWheelYOffset
  */
 void Camera::zoomCallback(float mouseWheelYOffset) {
-    /*
+
     this->fov -= (float)mouseWheelYOffset;
     if (this->fov < 1.0f){
         this->fov = 1.0f;
@@ -133,7 +133,7 @@ void Camera::zoomCallback(float mouseWheelYOffset) {
     if (this->fov > 100.0f){
         this->fov = 100.0f;
     }
-    */
+
 
     // Define the new world dimensions based on the mouse wheel offset
     const float zoomFactor = 1.0f + mouseWheelYOffset * 0.1f;
@@ -156,7 +156,7 @@ void Camera::zoomCallback(float mouseWheelYOffset) {
     // Update near and far clip planes based on camera position
     float distanceToCenter = glm::distance(this->position, this->worldCenter);
     //this->nearClipPlane = distanceToCenter * 0.001f;
-    this->farClipPlane = distanceToCenter * 10.0f;
+    this->farClipPlane = distanceToCenter * distanceToCenter;
 
     // Update the world dimensions
     this->worldDimensions = newWorldDimensions;

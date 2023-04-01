@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     glm::vec3 worldDimensions(8000.f, 8000.f, 8000.f);
 
     // Using pixels
-    glm::vec2 windowDim(600, 600);
+    glm::vec2 windowDim(800, 600);
     Window window(windowDim, "N-body simulation");
     RenderLoop renderLoop(window, true, false);
 
