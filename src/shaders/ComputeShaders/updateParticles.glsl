@@ -46,5 +46,9 @@ void updatePosition(uint index) {
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
-    updatePosition(index);
+
+    if (index < numParticles) {
+        updatePosition(index);
+    }
+
 }

@@ -16,7 +16,7 @@ void ParticleSolverGPU::updateParticlePositions(std::vector<Particle> &particles
     this->computeShader->use();
     this->computeShader->setFloat("deltaTime", deltaTime);
     this->computeShader->setInt("numParticles", particles.size());
-    glDispatchCompute((int) (particles.size() / 64), 1, 1);
+    glDispatchCompute(ceil(particles.size() / 64.0), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
