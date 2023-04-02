@@ -40,7 +40,7 @@ protected:
     glm::vec4* particlesAccelerations;
     Camera* camera;
     GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO;
-
+    Bloom *bloom;
 
     void lockParticlesBuffer();
     void waitParticlesBuffer();

@@ -113,6 +113,10 @@ glm::mat4 Camera::getModelViewProjection() const {
     return this->getProjectionMatrix() * this->getViewMatrix() * this->getModelMatrix();
 }
 
+glm::vec3 Camera::getPosition() {
+    return this->position;
+}
+
 //====================================================
 
 

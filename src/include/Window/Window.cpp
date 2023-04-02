@@ -11,6 +11,7 @@ Window::Window(glm::vec2 window, const char * title): windowWidth(window.x), win
     this->createWindow();
     this->initGlad();
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void Window::initGlfw(){

@@ -27,6 +27,7 @@ public:
 
     void setPreviousMousePos(glm::vec2 prevPos);
 
+    glm::vec3 getPosition();
 private:
     glm::vec3 worldDimensions;
     glm::vec3 position;

@@ -30,6 +30,7 @@
 #include "../include/ParticleSystemInitializer/interface/ParticleSystemInitializer.h"
 #include "../include/ArgumentsParser/ArgumentsParser.cpp"
 
+#include "../include/Bloom/Bloom.cpp"
 #include "../include/Window/Window.cpp"
 #include "../include/RenderTimer/RenderTimer.cpp"
 #include "../include/ParticleSimulation/ParticleSimulation.cpp"

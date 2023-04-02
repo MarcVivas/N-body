@@ -9,6 +9,7 @@ ParticleSimulation::~ParticleSimulation() {
     delete this->renderShader;
     delete this->camera;
     delete this->particleSolver;
+    delete this->bloom;
     glDeleteVertexArrays(1, &this->VAO);
     glDeleteBuffers(1, &this->VBO);
 }
@@ -20,6 +21,7 @@ void ParticleSimulation::draw() {
 
     this->renderShader->use();
     this->renderShader->setMat4("modelViewProjection", this->camera->getModelViewProjection());
+    this->renderShader->setVec3("cameraPos", this->camera->getPosition());
 
     glDrawArrays(GL_POINTS, 0, this->particles.size());
 
@@ -33,8 +35,12 @@ void ParticleSimulation::update(double deltaTime) {
 
 
 ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
-                               ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim) :particleSolver(particleSysSolver), worldDimensions(worldDim), camera(new Camera(windowDim, worldDim)) {
+                               ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim){
 
+    this->worldDimensions = worldDim;
+    this->particleSolver = particleSysSolver;
+    this->camera = new Camera(windowDim, worldDim);
+    this->bloom = new Bloom(windowDim);
     this->particles = particleSystemInitializer->generateParticles(worldDimensions);
 
 
@@ -50,7 +56,9 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
 #endif
 
     this->renderShader = new Shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
-
+    this->renderShader->use();
+    this->renderShader->setFloat("worldSize", glm::length(this->worldDimensions));
+    
 }
 
 
