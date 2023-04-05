@@ -10,7 +10,7 @@ layout(std430, binding=1) buffer velocitiesBuffer
     vec4 velocities[];
 };
 
-out vec3 vel;
+out vec3 velColor;
 
 // 3d view stuff
 uniform mat4 modelViewProjection;
@@ -28,6 +28,23 @@ void main()
     // set the point size based on the particle size
     gl_PointSize = particleSize * worldSize;
 
+    // Set the position of the particle
     gl_Position = modelViewProjection * vec4(positions[gl_VertexID].xyz, 1.f);
-    vel = velocities[gl_VertexID].xyz; // pass the velocity to the fragment shader
+
+    // Define a maximum velocity value
+    float maxVelocity = worldSize/11.f;
+
+    // Compute the magnitude of the particle's velocity
+    float velocityMagnitude = length(velocities[gl_VertexID]);
+
+    // Compute a normalized velocity value between 0 and 1
+    float normalizedVelocity = clamp(velocityMagnitude / maxVelocity, 0.0, 1.0);
+
+    // Define two colors for the gradient (e.g. blue and yellow)
+    vec3 colorLow = vec3(0.0, 0.0, 1.0); // blue (slow)
+    vec3 colorHigh = vec3(1.0, 1.0, 0.0); // yellow (fast)
+
+    // Interpolate between the two colors based on the normalized velocity value
+    float smoothNormalizedVelocity = smoothstep(0.0, 1.0, normalizedVelocity);
+    velColor = mix(colorLow, colorHigh, smoothNormalizedVelocity); // pass the velocity to the fragment shader
 }

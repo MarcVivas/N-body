@@ -10,20 +10,63 @@ ParticleSimulation::~ParticleSimulation() {
     delete this->camera;
     delete this->particleSolver;
     delete this->bloom;
+    delete this->finalRenderShader;
+    delete this->blurShader;
     glDeleteVertexArrays(1, &this->VAO);
     glDeleteBuffers(1, &this->VBO);
 }
 
 void ParticleSimulation::draw() {
 
-    glClearColor(1.f, 1.f, 1.f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+    // Render the normal scene and extract the bright particles
+    this->bloom->useFrameBuffer();
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glClearColor(0.f, 0.f, 0.f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->renderShader->use();
     this->renderShader->setMat4("modelViewProjection", this->camera->getModelViewProjection());
     this->renderShader->setVec3("cameraPos", this->camera->getPosition());
-
     glDrawArrays(GL_POINTS, 0, this->particles.size());
+
+
+    // Blur bright particles with two-pass Gaussian Blur
+    bool horizontal = true, first_iteration = true;
+    unsigned int amount = 2;
+    this->blurShader->use();
+    for (unsigned int i = 0; i < amount; i++)
+    {
+        this->bloom->bindPingPongBuffer(horizontal);
+        this->blurShader->setInt("horizontal", horizontal);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, first_iteration ? this->bloom->getBrightPointsScene() : this->bloom->getPingPongTexture(!horizontal));  // bind texture of other framebuffer (or scene if first iteration)
+        glBindVertexArray(this->screenVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        horizontal = !horizontal;
+        if (first_iteration){
+            first_iteration = false;
+        }
+    }
+
+
+    // Render the final scene
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+    glClear(GL_COLOR_BUFFER_BIT);
+    this->finalRenderShader->use();
+    glBindVertexArray(this->screenVAO);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, this->bloom->getNormalScene());
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, this->bloom->getPingPongTexture(!horizontal));	// use the color attachment texture as the texture of the quad plane
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
 
     this->lockParticlesBuffer();
 }
@@ -40,7 +83,7 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
     this->worldDimensions = worldDim;
     this->particleSolver = particleSysSolver;
     this->camera = new Camera(windowDim, worldDim);
-    this->bloom = new Bloom(windowDim);
+    this->bloom = new Bloom(windowDim, 1.f, true);
     this->particles = particleSystemInitializer->generateParticles(worldDimensions);
 
 
@@ -55,10 +98,51 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
     std::replace(fragmentShaderPath.begin(), fragmentShaderPath.end(), '/', '\\');
 #endif
 
+    std::string vertexShaderPath2("../src/shaders/finalRender_vs.glsl");
+    std::string fragmentShaderPath2("../src/shaders/finalRender_fs.glsl");
+
+#ifdef _WIN32
+    std::replace(vertexShaderPath2.begin(), vertexShaderPath2.end(), '/', '\\');
+    std::replace(fragmentShaderPath2.begin(), fragmentShaderPath2.end(), '/', '\\');
+#endif
+
+    std::string vertexShaderPath3("../src/shaders/blur_vs.glsl");
+    std::string fragmentShaderPath3("../src/shaders/blur_fs.glsl");
+
+#ifdef _WIN32
+    std::replace(vertexShaderPath3.begin(), vertexShaderPath3.end(), '/', '\\');
+    std::replace(fragmentShaderPath3.begin(), fragmentShaderPath3.end(), '/', '\\');
+#endif
+
     this->renderShader = new Shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
     this->renderShader->use();
     this->renderShader->setFloat("worldSize", glm::length(this->worldDimensions));
-    
+
+
+
+    this->finalRenderShader = new Shader(vertexShaderPath2.c_str(), fragmentShaderPath2.c_str());
+    this->finalRenderShader->use();
+    this->finalRenderShader->setInt("scene", 0);
+    this->finalRenderShader->setInt("bloomBlur", 1);
+    this->finalRenderShader->setInt("bloom", this->bloom->getBloomAmount());
+    this->finalRenderShader->setFloat("exposure", this->bloom->getExposure());
+
+    // screen quad VAO
+    glGenVertexArrays(1, &screenVAO);
+    glGenBuffers(1, &screenVBO);
+    glBindVertexArray(screenVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(textureVertices), &textureVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+
+    this->blurShader = new Shader(vertexShaderPath3.c_str(), fragmentShaderPath3.c_str());
+    this->blurShader->use();
+    this->blurShader->setInt("image", 0);
+
 }
 
 

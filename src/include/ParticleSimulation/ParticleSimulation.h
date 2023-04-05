@@ -31,9 +31,20 @@ protected:
     ParticleSolver *particleSolver;
     glm::vec3 worldDimensions;
     std::vector<Particle> particles;
-    Shader *renderShader;
+    Shader *renderShader, *finalRenderShader, *blurShader;
     GLuint VAO;
     GLuint VBO;
+    GLuint screenVAO, screenVBO;
+    float textureVertices[24] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+            // positions   // texCoords
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f,  0.0f, 0.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+            1.0f,  1.0f,  1.0f, 1.0f
+    };
     GLsync gSync = nullptr;
     glm::vec4* particlesPositions;
     glm::vec4* particlesVelocities;

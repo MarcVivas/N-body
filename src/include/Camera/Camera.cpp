@@ -38,7 +38,7 @@ Camera::Camera(glm::vec2 window, glm::vec3 worldDim) {
     this->aspectRatio = static_cast<float>(window.x) / static_cast<float>(window.y);
 
     // The distance from the camera to the near clipping plane, used for culling objects that are too close
-    this->nearClipPlane = 0.01f;
+    this->nearClipPlane = 0.1f;
 
     // The distance from the camera to the far clipping plane, used for culling objects that are too far away
     this->farClipPlane = worldDimensions.z * 100.0f;
