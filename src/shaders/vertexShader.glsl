@@ -19,6 +19,8 @@ uniform vec3 cameraPos;
 
 uniform float worldSize;
 
+uniform bool pointSize;
+
 void main()
 {
 
@@ -26,7 +28,13 @@ void main()
     float particleSize = 1.0 / length(cameraPos - positions[gl_VertexID].xyz);
 
     // set the point size based on the particle size
-    gl_PointSize = particleSize * worldSize;
+    if(pointSize){
+        gl_PointSize = particleSize * worldSize;
+    }
+    else{
+        gl_PointSize = 1;
+    }
+
 
     // Set the position of the particle
     gl_Position = modelViewProjection * vec4(positions[gl_VertexID].xyz, 1.f);

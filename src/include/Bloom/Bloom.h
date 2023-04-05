@@ -8,15 +8,18 @@
 
 class Bloom {
 public:
-    Bloom(glm::vec2 &windowDim, float exposure, int bloomAmount);
+    ~Bloom();
+    Bloom(glm::vec2 &windowDim);
     void useFrameBuffer();
     unsigned int getNormalScene();
     unsigned int getBrightPointsScene();
-    unsigned int getPingPongFrameBuffer(unsigned int pos);
     unsigned int getPingPongTexture(unsigned int pos);
-    int getBloomAmount();
-    float getExposure();
+    bool isActivated();
+    void setIsActive(const bool active);
+    float getIntensity();
+    void setIntensity(float newIntensity);
     void bindPingPongBuffer(unsigned int pos);
+    VertexFragmentShader* getBlurShader();
 private:
     unsigned int hdrFrameBuffer;
     unsigned int renderBuffer;
@@ -24,8 +27,9 @@ private:
     unsigned int sceneTextures[2];
     unsigned int pingpongFBO[2];
     unsigned int pingPongTextures[2];
-    float exposure;
-    int bloomAmount;
+    float intensity;
+    bool activated;
+    VertexFragmentShader *blurShader;
 };
 
 

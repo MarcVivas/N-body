@@ -12,7 +12,7 @@ public:
     Camera(glm::vec2 window, glm::vec3 worldDim);
 
     // Set aspect ratio
-    void setAspectRatio(unsigned int winWidth, unsigned int winHeight);
+    void setAspectRatio(glm::vec2 window);
 
     // Get the model view projection matrix
     glm::mat4 getModelViewProjection() const;

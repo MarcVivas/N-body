@@ -39,8 +39,32 @@ void WindowInputManager::setKeyCallback() {
                            }
                            if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
                                inputManager->getRenderLoop()->setPauseSimulation(!inputManager->getRenderLoop()->getPauseSimulation());
-                               usleep(150000);
                            }
+
+                           if( key == GLFW_KEY_B && action == GLFW_PRESS){
+                               auto bloom = inputManager->getParticleSimulation()->getParticleDrawer()->getBloom();
+                               bloom->setIsActive(!bloom->isActivated());
+                           }
+
+                           if( key == GLFW_KEY_D   && action == GLFW_PRESS ){
+                               auto bloom = inputManager->getParticleSimulation()->getParticleDrawer()->getBloom();
+                               float decrease = 0.1;
+                               bloom->setIntensity(bloom->getIntensity() - decrease < 0 ? 0.f : bloom->getIntensity() - decrease);
+                               std::cout << "Intensity: " << bloom->getIntensity() << '\n';
+                           }
+                           if( key == GLFW_KEY_I   && action == GLFW_PRESS){
+                               auto bloom = inputManager->getParticleSimulation()->getParticleDrawer()->getBloom();
+                               float increase = 0.1;
+                               bloom->setIntensity(bloom->getIntensity() + increase);
+                               std::cout << "Intensity: " << bloom->getIntensity() << '\n';
+                           }
+                           if( key == GLFW_KEY_Q   && action == GLFW_PRESS){
+                               auto particleDraw = inputManager->getParticleSimulation()->getParticleDrawer();
+                               bool pointSize = !particleDraw->getPointSize();
+                               particleDraw->setPointSize(pointSize);
+                           }
+
+
                        }
     );
 }
@@ -60,7 +84,7 @@ void WindowInputManager::setFramebufferSizeCallback() {
         windowInputManager->getWindow()->updateWindowSize(width, height);
 
         // Update the aspect ratio
-        windowInputManager->getParticleSimulation()->getCamera()->setAspectRatio(width, height);
+        windowInputManager->getParticleSimulation()->getParticleDrawer()->updateWindowDimension(glm::vec2(width, height));
     });
 }
 

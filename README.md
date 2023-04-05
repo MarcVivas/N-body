@@ -6,12 +6,16 @@
 [How to run the project](#how-to-run-the-project)
 
 ## Controls
-| Key/Input      | Action                       |
-|----------------|------------------------------|
-| Esc            | Closes the program           |
-| Space          | Pauses/starts the simulation |
-| Mouse scroll   | Zoom in/out                  |
-| Click and drag | Moves the camera             |
+| Key/Input      | Action                     |
+|----------------|----------------------------|
+| Esc            | Close the program          |
+| Space          | Pause/start the simulation |
+| Mouse scroll   | Zoom in/out                |
+| Click and drag | Move the camera            |
+| B              | Activate/Deactivate bloom  |
+| I              | Increase bloom intensity   |
+| D              | Decrease bloom intensity   |
+| Q              | Enable/disable point size  |
   
 
 

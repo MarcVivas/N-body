@@ -4,9 +4,9 @@
 
 #include "Bloom.h"
 
-Bloom::Bloom(glm::vec2 &windowDim,  float exp, int bloom) {
-    this->bloomAmount = bloom;
-    this->exposure = exp;
+Bloom::Bloom(glm::vec2 &windowDim) {
+    this->activated = true;
+    this->intensity = 0.5f;
 
     // set up floating point framebuffer to render scene to
     glGenFramebuffers(1, &this->hdrFrameBuffer);
@@ -35,10 +35,6 @@ Bloom::Bloom(glm::vec2 &windowDim,  float exp, int bloom) {
     glDrawBuffers(2, this->attachments);
 
 
-
-
-
-
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     glGenRenderbuffers(1, &this->renderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, this->renderBuffer);
@@ -48,8 +44,6 @@ Bloom::Bloom(glm::vec2 &windowDim,  float exp, int bloom) {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
 
 
     glGenFramebuffers(2, pingpongFBO);
@@ -70,9 +64,14 @@ Bloom::Bloom(glm::vec2 &windowDim,  float exp, int bloom) {
         );
     }
 
+    this->blurShader = new VertexFragmentShader("../src/shaders/blur_vs.glsl", "../src/shaders/blur_fs.glsl");
+    this->blurShader->use();
+    this->blurShader->setInt("image", 0);
+}
 
 
-
+Bloom::~Bloom(){
+    delete this->blurShader;
 }
 
 void Bloom::useFrameBuffer() {
@@ -88,22 +87,31 @@ unsigned int Bloom::getBrightPointsScene() {
     return this->sceneTextures[1];
 }
 
-unsigned int Bloom::getPingPongFrameBuffer(unsigned int pos) {
-    return this->pingpongFBO[pos];
-}
 
 unsigned int Bloom::getPingPongTexture(unsigned int pos) {
     return this->pingPongTextures[pos];
 }
 
-float Bloom::getExposure() {
-    return this->exposure;
+float Bloom::getIntensity() {
+    return this->intensity;
 }
 
-int Bloom::getBloomAmount() {
-    return this->bloomAmount;
+bool Bloom::isActivated() {
+    return this->activated;
 }
 
 void Bloom::bindPingPongBuffer(unsigned int pos) {
     glBindFramebuffer(GL_FRAMEBUFFER, this->pingpongFBO[pos]);
+}
+
+VertexFragmentShader* Bloom::getBlurShader() {
+    return this->blurShader;
+}
+
+void Bloom::setIsActive(const bool active) {
+    this->activated = active;
+}
+
+void Bloom::setIntensity(float newIntensity) {
+    this->intensity = newIntensity;
 }

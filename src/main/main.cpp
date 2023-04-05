@@ -37,6 +37,7 @@
 #include "../include/Bloom/Bloom.cpp"
 #include "../include/Window/Window.cpp"
 #include "../include/RenderTimer/RenderTimer.cpp"
+#include "../include/ParticleDrawer/ParticleDrawer.cpp"
 #include "../include/ParticleSimulation/ParticleSimulation.cpp"
 #include "../include/RenderLoop/RenderLoop.cpp"
 #include "../include/WindowInputManager/WindowInputManager.cpp"

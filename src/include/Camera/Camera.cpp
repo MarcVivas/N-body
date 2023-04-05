@@ -55,8 +55,8 @@ Camera::Camera(glm::vec2 window, glm::vec3 worldDim) {
  * @param winWidth
  * @param winHeight
  */
-void Camera::setAspectRatio(unsigned int winWidth, unsigned int winHeight) {
-    this->aspectRatio = static_cast<float>(winWidth) / static_cast<float>(winHeight);
+void Camera::setAspectRatio(glm::vec2 window) {
+    this->aspectRatio = static_cast<float>(window.x) / static_cast<float>(window.y);
 }
 
 /**

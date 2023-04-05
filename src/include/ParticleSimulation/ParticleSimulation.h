@@ -12,6 +12,7 @@ public:
     virtual std::vector<glm::vec4> getPositions();
     virtual std::vector<glm::vec4> getVelocities();
     virtual std::vector<glm::vec4> getAccelerations();
+    virtual ParticleDrawer* getParticleDrawer();
     ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim);
     ~ParticleSimulation();
 private:
@@ -29,29 +30,15 @@ private:
 
 protected:
     ParticleSolver *particleSolver;
-    glm::vec3 worldDimensions;
+    ParticleDrawer *particleDrawer;
     std::vector<Particle> particles;
-    Shader *renderShader, *finalRenderShader, *blurShader;
     GLuint VAO;
     GLuint VBO;
-    GLuint screenVAO, screenVBO;
-    float textureVertices[24] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-            // positions   // texCoords
-            -1.0f,  1.0f,  0.0f, 1.0f,
-            -1.0f, -1.0f,  0.0f, 0.0f,
-            1.0f, -1.0f,  1.0f, 0.0f,
-
-            -1.0f,  1.0f,  0.0f, 1.0f,
-            1.0f, -1.0f,  1.0f, 0.0f,
-            1.0f,  1.0f,  1.0f, 1.0f
-    };
     GLsync gSync = nullptr;
     glm::vec4* particlesPositions;
     glm::vec4* particlesVelocities;
     glm::vec4* particlesAccelerations;
-    Camera* camera;
     GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO;
-    Bloom *bloom;
 
     void lockParticlesBuffer();
     void waitParticlesBuffer();
