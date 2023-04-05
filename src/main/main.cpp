@@ -19,7 +19,11 @@
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../include/Camera/Camera.cpp"
-#include "../include/Shader/Shader.cpp"
+
+#include "../include/Shader/abstract/Shader.cpp"
+#include "../include/Shader/ComputeShader/ComputeShader.cpp"
+#include "../include/Shader/VertexFragmentShader/VertexFragmentShader.cpp"
+
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"
 #include "../include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"

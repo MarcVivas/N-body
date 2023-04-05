@@ -5,11 +5,7 @@
 #include "ParticleSolverGPU.h"
 
 ParticleSolverGPU::ParticleSolverGPU(std::string &pathToComputeShader): ParticleSolver() {
-#ifdef _WIN32
-    std::replace(pathToComputeShader.begin(), pathToComputeShader.end(), '/', '\\');
-#endif
-
-    this->computeShader = new Shader(pathToComputeShader.c_str());
+    this->computeShader = new ComputeShader(pathToComputeShader);
 }
 
 void ParticleSolverGPU::updateParticlePositions(std::vector<Particle> &particles, glm::vec4* positions, glm::vec4* velocities, float deltaTime) {

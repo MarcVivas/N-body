@@ -12,10 +12,8 @@ class Shader {
 public:
     unsigned int ID;
 
-    ~Shader();
+    virtual ~Shader();
 
-    Shader(const char *vertexPath, const char *fragmentPath);
-    Shader(const char *computeShaderPath);
 
     Shader();
 
@@ -59,10 +57,16 @@ public:
     void setMat4(const std::string &name, const glm::mat4 &mat) const;
 
 
-private:
+protected:
     // Function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
     void checkCompileErrors(unsigned int shader, std::string type);
+
+    void fixPathSeparators(std::string &path);
+
+    unsigned int compileShader(GLuint shaderType, const char *code);
+
+    std::string readFileToString(std::string& filePath);
 
 };
 #endif //N_BODY_SHADER_H

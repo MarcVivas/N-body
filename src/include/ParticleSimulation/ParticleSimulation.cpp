@@ -17,9 +17,7 @@ ParticleSimulation::~ParticleSimulation() {
 }
 
 void ParticleSimulation::draw() {
-
-
-
+    
     // Render the normal scene and extract the bright particles
     this->bloom->useFrameBuffer();
     glEnable(GL_DEPTH_TEST);
@@ -90,41 +88,15 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
     this->createBuffers(this->particleSolver->usesGPU());
 
 
-    std::string vertexShaderPath("../src/shaders/vertexShader.glsl");
-    std::string fragmentShaderPath("../src/shaders/fragmentShader.glsl");
-
-#ifdef _WIN32
-    std::replace(vertexShaderPath.begin(), vertexShaderPath.end(), '/', '\\');
-    std::replace(fragmentShaderPath.begin(), fragmentShaderPath.end(), '/', '\\');
-#endif
-
-    std::string vertexShaderPath2("../src/shaders/finalRender_vs.glsl");
-    std::string fragmentShaderPath2("../src/shaders/finalRender_fs.glsl");
-
-#ifdef _WIN32
-    std::replace(vertexShaderPath2.begin(), vertexShaderPath2.end(), '/', '\\');
-    std::replace(fragmentShaderPath2.begin(), fragmentShaderPath2.end(), '/', '\\');
-#endif
-
-    std::string vertexShaderPath3("../src/shaders/blur_vs.glsl");
-    std::string fragmentShaderPath3("../src/shaders/blur_fs.glsl");
-
-#ifdef _WIN32
-    std::replace(vertexShaderPath3.begin(), vertexShaderPath3.end(), '/', '\\');
-    std::replace(fragmentShaderPath3.begin(), fragmentShaderPath3.end(), '/', '\\');
-#endif
-
-    this->renderShader = new Shader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
+    this->renderShader = new VertexFragmentShader("../src/shaders/vertexShader.glsl", "../src/shaders/fragmentShader.glsl");
     this->renderShader->use();
     this->renderShader->setFloat("worldSize", glm::length(this->worldDimensions));
 
 
-
-    this->finalRenderShader = new Shader(vertexShaderPath2.c_str(), fragmentShaderPath2.c_str());
+    this->finalRenderShader = new VertexFragmentShader("../src/shaders/finalRender_vs.glsl", "../src/shaders/finalRender_fs.glsl");
     this->finalRenderShader->use();
     this->finalRenderShader->setInt("scene", 0);
     this->finalRenderShader->setInt("bloomBlur", 1);
-    this->finalRenderShader->setInt("bloom", this->bloom->getBloomAmount());
     this->finalRenderShader->setFloat("exposure", this->bloom->getExposure());
 
     // screen quad VAO
@@ -139,7 +111,7 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
-    this->blurShader = new Shader(vertexShaderPath3.c_str(), fragmentShaderPath3.c_str());
+    this->blurShader = new VertexFragmentShader("../src/shaders/blur_vs.glsl", "../src/shaders/blur_fs.glsl");
     this->blurShader->use();
     this->blurShader->setInt("image", 0);
 
