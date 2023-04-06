@@ -28,7 +28,7 @@ ParticleDrawer::ParticleDrawer(glm::vec3 worldDim, glm::vec2 windowDim) {
     this->finalRenderShader->setFloat("intensity", this->bloom->getIntensity());
 
 
-    // Screen quad VAO
+    // Screen texture quad VAO
     glGenVertexArrays(1, &this->screenVAO);
     glGenBuffers(1, &this->screenVBO);
     glBindVertexArray(this->screenVAO);
@@ -45,6 +45,7 @@ ParticleDrawer::ParticleDrawer(glm::vec3 worldDim, glm::vec2 windowDim) {
 
 void ParticleDrawer::draw(size_t particlesCount) {
     if(!this->bloom->isActivated()){
+        // Use the default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         this->drawNormalScene(particlesCount);
     }
@@ -70,8 +71,15 @@ void ParticleDrawer::drawBloomScene(size_t particlesCount) {
     // Render the normal scene and extract the bright particles
     this->bloom->useFrameBuffer();
     this->drawNormalScene(particlesCount);
-    glDisable(GL_BLEND);
+
     // Blur bright particles with two-pass Gaussian Blur
+    this->blurBrightParticles();
+
+    // Render the final scene by combining the normal scene and the blurred scene
+    this->combineBlurAndNormalScene();
+}
+
+void ParticleDrawer::blurBrightParticles() {
     bool horizontal = true, first_iteration = true;
     unsigned int amount = 2;
     this->bloom->getBlurShader()->use();
@@ -88,22 +96,29 @@ void ParticleDrawer::drawBloomScene(size_t particlesCount) {
             first_iteration = false;
         }
     }
+}
 
-
-    // Render the final scene
+void ParticleDrawer::combineBlurAndNormalScene() {
+    // Use the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+
+    // disable depth test so screen-space quad isn't discarded due to depth test.
+    glDisable(GL_DEPTH_TEST);
+
+    // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
     this->finalRenderShader->use();
     this->finalRenderShader->setFloat("intensity", this->bloom->getIntensity());
+
     glBindVertexArray(this->screenVAO);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, this->bloom->getNormalScene());
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, this->bloom->getPingPongTexture(!horizontal));	// use the color attachment texture as the texture of the quad plane
+    glBindTexture(GL_TEXTURE_2D, this->bloom->getPingPongTexture(false));	// use the color attachment texture as the texture of the quad plane
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

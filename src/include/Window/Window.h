@@ -10,8 +10,6 @@ class Window {
 public:
     Window(glm::vec2 window, const char * title);
     void updateWindowSize(const int width, const int height);
-    unsigned int getWindowWidth() const;
-    unsigned int getWindowHeight() const;
     GLFWwindow* getWindow();
     void updateWindowTitle(const char * title);
 

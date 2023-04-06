@@ -2,7 +2,6 @@
 // Created by marc on 5/03/23.
 //
 
-// ParticleSystem Abstract Class
 #include "ParticleSimulation.h"
 
 ParticleSimulation::~ParticleSimulation() {
@@ -124,9 +123,6 @@ void ParticleSimulation::waitParticlesBuffer()
     }
 }
 
-Camera* ParticleSimulation::getCamera(){
-    return this->particleDrawer->getCamera();
-}
 
 ParticleDrawer *ParticleSimulation::getParticleDrawer() {
     return this->particleDrawer;

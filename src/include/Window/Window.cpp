@@ -12,11 +12,11 @@ Window::Window(glm::vec2 window, const char * title): windowWidth(window.x), win
     this->initGlad();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
-    glEnable(GL_BLEND);
 }
 
 void Window::initGlfw(){
     glfwInit();
+    // OpenGL 4.5
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -52,13 +52,6 @@ void Window::createWindow() {
     glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-unsigned int Window::getWindowWidth() const {
-    return this->windowWidth;
-}
-
-unsigned int Window::getWindowHeight() const {
-    return this->windowHeight;
-}
 
 GLFWwindow *Window::getWindow() {
     return this->window;

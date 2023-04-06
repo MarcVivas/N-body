@@ -37,6 +37,8 @@ protected:
 
     void drawBloomScene(size_t particlesCount);
     void drawNormalScene(size_t particlesCount);
+    void blurBrightParticles();
+    void combineBlurAndNormalScene();
 };
 
 

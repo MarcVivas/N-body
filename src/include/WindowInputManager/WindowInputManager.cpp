@@ -34,30 +34,40 @@ void WindowInputManager::setKeyCallback() {
     glfwSetKeyCallback(this->window->getWindow(), [](GLFWwindow* win, int key, int scancode, int action, int mods) -> void
                        {
                            auto inputManager = static_cast<WindowInputManager*>(glfwGetWindowUserPointer(win)); // retrieve the pointer to the instance
+
+                           // Quit the render loop when escape is pressed
                            if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
                                glfwSetWindowShouldClose(win, true);
                            }
+
+                           // Pause/start the simulation when space is pressed
                            if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
                                inputManager->getRenderLoop()->setPauseSimulation(!inputManager->getRenderLoop()->getPauseSimulation());
                            }
 
+                           // Activate/Deactivate bloom when b is pressed
                            if( key == GLFW_KEY_B && action == GLFW_PRESS){
                                auto bloom = inputManager->getParticleSimulation()->getParticleDrawer()->getBloom();
                                bloom->setIsActive(!bloom->isActivated());
                            }
 
+                           // Decrease bloom intensity when D is pressed
                            if( key == GLFW_KEY_D   && action == GLFW_PRESS ){
                                auto bloom = inputManager->getParticleSimulation()->getParticleDrawer()->getBloom();
                                float decrease = 0.1;
                                bloom->setIntensity(bloom->getIntensity() - decrease < 0 ? 0.f : bloom->getIntensity() - decrease);
                                std::cout << "Intensity: " << bloom->getIntensity() << '\n';
                            }
+
+                           // Increase bloom intensity when I is pressed
                            if( key == GLFW_KEY_I   && action == GLFW_PRESS){
                                auto bloom = inputManager->getParticleSimulation()->getParticleDrawer()->getBloom();
                                float increase = 0.1;
                                bloom->setIntensity(bloom->getIntensity() + increase);
                                std::cout << "Intensity: " << bloom->getIntensity() << '\n';
                            }
+
+                           // Disable/Enable point size with Q
                            if( key == GLFW_KEY_Q   && action == GLFW_PRESS){
                                auto particleDraw = inputManager->getParticleSimulation()->getParticleDrawer();
                                bool pointSize = !particleDraw->getPointSize();
@@ -89,38 +99,51 @@ void WindowInputManager::setFramebufferSizeCallback() {
 }
 
 
-// Cursor/mouse movement
+/**
+ * Cursor/mouse movement
+ */
 void WindowInputManager::setMouseMovementCallback() {
     glfwSetWindowUserPointer(this->window->getWindow(), this);
     glfwSetCursorPosCallback(this->window->getWindow(), [](GLFWwindow* win, double xPos, double yPos)->void
     {
         auto windowInputManager = static_cast<WindowInputManager*>(glfwGetWindowUserPointer(win)); // retrieve the pointer to the instance
-        windowInputManager->getParticleSimulation()->getCamera()->rotateCallback(glm::vec2(xPos, yPos));
+
+        // Rotate the camera it the mouse is pressed
+        windowInputManager->getParticleSimulation()->getParticleDrawer()->getCamera()->rotateCallback(glm::vec2(xPos, yPos));
     });
 }
 
-
+/**
+ * Mouse scroll
+ */
 void WindowInputManager::setScrollCallback(){
     glfwSetWindowUserPointer(this->window->getWindow(), this);
     glfwSetScrollCallback(this->window->getWindow(), [](GLFWwindow* win, double xOffset, double yOffset)->void
     {
         auto windowInputManager = static_cast<WindowInputManager*>(glfwGetWindowUserPointer(win)); // retrieve the pointer to the instance
-        windowInputManager->getParticleSimulation()->getCamera()->zoomCallback(yOffset);
+
+        // Zoom in / Zoom out
+        windowInputManager->getParticleSimulation()->getParticleDrawer()->getCamera()->zoomCallback(yOffset);
     });
 }
 
+/**
+ * Mouse buttons
+ */
 void WindowInputManager::setMouseButtonCallback() {
     glfwSetWindowUserPointer(this->window->getWindow(), this);
     glfwSetMouseButtonCallback(this->window->getWindow(), [](GLFWwindow* win, int button, int action, int mods)->void
     {
         auto windowInputManager = static_cast<WindowInputManager*>(glfwGetWindowUserPointer(win)); // retrieve the pointer to the instance
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-            windowInputManager->getParticleSimulation()->getCamera()->setIsDragging(true);
+            // The user started to click!
+            windowInputManager->getParticleSimulation()->getParticleDrawer()->getCamera()->setIsDragging(true);
             double prevMouseXPos, prevMouseYPos;
             glfwGetCursorPos(win, &prevMouseXPos, &prevMouseYPos);
-            windowInputManager->getParticleSimulation()->getCamera()->setPreviousMousePos(glm::vec2(prevMouseXPos, prevMouseYPos));
+            windowInputManager->getParticleSimulation()->getParticleDrawer()->getCamera()->setPreviousMousePos(glm::vec2(prevMouseXPos, prevMouseYPos));
         } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-            windowInputManager->getParticleSimulation()->getCamera()->setIsDragging(false);
+            // The user is not clicking anymore
+            windowInputManager->getParticleSimulation()->getParticleDrawer()->getCamera()->setIsDragging(false);
         }
     });
 }

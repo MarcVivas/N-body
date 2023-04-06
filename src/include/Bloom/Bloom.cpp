@@ -29,10 +29,10 @@ Bloom::Bloom(glm::vec2 &windowDim) {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, this->sceneTextures[i], 0);
     }
 
-    // Tell OpenGL that we are using 2 color attachments for this frameBuffer
-    this->attachments[0] = GL_COLOR_ATTACHMENT0;
-    this->attachments[1] = GL_COLOR_ATTACHMENT1;
-    glDrawBuffers(2, this->attachments);
+    // Tell OpenGL that we are using 2 color scene for this frameBuffer
+    this->scene[0] = GL_COLOR_ATTACHMENT0;
+    this->scene[1] = GL_COLOR_ATTACHMENT1;
+    glDrawBuffers(2, this->scene);
 
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
@@ -40,7 +40,7 @@ Bloom::Bloom(glm::vec2 &windowDim) {
     glBindRenderbuffer(GL_RENDERBUFFER, this->renderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowDim.x, windowDim.y); // use a single renderbuffer object for both a depth AND stencil buffer.
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->renderBuffer); // now actually attach it
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+    // now that we actually created the framebuffer and added all scene we want to check if it is actually complete now
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

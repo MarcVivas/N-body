@@ -23,7 +23,7 @@ public:
 private:
     unsigned int hdrFrameBuffer;
     unsigned int renderBuffer;
-    unsigned int attachments[2];
+    unsigned int scene[2];
     unsigned int sceneTextures[2];
     unsigned int pingpongFBO[2];
     unsigned int pingPongTextures[2];
