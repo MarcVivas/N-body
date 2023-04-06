@@ -1,15 +1,10 @@
-//--------------------------
-// Code extracted from:
-// https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
-// Code modified by MarcVivas
-//--------------------------
-
 #ifndef N_BODY_SHADER_H
 #define N_BODY_SHADER_H
 
 
 class Shader {
 public:
+    // Shader ID
     unsigned int ID;
 
     virtual ~Shader();
@@ -17,8 +12,9 @@ public:
 
     Shader();
 
-    // activate the shader
-    // ------------------------------------------------------------------------
+    /**
+     * Activates the shader
+     */
     void use() const;
 
     // Uniform functions
@@ -58,14 +54,36 @@ public:
 
 
 protected:
-    // Function for checking shader compilation/linking errors.
-    // ------------------------------------------------------------------------
+    /**
+    * Checks for any compilation or linking errors in the shader object and prints any relevant error messages.
+    *
+    * @param shader The shader object to check for errors.
+    * @param type The type of the shader object ("VERTEX", "FRAGMENT", "PROGRAM", etc.) to use in the error messages.
+    */
     void checkCompileErrors(unsigned int shader, std::string type);
 
+    /**
+    * This function fixes path separators in the given string to be compatible with the current operating system.
+    * On Windows, it replaces forward slashes with backslashes.
+    * @param path The path to fix the separators of.
+    */
     void fixPathSeparators(std::string &path);
 
+
+    /**
+    * This function compiles a shader of the specified type with the given code.
+    * @param shaderType The type of shader (e.g., GL_VERTEX_SHADER, GL_COMPUTE_SHADER).
+    * @param code The source code of the shader.
+    * @return The ID of the compiled shader.
+    */
     unsigned int compileShader(GLuint shaderType, const char *code);
 
+    /**
+    * Reads a file and returns its contents as a string.
+    *
+    * @param filePath the path to the file to be read.
+    * @return the contents of the file as a string.
+    */
     std::string readFileToString(std::string& filePath);
 
 };

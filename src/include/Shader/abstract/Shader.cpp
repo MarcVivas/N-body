@@ -1,9 +1,3 @@
-//--------------------------
-// Code extracted from:
-// https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/shader_s.h
-// Code modified by MarcVivas
-//--------------------------
-
 #include "Shader.h"
 
 /**
@@ -74,23 +68,16 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
 void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     int success;
     char infoLog[1024];
-    if (type != "PROGRAM")
-    {
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-        }
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success && type != "PROGRAM") {
+        glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
+        std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
     }
-    else
-    {
-        glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-        }
+
+    glGetProgramiv(shader, GL_LINK_STATUS, &success);
+    if (!success && type == "PROGRAM") {
+        glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
+        std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
     }
 }
 
