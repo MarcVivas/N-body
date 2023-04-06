@@ -70,8 +70,7 @@ void ParticleDrawer::drawBloomScene(size_t particlesCount) {
     // Render the normal scene and extract the bright particles
     this->bloom->useFrameBuffer();
     this->drawNormalScene(particlesCount);
-
-
+    glDisable(GL_BLEND);
     // Blur bright particles with two-pass Gaussian Blur
     bool horizontal = true, first_iteration = true;
     unsigned int amount = 2;

@@ -10,7 +10,7 @@ layout(std430, binding=1) buffer velocitiesBuffer
     vec4 velocities[];
 };
 
-out vec3 velColor;
+out vec4 particleVelocity;
 
 // 3d view stuff
 uniform mat4 modelViewProjection;
@@ -21,38 +21,27 @@ uniform float worldSize;
 
 uniform bool pointSize;
 
-void main()
-{
 
+float getParticleSize(){
     // set the particle size based on the distance from the camera to the particle
-    float particleSize = 1.0 / length(cameraPos - positions[gl_VertexID].xyz);
+    float particleSize = 1.25 / length(cameraPos - positions[gl_VertexID].xyz);
 
     // set the point size based on the particle size
     if(pointSize){
-        gl_PointSize = particleSize * worldSize;
+        return particleSize * worldSize;
     }
-    else{
-        gl_PointSize = 1;
-    }
+    return 1;
+}
 
+
+void main()
+{
+    // Set the point size
+    gl_PointSize = getParticleSize();
 
     // Set the position of the particle
     gl_Position = modelViewProjection * vec4(positions[gl_VertexID].xyz, 1.f);
 
-    // Define a maximum velocity value
-    float maxVelocity = worldSize/11.f;
-
-    // Compute the magnitude of the particle's velocity
-    float velocityMagnitude = length(velocities[gl_VertexID]);
-
-    // Compute a normalized velocity value between 0 and 1
-    float normalizedVelocity = clamp(velocityMagnitude / maxVelocity, 0.0, 1.0);
-
-    // Define two colors for the gradient (e.g. blue and yellow)
-    vec3 colorLow = vec3(0.0, 0.0, 1.0); // blue (slow)
-    vec3 colorHigh = vec3(1.0, 1.0, 0.0); // yellow (fast)
-
-    // Interpolate between the two colors based on the normalized velocity value
-    float smoothNormalizedVelocity = smoothstep(0.0, 1.0, normalizedVelocity);
-    velColor = mix(colorLow, colorHigh, smoothNormalizedVelocity); // pass the velocity to the fragment shader
+    // Pass the velocity to the fragment shader
+    particleVelocity = velocities[gl_VertexID];
 }
