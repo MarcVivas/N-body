@@ -12,6 +12,7 @@ public:
     void runLoop(ParticleSimulation *particleSimulation);
     void setPauseSimulation(bool pause);
     bool getPauseSimulation();
+    ~RenderLoop();
 private:
     Window window;
     RenderTimer renderTimer;

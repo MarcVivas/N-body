@@ -11,15 +11,18 @@ public:
     RenderTimer(bool showFPS, bool vSync);
     void setDeltaTime(double time);
     double getDeltaTime();
-    void updateTime(Window& window);
+    void updateTime(Window& window, bool paused);
+    void printFinalStats();
 private:
     double deltaTime;
     bool showFPS;
     double previousTime;
     size_t frameCount;
+    size_t totalIterations;
+    double totalElapsedTime;
     double lastFrameTime;
     void updateFPS(Window& window);
-    void updateDeltaTime();
+    void updateDeltaTime(bool paused);
 };
 
 

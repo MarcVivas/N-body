@@ -11,7 +11,7 @@ void RenderLoop::runLoop(ParticleSimulation *particleSimulation) {
 
     while (!glfwWindowShouldClose(this->window.getWindow()))
     {
-        this->renderTimer.updateTime(this->window);
+        this->renderTimer.updateTime(this->window, this->pauseSimulation);
 
         if(!this->pauseSimulation){
             particleSimulation->update(this->renderTimer.getDeltaTime());
@@ -38,4 +38,9 @@ void RenderLoop::setPauseSimulation(bool pause) {
 
 bool RenderLoop::getPauseSimulation(){
     return this->pauseSimulation;
+}
+
+
+RenderLoop::~RenderLoop(){
+    this->renderTimer.printFinalStats();
 }
