@@ -1,3 +1,4 @@
+
 # N-body simulation
 
 
@@ -115,4 +116,17 @@ Now you should be able to run the compiled program.
 ./N-body
 ```
 
+## Program arguments
+- `-v` Configure which version/algorithm you want to use. 
+- `-i` Configure which initialization you want (How the bodies are initialized).
+- `-n` Configure how many bodies you want to simulate.  
 
+
+## Available Versions/algorithms
+There is a total of `3`versions you can try:
+
+## Available initializations
+You can try the next initializations:
+
+## Benchmark
+There's a python benchmark that can be used to measure the performance of different versions. 
