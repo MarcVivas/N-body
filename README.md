@@ -1,10 +1,26 @@
 
 # N-body simulation
 
+## Preview
 
 ## Table of contents
-[Controls](#controls)  
-[How to run the project](#how-to-run-the-project)
+- [About this project](#about-this-project)  
+- [Controls](#controls)  
+- [How to run the project](#how-to-run-the-project)  
+- [Program arguments](#program-arguments)  
+- [Available versions](#available-versions)  
+- [Available initializations](#available-initializations)  
+
+
+## About this project  
+This project was made to learn `C++`, `OpenGL` and `GPU programming`.
+
+The program offers: 
+- Different versions/algorithms can be tried.
+- Different intializations can be tried.
+- The number of bodies to simulate can be customized.
+- The simulation is in a 3D world.
+- Particles have bloom (only the brightest ones).
 
 ## Controls
 | Key/Input      | Action                     |
@@ -117,12 +133,16 @@ Now you should be able to run the compiled program.
 ```
 
 ## Program arguments
-- `-v` Configure which version/algorithm you want to use. 
-- `-i` Configure which initialization you want (How the bodies are initialized).
+- `-v` Configure which [version](#available-versions) you want to use. 
+- `-i` Configure which [initialization](#available-initializations) you want (How the bodies are initialized).
 - `-n` Configure how many bodies you want to simulate.  
 
+The default arguments are:
+```bash
+./N-body -v 1 -i 2 -n 100  
+```
 
-## Available Versions/algorithms
+## Available versions
 There is a total of `3` versions you can try:
 - `-v 1` Particle-particle sequential algorithm (n^2 complexity) using the CPU.
 - `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU.
@@ -133,5 +153,6 @@ There is a total of `3` versions you can try:
 You can try the next initializations:
 - `-i 1` Particles form a cube and have random velocities and masses.
 - `-i 2` Particles form a galaxy.
+
 ## Benchmark
 There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.
