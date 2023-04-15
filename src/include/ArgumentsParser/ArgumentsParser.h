@@ -12,10 +12,14 @@ public:
     Version getVersion();
     InitializationType getInitializationType();
     size_t getNumParticles();
+    bool isTest();
+    bool isBenchmark();
 private:
     Version version;
     InitializationType init;
     size_t numParticles;
+    bool test;
+    bool benchmark;
 };
 
 

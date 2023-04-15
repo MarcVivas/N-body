@@ -8,15 +8,18 @@
 
 class RenderLoop {
 public:
+    RenderLoop();
     RenderLoop(const Window& win, bool showFps, bool vSync);
     void runLoop(ParticleSimulation *particleSimulation);
     void setPauseSimulation(bool pause);
     bool getPauseSimulation();
+    void setIsBenchmark(bool bench);
     ~RenderLoop();
 private:
     Window window;
     RenderTimer renderTimer;
     bool pauseSimulation;
+    bool isBenchmark;
 };
 
 

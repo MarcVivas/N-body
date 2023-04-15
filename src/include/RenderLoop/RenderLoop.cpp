@@ -4,13 +4,26 @@
 
 #include "RenderLoop.h"
 
-RenderLoop::RenderLoop(const Window& win, bool showFps, bool vSync) : window(win), renderTimer(RenderTimer(showFps, vSync)), pauseSimulation(true){
-}
+RenderLoop::RenderLoop(const Window& win, bool showFps, bool vSync) :
+    window(win),
+    renderTimer(RenderTimer(showFps, vSync)),
+    pauseSimulation(true),
+    isBenchmark(false)
+{}
+
+RenderLoop::RenderLoop()=default;
 
 void RenderLoop::runLoop(ParticleSimulation *particleSimulation) {
+    this->pauseSimulation = !this->isBenchmark;
 
     while (!glfwWindowShouldClose(this->window.getWindow()))
     {
+        if(this->isBenchmark){
+            if (this->renderTimer.getTotalElapsedTime() >= 4.0){
+                break;
+            }
+        }
+
         this->renderTimer.updateTime(this->window, this->pauseSimulation);
 
         if(!this->pauseSimulation){
@@ -44,3 +57,8 @@ bool RenderLoop::getPauseSimulation(){
 RenderLoop::~RenderLoop(){
     this->renderTimer.printFinalStats();
 }
+
+void RenderLoop::setIsBenchmark(bool bench) {
+    this->isBenchmark = bench;
+}
+

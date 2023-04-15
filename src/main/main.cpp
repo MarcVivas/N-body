@@ -54,7 +54,9 @@ int main(int argc, char *argv[])
     // Using pixels
     glm::vec2 windowDim(800, 600);
     Window window(windowDim, "N-body simulation");
+
     RenderLoop renderLoop(window, true, false);
+    renderLoop.setIsBenchmark(args.isBenchmark());
 
     ParticleSystemInitializer* particleSystemInitializer;
 

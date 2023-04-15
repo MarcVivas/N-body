@@ -8,11 +8,13 @@
 
 class RenderTimer {
 public:
+    RenderTimer();
     RenderTimer(bool showFPS, bool vSync);
     void setDeltaTime(double time);
     double getDeltaTime();
     void updateTime(Window& window, bool paused);
     void printFinalStats();
+    double getTotalElapsedTime();
 private:
     double deltaTime;
     bool showFPS;

@@ -8,6 +8,7 @@
 
 class Window {
 public:
+    Window();
     Window(glm::vec2 window, const char * title);
     void updateWindowSize(const int width, const int height);
     GLFWwindow* getWindow();

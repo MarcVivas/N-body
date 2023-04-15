@@ -67,3 +67,5 @@ void Window::updateWindowSize(const int width, const int height) {
 void Window::updateWindowTitle(const char *title) {
     glfwSetWindowTitle(this->getWindow(), title);
 }
+
+Window::Window() = default;

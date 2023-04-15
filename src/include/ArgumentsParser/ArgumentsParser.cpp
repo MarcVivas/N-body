@@ -9,6 +9,8 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     this->version = PP_CPU_SEQUENTIAL;
     this->numParticles = 100;
     this->init = GALAXY;
+    this->test = false;
+    this->benchmark = false;
 
     std::cout << "============================================ \n\n";
     std::cout << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init]\n";
@@ -29,7 +31,7 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "============================================ \n\n";
 
     int option;
-    while ((option = getopt(argc, argv, "v:n:i:")) != -1) {
+    while ((option = getopt(argc, argv, "v:n:i:bt")) != -1) {
         switch (option) {
             case 'v':
                 version = static_cast<Version>(atoi(optarg));
@@ -47,6 +49,12 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
                     std::cerr << "Invalid initialization type\n";
                     exit(EXIT_FAILURE);
                 }
+                break;
+            case 'b':
+                this->benchmark = true;
+                break;
+            case 't':
+                this->test = true;
                 break;
             default:
                 std::cerr << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init]\n";
@@ -74,4 +82,12 @@ InitializationType ArgumentsParser::getInitializationType() {
 
 size_t ArgumentsParser::getNumParticles() {
     return this->numParticles;
+}
+
+bool ArgumentsParser::isTest() {
+    return this->test;
+}
+
+bool ArgumentsParser::isBenchmark(){
+    return this->benchmark;
 }

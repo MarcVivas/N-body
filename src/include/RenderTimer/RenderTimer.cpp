@@ -4,6 +4,8 @@
 
 #include "RenderTimer.h"
 
+RenderTimer::RenderTimer() = default;
+
 RenderTimer::RenderTimer(bool showFps, bool vSync) :
     showFPS(showFps),
     previousTime(glfwGetTime()),
@@ -87,8 +89,12 @@ void RenderTimer::printFinalStats() {
         std::cout << "Average FPS: " <<  averageFPS << " fps" << std::endl;
         std::cout << "Average Frame Time: " << averageFrameTime * 1000 << " ms" << std::endl;
     }     
-    std::cout << "Total iterations: " << this->totalIterations << std::endl;
+    std::cout << "Total iterations: " << this->totalIterations << " iterations" << std::endl;
     std::cout << "===============================================\n";
 
+}
+
+double RenderTimer::getTotalElapsedTime() {
+    return this->totalElapsedTime;
 }
 
