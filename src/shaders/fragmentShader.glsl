@@ -6,6 +6,7 @@ uniform float worldSize;
 
 in vec4 particleVelocity;
 
+in float particleSize;
 
 vec4 getParticleColor(){
     // Define a maximum velocity value
@@ -45,7 +46,7 @@ void main()
 {
     // Make GL_POINTS circular
     vec2 pos = gl_PointCoord.xy-0.5;
-    if(dot(pos,pos) > 0.25){
+    if(dot(pos,pos) > 0.25 && particleSize > 3.0){
         discard;
     }
 

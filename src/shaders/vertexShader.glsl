@@ -21,6 +21,7 @@ uniform float worldSize;
 
 uniform bool pointSize;
 
+out float particleSize;
 
 float getParticleSize(){
     // set the particle size based on the distance from the camera to the particle
@@ -38,6 +39,7 @@ void main()
 {
     // Set the point size
     gl_PointSize = getParticleSize();
+    particleSize = gl_PointSize;
 
     // Set the position of the particle
     gl_Position = modelViewProjection * vec4(positions[gl_VertexID].xyz, 1.f);
