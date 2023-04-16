@@ -38,6 +38,7 @@ The program offers:
 ## How to run the project
 
 1. [Linux](#linux)
+2. [Windows](#windows)
 
 ### Linux
 
@@ -48,7 +49,7 @@ You need to have installed:
 - `cmake`
 - `make`
 
-#### Run the program
+#### Run the program 
 This command will create a new directory titled `build` and change the location to it.
 ```bash
 mkdir build && cd build
@@ -66,6 +67,35 @@ Run the compiled program.
 ./N-body
 ```
 
+### Windows
+#### Previous requirements
+- `git`
+- `cmake`
+- `mingw`
+
+Since the program uses OpenMP, you also need to install this:
+```commandline
+mingw-get install mingw32-pthreads-w32
+```
+#### Run the program
+These commands will create a new directory titled `build` and change the location to it.
+```bash
+mkdir build 
+cd build
+``` 
+Build a `Makefile` using `cmake`.
+```bash
+cmake -G "MinGW Makefiles" ..
+```
+Compile the program using the `Makefile`.
+```bash
+ mingw32-make
+```
+
+Run the compiled program.
+```bash
+.\N-body.exe  
+```
 
 ## Program arguments
 - `-v` Configure which [version](#available-versions) you want to use. 

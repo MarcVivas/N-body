@@ -5,7 +5,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <getopt.h>
 #include <vector>
 #include <algorithm>
 #include <chrono>

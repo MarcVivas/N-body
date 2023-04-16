@@ -6,9 +6,9 @@
 
 ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     // Default values
-    this->version = PP_CPU_SEQUENTIAL;
+    this->version = Version::PP_CPU_SEQUENTIAL;
     this->numParticles = 100;
-    this->init = GALAXY;
+    this->init = InitializationType::GALAXY;
     this->test = false;
     this->benchmark = false;
 
@@ -30,38 +30,46 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
 
     std::cout << "============================================ \n\n";
 
-    int option;
-    while ((option = getopt(argc, argv, "v:n:i:bt")) != -1) {
-        switch (option) {
-            case 'v':
-                version = static_cast<Version>(atoi(optarg));
-                if (version < static_cast<int>(Version::PP_CPU_SEQUENTIAL) || version > static_cast<int>(Version::PP_GPU_PARALLEL)) {
-                    std::cerr << "Invalid version\n";
-                    exit(EXIT_FAILURE);
-                }
-                break;
-            case 'n':
-                numParticles = atoi(optarg);
-                break;
-            case 'i':
-                init = static_cast<InitializationType>(atoi(optarg));
-                if (init < static_cast<int>(InitializationType::CUBE) || init > static_cast<int>(InitializationType::GALAXY)) {
-                    std::cerr << "Invalid initialization type\n";
-                    exit(EXIT_FAILURE);
-                }
-                break;
-            case 'b':
-                this->benchmark = true;
-                break;
-            case 't':
-                this->test = true;
-                break;
-            default:
-                std::cerr << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init]\n";
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg == "-v" && i + 1 < argc) {
+            int value = std::stoi(argv[i + 1]);
+            if (value >= static_cast<int>(Version::PP_CPU_SEQUENTIAL) &&
+                value <= static_cast<int>(Version::PP_GPU_PARALLEL)) {
+                this->version = static_cast<Version>(value);
+            } else {
+                std::cerr << "Invalid version\n";
                 exit(EXIT_FAILURE);
+            }
+            i++;
+        } else if (arg == "-n" && i + 1 < argc) {
+            int value = std::stoi(argv[i + 1]);
+            if (value > 0) {
+                this->numParticles = value;
+            } else {
+                std::cerr << "Invalid number of particles\n";
+                exit(EXIT_FAILURE);
+            }
+            i++;
+        } else if (arg == "-i" && i + 1 < argc) {
+            int value = std::stoi(argv[i + 1]);
+            if (value >= static_cast<int>(InitializationType::CUBE) &&
+                value <= static_cast<int>(InitializationType::GALAXY)) {
+                this->init = static_cast<InitializationType>(value);
+            } else {
+                std::cerr << "Invalid initialization type\n";
+                exit(EXIT_FAILURE);
+            }
+            i++;
+        } else if (arg == "-b") {
+            this->benchmark = true;
+        } else if (arg == "-t") {
+            this->test = true;
+        } else {
+            std::cerr << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init]\n";
+            exit(EXIT_FAILURE);
         }
     }
-
 
     std::cout << "------------------------------------ \n\n";
     std::cout << "Now using: \n\n";
@@ -69,7 +77,6 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "Num particles: " << numParticles << "\n";
     std::cout << "Init: " << init << "\n\n";
     std::cout << "------------------------------------ \n\n";
-
 }
 
 Version ArgumentsParser::getVersion() {

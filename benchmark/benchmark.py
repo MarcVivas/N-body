@@ -27,12 +27,11 @@ bodies = [2**i for i in range(8, 21, 1)]
 df = pd.DataFrame(columns=['Algorithm', 'Bodies', 'Elapsed Time', 'Average FPS', 'Average Frame Time', 'Iterations'])
 
 
-
 # Loop through the algorithms and number of bodies
 for algorithm in algorithms:
     for n in bodies:
         # Run the C++ program and capture the output
-        output = subprocess.check_output([program_path, '-v', str(algorithm), '-n', str(n), '-b', '-i 1'])
+        output = subprocess.check_output([program_path, '-v', str(algorithm), '-n', str(n), '-b', '-i' , '1'])
         output = output.decode('utf-8').split('\n')
 
 
