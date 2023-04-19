@@ -8,11 +8,11 @@ ParticleSolverGPU::ParticleSolverGPU(std::string &pathToComputeShader): Particle
     this->computeShader = new ComputeShader(pathToComputeShader);
 }
 
-void ParticleSolverGPU::updateParticlePositions(std::vector<Particle> &particles, glm::vec4* positions, glm::vec4* velocities, float deltaTime) {
+void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles, float deltaTime) {
     this->computeShader->use();
     this->computeShader->setFloat("deltaTime", deltaTime);
-    this->computeShader->setInt("numParticles", particles.size());
-    glDispatchCompute(ceil(particles.size() / 64.0), 1, 1);
+    this->computeShader->setInt("numParticles", particles->size());
+    glDispatchCompute(ceil(particles->size() / 64.0), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 

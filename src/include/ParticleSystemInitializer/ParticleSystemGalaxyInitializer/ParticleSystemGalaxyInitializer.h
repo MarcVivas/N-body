@@ -10,7 +10,7 @@
 class ParticleSystemGalaxyInitializer: public ParticleSystemInitializer{
 public:
     ParticleSystemGalaxyInitializer(size_t numParticles);
-    std::vector<Particle> generateParticles(glm::vec3 worldDimensions);
+    ParticleSystem* generateParticles(glm::vec3 worldDimensions);
 
 private:
     size_t totalParticles;

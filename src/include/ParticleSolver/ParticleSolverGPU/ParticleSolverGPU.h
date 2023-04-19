@@ -12,7 +12,7 @@ public:
     ParticleSolverGPU(std::string &pathToComputeShader);
     ~ParticleSolverGPU();
     bool usesGPU() override;
-    void updateParticlePositions(std::vector<Particle> &particles, glm::vec4* positions, glm::vec4* velocities,  float deltaTime) override;
+    void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
 private:
     Shader *computeShader;
 

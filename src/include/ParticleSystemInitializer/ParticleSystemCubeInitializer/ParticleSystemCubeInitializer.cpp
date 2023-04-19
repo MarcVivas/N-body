@@ -6,7 +6,7 @@
 
 ParticleSystemCubeInitializer::ParticleSystemCubeInitializer(size_t numParticles) : totalParticles(numParticles){}
 
-std::vector<Particle> ParticleSystemCubeInitializer::generateParticles(glm::vec3 worldDimensions) {
+ParticleSystem* ParticleSystemCubeInitializer::generateParticles(glm::vec3 worldDimensions) {
     Particle* particles = new Particle[this->totalParticles];
 
     std::random_device randomDevice;
@@ -25,5 +25,5 @@ std::vector<Particle> ParticleSystemCubeInitializer::generateParticles(glm::vec3
 
     delete[] particles; // free the allocated memory
 
-    return particleVector;
+    return new ParticleSystem(particleVector);
 }

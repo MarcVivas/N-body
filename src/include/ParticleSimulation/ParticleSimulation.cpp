@@ -4,39 +4,33 @@
 
 #include "ParticleSimulation.h"
 
+ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
+                                       ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim){
+
+    this->particleSolver = particleSysSolver;
+    this->particleDrawer = new ParticleDrawer(worldDim, windowDim);
+    this->particleSystem = particleSystemInitializer->generateParticles(worldDim);
+    this->createBuffers(this->particleSolver->usesGPU());
+}
+
+
 ParticleSimulation::~ParticleSimulation() {
     delete this->particleDrawer;
     delete this->particleSolver;
+    delete this->particleSystem;
     glDeleteVertexArrays(1, &this->VAO);
     glDeleteBuffers(1, &this->VBO);
 }
 
 void ParticleSimulation::draw() {
-    this->particleDrawer->draw(this->particles.size());
+    this->particleDrawer->draw(this->particleSystem->size());
     this->lockParticlesBuffer();
 }
 
 void ParticleSimulation::update(double deltaTime) {
-    this->particleSolver->updateParticlePositions(this->particles, this->particlesPositions, this->particlesVelocities, deltaTime);
+    this->particleSolver->updateParticlePositions(this->particleSystem, deltaTime);
     this->waitParticlesBuffer();
 }
-
-
-ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
-                               ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim){
-
-    this->particleSolver = particleSysSolver;
-    this->particleDrawer = new ParticleDrawer(worldDim, windowDim);
-    this->particles = particleSystemInitializer->generateParticles(worldDim);
-    this->createBuffers(this->particleSolver->usesGPU());
-}
-
-
-void ParticleSimulation::copyParticlesToGPU() {
-    std::memcpy(this->particlesPositions, &this->getPositions()[0], this->particles.size() * sizeof(glm::vec4));
-    std::memcpy(this->particlesVelocities, &this->getVelocities()[0], this->particles.size() * sizeof(glm::vec4));
-}
-
 
 void ParticleSimulation::createBuffers(bool usesGPU) {
     glGenVertexArrays(1, &this->VAO);
@@ -69,11 +63,13 @@ void ParticleSimulation::createBuffers(bool usesGPU) {
 
 void ParticleSimulation::configureGpuBuffers() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getPositions()[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getPositions(), GL_DYNAMIC_DRAW);
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->velocities_SSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getVelocities()[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getVelocities(), GL_DYNAMIC_DRAW);
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getAccelerations()[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getAccelerations(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -81,19 +77,22 @@ void ParticleSimulation::configureGpuBuffers() {
  * Creates persistent mapped shader storage buffer objects
  */
 void ParticleSimulation::configureCpuBuffers() {
-    GLbitfield bufferStorageFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+    GLbitfield bufferStorageFlags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getPositions()[0], bufferStorageFlags);
-    this->particlesPositions = (glm::vec4*) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particles.size(), bufferStorageFlags);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getPositions(), bufferStorageFlags);
+    glm::vec4* positions = (glm::vec4*) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particleSystem->size(), bufferStorageFlags);
+    this->particleSystem->setPositions(positions);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->velocities_SSBO);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getVelocities()[0], bufferStorageFlags);
-    this->particlesVelocities = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particles.size(), bufferStorageFlags);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getVelocities(), bufferStorageFlags);
+    glm::vec4* velocities = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particleSystem->size(), bufferStorageFlags);
+    this->particleSystem->setVelocities(velocities);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles.size(), &this->getAccelerations()[0], bufferStorageFlags);
-    this->particlesAccelerations = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particles.size(), bufferStorageFlags);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getAccelerations(), bufferStorageFlags);
+    glm::vec4* accelerations = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * this->particleSystem->size(), bufferStorageFlags);
+    this->particleSystem->setAccelerations(accelerations);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 }
@@ -126,31 +125,4 @@ void ParticleSimulation::waitParticlesBuffer()
 
 ParticleDrawer *ParticleSimulation::getParticleDrawer() {
     return this->particleDrawer;
-}
-
-std::vector<glm::vec4> ParticleSimulation::getPositions() {
-    std::vector<glm::vec4> positions(this->particles.size());
-
-    std::transform(this->particles.begin(), this->particles.end(), positions.begin(),
-                   [](const Particle& p) { return p.position; });
-
-    return positions;
-}
-
-std::vector<glm::vec4> ParticleSimulation::getVelocities() {
-    std::vector<glm::vec4> velocities(this->particles.size());
-
-    std::transform(particles.begin(), particles.end(), velocities.begin(),
-                   [](const Particle& p) { return p.velocity; });
-
-    return velocities;
-}
-
-std::vector<glm::vec4> ParticleSimulation::getAccelerations() {
-    std::vector<glm::vec4> accelerations(this->particles.size());
-
-    std::transform(particles.begin(), particles.end(), accelerations.begin(),
-                   [](const Particle& p) { return p.acceleration; });
-
-    return accelerations;
 }

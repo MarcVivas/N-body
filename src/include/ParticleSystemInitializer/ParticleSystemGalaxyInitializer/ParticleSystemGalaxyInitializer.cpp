@@ -8,7 +8,7 @@ ParticleSystemGalaxyInitializer::ParticleSystemGalaxyInitializer(size_t numParti
 }
 
 
-std::vector<Particle> ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 worldDimensions) {
+ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 worldDimensions) {
     Particle* particles = new Particle[this->totalParticles];
 
     std::random_device randomDevice;
@@ -58,5 +58,5 @@ std::vector<Particle> ParticleSystemGalaxyInitializer::generateParticles(glm::ve
 
     delete[] particles; // free the allocated memory
 
-    return particleVector;
+    return new ParticleSystem(particleVector);
 }

@@ -10,7 +10,7 @@ class ParticleSolver {
 public:
     virtual ~ParticleSolver() = default;
     ParticleSolver() = default;
-    virtual void updateParticlePositions(std::vector<Particle> &particles, glm::vec4* positions, glm::vec4* velocities, float deltaTime) = 0;
+    virtual void updateParticlePositions(ParticleSystem *particles, float deltaTime) = 0;
     virtual bool usesGPU() = 0;
 };
 

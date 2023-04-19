@@ -8,7 +8,6 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
-#include <random>
 #include <omp.h>
 #include <cstring>
 #ifdef _WIN32
@@ -16,7 +15,6 @@
 #else
 #include <unistd.h>
 #endif
-#include <glm/gtc/random.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../include/Camera/Camera.cpp"
 
@@ -26,12 +24,12 @@
 
 #include "../include/enums/enums.h"
 #include "../include/Particle/Particle.cpp"
+#include "../include/ParticleSystemInitializer/interface/ParticleSystemInitializer.h"
 #include "../include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
 #include "../include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
 #include "../include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp"
 #include "../include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp"
 #include "../include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp"
-#include "../include/ParticleSystemInitializer/interface/ParticleSystemInitializer.h"
 #include "../include/ArgumentsParser/ArgumentsParser.cpp"
 
 #include "../include/Bloom/Bloom.cpp"
