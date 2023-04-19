@@ -15,12 +15,15 @@
 ## About this project  
 This project was made to learn `C++`, `OpenGL` and `GPU programming`.
 
-The program offers: 
+### Features
 - Different versions/algorithms can be tried.
 - Different intializations can be tried.
 - The number of bodies to simulate can be customized.
 - The simulation is in a 3D world.
+- The simulation is in realtime.
 - Particles have bloom (only the brightest ones).
+- Leapfrog integrator.
+- Plummer softening.
 
 ## Controls
 | Key/Input      | Action                     |
