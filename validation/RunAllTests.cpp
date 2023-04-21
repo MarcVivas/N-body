@@ -8,7 +8,7 @@
 #include <sstream>
 #include <fstream>
 #include <omp.h>
-
+#include <algorithm>
 #include "../src/include/Shader/abstract/Shader.cpp"
 #include "../src/include/Shader/ComputeShader/ComputeShader.cpp"
 #include "../src/include/Particle/Particle.cpp"
