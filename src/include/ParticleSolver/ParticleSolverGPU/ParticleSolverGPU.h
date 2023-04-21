@@ -13,7 +13,9 @@ public:
     ~ParticleSolverGPU();
     bool usesGPU() override;
     void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
-private:
+    float getSquaredSoftening() override;
+protected:
+    float squaredSoftening;
     Shader *computeShader;
 
 };

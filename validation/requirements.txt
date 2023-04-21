@@ -1,0 +1,5 @@
+lxml==4.9.2
+matplotlib==3.7.1
+pandas==1.4.2
+seaborn==0.12.2
+setuptools==45.2.0

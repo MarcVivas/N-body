@@ -6,6 +6,7 @@
 
 ParticleSolverGPU::ParticleSolverGPU(std::string &pathToComputeShader): ParticleSolver() {
     this->computeShader = new ComputeShader(pathToComputeShader);
+    this->squaredSoftening = 0.5f;
 }
 
 void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles, float deltaTime) {
@@ -22,3 +23,7 @@ ParticleSolverGPU::~ParticleSolverGPU() noexcept {
 }
 
 bool ParticleSolverGPU::usesGPU() {return true;}
+
+float ParticleSolverGPU::getSquaredSoftening() {
+    return this->squaredSoftening;
+}

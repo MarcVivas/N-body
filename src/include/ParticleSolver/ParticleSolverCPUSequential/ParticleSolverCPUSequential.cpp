@@ -4,6 +4,9 @@
 
 #include "ParticleSolverCPUSequential.h"
 
+ParticleSolverCPUSequential::ParticleSolverCPUSequential(): ParticleSolver() {
+    this->squaredSoftening = 0.5f;
+}
 
 void ParticleSolverCPUSequential::updateParticlePositions(ParticleSystem *particles, float deltaTime){
     for(size_t i =  0; i<particles->size(); i++){
@@ -13,3 +16,8 @@ void ParticleSolverCPUSequential::updateParticlePositions(ParticleSystem *partic
 }
 
 bool ParticleSolverCPUSequential::usesGPU() {return false;}
+
+
+float ParticleSolverCPUSequential::getSquaredSoftening() {
+    return this->squaredSoftening;
+}

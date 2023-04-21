@@ -9,9 +9,13 @@
 
 
 class ParticleSolverCPUSequential: public ParticleSolver  {
+public:
+    ParticleSolverCPUSequential();
     void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
     bool usesGPU() override;
-
+    float getSquaredSoftening() override;
+protected:
+    float squaredSoftening;
 };
 
 

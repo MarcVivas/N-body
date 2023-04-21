@@ -28,7 +28,7 @@ void ParticleSystem::updateParticlePosition(unsigned int particleId, float delta
     // Update acceleration (i+1)
     this->accelerations[particleId] = glm::vec4(newAcceleration, 0);
 
-    // Compute next velocity (i + 1)
+    // Compute next velocity (i+1)
     this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
 }
 

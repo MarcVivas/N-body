@@ -9,9 +9,13 @@
 
 
 class ParticleSolverCPUParallel: public ParticleSolver  {
+public:
+    ParticleSolverCPUParallel();
     void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
     bool usesGPU() override;
-
+    float getSquaredSoftening() override;
+protected:
+    float squaredSoftening;
 };
 
 
