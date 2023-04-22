@@ -16,12 +16,6 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
 }
 
 
-ParticleSystem::~ParticleSystem() {
-    delete [] this->accelerations;
-    delete [] this->velocities;
-    delete [] this->masses;
-    delete [] this->positions;
-}
 
 /**
  * Updates a particle position
@@ -30,7 +24,7 @@ ParticleSystem::~ParticleSystem() {
  * @param deltaTime
  * @param newAcceleration
  */
-void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec3 newAcceleration) {
+void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec3 &newAcceleration) {
     float dtDividedBy2 = deltaTime/2.f;
 
     // Compute velocity (i + 1/2)
