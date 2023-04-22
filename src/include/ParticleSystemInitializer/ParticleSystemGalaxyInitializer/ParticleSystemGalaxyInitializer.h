@@ -1,7 +1,5 @@
-//
-// Created by marc on 15/03/23.
-//
-#include "../interface/ParticleSystemInitializer.h"
+
+#include "ParticleSystemInitializer.h"
 
 #ifndef N_BODY_PARTICLESYSTEMGALAXYINITIALIZER_H
 #define N_BODY_PARTICLESYSTEMGALAXYINITIALIZER_H

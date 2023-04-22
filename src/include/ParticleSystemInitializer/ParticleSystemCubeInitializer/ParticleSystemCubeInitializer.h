@@ -1,8 +1,5 @@
-//
-// Created by marc on 12/03/23.
-//
 
-#include "../interface/ParticleSystemInitializer.h"
+#include "ParticleSystemInitializer.h"
 
 #ifndef PARTICLESYSTEMCUBEINITIALIZER_H
 #define PARTICLESYSTEMCUBEINITIALIZER_H
