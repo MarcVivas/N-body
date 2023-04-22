@@ -15,7 +15,13 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
     }
 }
 
-
+/**
+ * Updates a particle position
+ * Performs the leapfrog integration
+ * @param particleId
+ * @param deltaTime
+ * @param newAcceleration
+ */
 void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec3 newAcceleration) {
     float dtDividedBy2 = deltaTime/2.f;
 

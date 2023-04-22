@@ -15,8 +15,6 @@ public:
     Particle(glm::vec3 pos, glm::vec3 vel, float mass);
     ~Particle();
 
-    void updatePosition(float deltaTime, glm::vec3 newAcceleration);
-
     void setVelocity(glm::vec3 &vel);
 
     friend std::ostream& operator<<(std::ostream& os, const Particle& p);
