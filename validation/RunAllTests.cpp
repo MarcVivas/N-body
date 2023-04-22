@@ -1,21 +1,13 @@
 #include <iostream>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
+#include <ctime>
 #include <glm/glm.hpp>
-#include <glm/gtx/norm.hpp>
-#include <vector>
-#include <sstream>
-#include <fstream>
-#include <omp.h>
-#include <algorithm>
-#include "../src/include/Shader/abstract/Shader.cpp"
-#include "../src/include/Shader/ComputeShader/ComputeShader.cpp"
-#include "../src/include/Particle/Particle.cpp"
-#include "tests/EnergyConservationTest/CPUEnergyConservationTest.cpp"
-#include "tests/EnergyConservationTest/GPUEnergyConservationTest.cpp"
-#include "../src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
-#include "../src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
+
+#include "CPUEnergyConservationTest.h"
+#include "GPUEnergyConservationTest.h"
+
+#include "ParticleSystemCubeInitializer.h"
+#include "ParticleSolverCPUParallel.h"
+#include "ParticleSolverCPUSequential.h"
 
 int main(){
     srand(static_cast<unsigned int>(std::time(nullptr)));

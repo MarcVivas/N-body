@@ -1,10 +1,6 @@
-//
-// Created by marc on 18/03/23.
-//
-
 
 #include "Window.h"
-
+#include <iostream>
 
 Window::Window(glm::vec2 window, const char * title): windowWidth(window.x), windowHeight(window.y), windowTitle(std::string(title).append(" ")){
     this->initGlfw();

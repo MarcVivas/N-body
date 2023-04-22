@@ -1,5 +1,7 @@
-#include "../../interface/Test.h"
-#include "../../../../src/include/ParticleSolver/interface/ParticleSolver.h"
+#include "Test.h"
+#include "ParticleSystem.h"
+#include "ParticleSolver.h"
+
 #ifndef N_BODY_CPUTEST_H
 #define N_BODY_CPUTEST_H
 

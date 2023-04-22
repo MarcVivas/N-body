@@ -1,9 +1,6 @@
-//
-// Created by marc on 21/04/23.
-//
 
 #include "CPUEnergyConservationTest.h"
-
+#include <iostream>
 
 CPUEnergyConservationTest::CPUEnergyConservationTest(ParticleSystem* particleSystem, ParticleSolver *particleSolver): CPUTest(particleSystem, particleSolver) {
     this->energyCalculator = new EnergyCalculator();

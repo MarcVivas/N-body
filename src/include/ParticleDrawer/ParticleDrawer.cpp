@@ -1,6 +1,4 @@
-//
-// Created by marc on 5/04/23.
-//
+
 
 #include "ParticleDrawer.h"
 

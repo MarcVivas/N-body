@@ -1,8 +1,6 @@
-//
-// Created by marc on 20/04/23.
-//
-
 #include "EnergyCalculator.h"
+#include <iostream>
+#include <glm/gtx/norm.hpp>
 
 void EnergyCalculator::computeEnergy(ParticleSystem *particles, const float squaredSoftening) {
 

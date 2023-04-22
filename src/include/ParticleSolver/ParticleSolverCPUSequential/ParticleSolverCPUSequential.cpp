@@ -1,6 +1,3 @@
-//
-// Created by marc on 12/03/23.
-//
 
 #include "ParticleSolverCPUSequential.h"
 

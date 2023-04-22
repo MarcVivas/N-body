@@ -1,8 +1,5 @@
-//
-// Created by marc on 12/03/23.
-//
 
-#include "../interface/ParticleSolver.h"
+#include "ParticleSolver.h"
 
 #ifndef N_BODY_PARTICLESOLVERCPUSEQUENTIAL_H
 #define N_BODY_PARTICLESOLVERCPUSEQUENTIAL_H

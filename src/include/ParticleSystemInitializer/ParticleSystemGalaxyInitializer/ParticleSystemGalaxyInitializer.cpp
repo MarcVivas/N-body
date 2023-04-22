@@ -1,8 +1,7 @@
-//
-// Created by marc on 15/03/23.
-//
-
 #include "ParticleSystemGalaxyInitializer.h"
+#include <random>
+#include <glm/gtc/random.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 ParticleSystemGalaxyInitializer::ParticleSystemGalaxyInitializer(size_t numParticles) :totalParticles(numParticles){
 }

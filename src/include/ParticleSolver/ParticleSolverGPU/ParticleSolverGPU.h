@@ -1,7 +1,6 @@
-//
-// Created by marc on 30/03/23.
-//
-#include "../interface/ParticleSolver.h"
+
+#include "ParticleSolver.h"
+#include "ComputeShader.h"
 
 #ifndef N_BODY_PARTICLESOLVERGPU_H
 #define N_BODY_PARTICLESOLVERGPU_H

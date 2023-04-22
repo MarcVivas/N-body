@@ -1,6 +1,6 @@
-//
-// Created by marc on 18/03/23.
-//
+#include "Window.h"
+#include "ParticleSimulation.h"
+#include "RenderTimer.h"
 
 #ifndef N_BODY_RENDERLOOP_H
 #define N_BODY_RENDERLOOP_H

@@ -1,8 +1,6 @@
-//
-// Created by marc on 18/03/23.
-//
-
 #include "RenderTimer.h"
+#include <iostream>
+#include <sstream>
 
 RenderTimer::RenderTimer() = default;
 

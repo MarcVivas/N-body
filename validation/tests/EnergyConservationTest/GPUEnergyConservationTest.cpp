@@ -1,9 +1,6 @@
-//
-// Created by marc on 20/04/23.
-//
 
 #include "GPUEnergyConservationTest.h"
-
+#include <iostream>
 
 GPUEnergyConservationTest::GPUEnergyConservationTest(ParticleSystem* particleSystem, std::string& shaderPath) : GPUTest(particleSystem, shaderPath){
     this->energyCalculator = new EnergyCalculator();

@@ -1,8 +1,6 @@
-//
-// Created by marc on 12/03/23.
-//
 
 #include "ParticleSolverCPUParallel.h"
+#include <omp.h>
 
 ParticleSolverCPUParallel::ParticleSolverCPUParallel(): ParticleSolver() {
     this->squaredSoftening = 0.5f;

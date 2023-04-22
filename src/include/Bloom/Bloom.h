@@ -1,6 +1,5 @@
-//
-// Created by marc on 2/04/23.
-//
+#include <glm/glm.hpp>
+#include "VertexFragmentShader.h"
 
 #ifndef N_BODY_BLOOM_H
 #define N_BODY_BLOOM_H

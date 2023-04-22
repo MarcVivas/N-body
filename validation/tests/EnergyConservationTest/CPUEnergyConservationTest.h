@@ -1,7 +1,6 @@
-//
-// Created by marc on 21/04/23.
-//
-#include "../abstract/CPUTest/CPUTest.cpp"
+
+#include "CPUTest.h"
+#include "EnergyCalculator.h"
 
 #ifndef N_BODY_CPUENERGYCONSERVATIONTEST_H
 #define N_BODY_CPUENERGYCONSERVATIONTEST_H

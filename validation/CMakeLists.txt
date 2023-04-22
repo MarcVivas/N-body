@@ -53,6 +53,20 @@ FetchContent_MakeAvailable(glfw glad glm)
 set(
         PROJECT_SOURCES
         RunAllTests.cpp
+        ../src/include/Shader/abstract/Shader.cpp
+        ../src/include/Shader/ComputeShader/ComputeShader.cpp
+        ../src/include/Shader/VertexFragmentShader/VertexFragmentShader.cpp
+        ../src/include/Particle/Particle.cpp
+        ../src/include/ParticleSystem/ParticleSystem.cpp
+        ../src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp
+        ../src/include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp
+        ../src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
+        ../src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
+        tests/abstract/CPUTest/CPUTest.cpp
+        tests/abstract/GPUTest/GPUTest.cpp
+        tests/EnergyConservationTest/CPUEnergyConservationTest.cpp
+        tests/EnergyConservationTest/GPUEnergyConservationTest.cpp
+        tests/EnergyConservationTest/EnergyCalculator/EnergyCalculator.cpp
 )
 
 
@@ -68,5 +82,24 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 add_dependencies(${PROJECT_NAME} glfw glad glm)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(
+        ${PROJECT_NAME} PRIVATE
+        ../src/include/Shader/abstract/
+        ../src/include/Shader/ComputeShader/
+        ../src/include/Shader/VertexFragmentShader
+        ../src/include/Particle/
+        ../src/include/ParticleSolver/interface/
+        ../src/include/ParticleSolver/ParticleSolverGPU/
+        ../src/include/ParticleSolver/ParticleSolverCPUParallel/
+        ../src/include/ParticleSolver/ParticleSolverCPUSequential/
+        ../src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/
+        ../src/include/ParticleSystem/
+        tests/interface/
+        tests/abstract/CPUTest/
+        tests/abstract/GPUTest/
+        tests/EnergyConservationTest/
+        tests/EnergyConservationTest/
+        tests/EnergyConservationTest/EnergyCalculator/
+
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad glm OpenMP::OpenMP_CXX)

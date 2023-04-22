@@ -1,4 +1,11 @@
 #include "Shader.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#ifdef _WIN32
+#include <algorithm>
+#endif
+
 
 /**
  * Destructor

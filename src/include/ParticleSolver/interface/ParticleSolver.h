@@ -1,6 +1,4 @@
-//
-// Created by marc on 12/03/23.
-//
+#include "ParticleSystem.h"
 
 #ifndef N_BODY_PARTICLESOLVER_H
 #define N_BODY_PARTICLESOLVER_H

@@ -1,8 +1,6 @@
-//
-// Created by marc on 20/04/23.
-//
 
-#include "../abstract/GPUTest/GPUTest.cpp"
+#include "GPUTest.h"
+#include "EnergyCalculator.h"
 
 #ifndef N_BODY_GPUENERGYCONSERVATIONTEST_H
 #define N_BODY_GPUENERGYCONSERVATIONTEST_H

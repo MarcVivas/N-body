@@ -1,50 +1,18 @@
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <algorithm>
-#include <chrono>
-#include <omp.h>
-#include <cstring>
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-#include <glm/gtc/matrix_transform.hpp>
-#include "../include/Camera/Camera.cpp"
+#include "ArgumentsParser.h"
 
-#include "../include/Shader/abstract/Shader.cpp"
-#include "../include/Shader/ComputeShader/ComputeShader.cpp"
-#include "../include/Shader/VertexFragmentShader/VertexFragmentShader.cpp"
+#include "ParticleSystemCubeInitializer.h"
+#include "ParticleSystemGalaxyInitializer.h"
 
-#include "../include/enums/enums.h"
-#include "../include/Particle/Particle.cpp"
-#include "../include/ParticleSystemInitializer/interface/ParticleSystemInitializer.h"
-#include "../include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp"
-#include "../include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp"
-#include "../include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp"
-#include "../include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp"
-#include "../include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp"
-#include "../include/ArgumentsParser/ArgumentsParser.cpp"
+#include "ParticleSolverCPUSequential.h"
+#include "ParticleSolverCPUParallel.h"
+#include "ParticleSolverGPU.h"
 
-#include "../include/Bloom/Bloom.cpp"
-#include "../include/Window/Window.cpp"
-#include "../include/RenderTimer/RenderTimer.cpp"
-#include "../include/ParticleDrawer/ParticleDrawer.cpp"
-#include "../include/ParticleSimulation/ParticleSimulation.cpp"
-#include "../include/RenderLoop/RenderLoop.cpp"
-#include "../include/WindowInputManager/WindowInputManager.cpp"
+#include "WindowInputManager.h"
 
 int main(int argc, char *argv[])
 {
     // Get the arguments
     ArgumentsParser args(argc, argv);
-
 
     // Using meters
     glm::vec3 worldDimensions(8000.f, 8000.f, 8000.f);
@@ -89,8 +57,6 @@ int main(int argc, char *argv[])
     WindowInputManager windowInputManager(&window, &renderLoop, particleSimulation);
 
     renderLoop.runLoop(particleSimulation);
-
-    //std::cout << *particleSystem << std::endl;
 
     delete particleSimulation;
     delete particleSystemInitializer;

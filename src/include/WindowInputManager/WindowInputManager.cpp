@@ -1,8 +1,7 @@
-//
-// Created by marc on 18/03/23.
-//
+
 
 #include "WindowInputManager.h"
+#include <iostream>
 
 WindowInputManager::WindowInputManager(Window *win, RenderLoop *loop, ParticleSimulation* particleSim): window(win), renderLoop(loop), particleSimulation(particleSim) {
     this->setKeyCallback();

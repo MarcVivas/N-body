@@ -1,6 +1,11 @@
-//
-// Created by marc on 5/03/23.
-//
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include "ParticleSystem.h"
+#include "ParticleSystemCubeInitializer.h"
+#include "ParticleSystemGalaxyInitializer.h"
+#include "ParticleSolver.h"
+#include "ParticleDrawer.h"
+
 
 #ifndef PARTICLESIMULATION_H
 #define PARTICLESIMULATION_H

@@ -1,13 +1,9 @@
-//
-// Created by marc on 12/03/23.
-//
+#include "ParticleSystem.h"
+
 
 #ifndef PARTICLESYSTEMINITIALIZER_H
 #define PARTICLESYSTEMINITIALIZER_H
 
-#include <random>
-#include <glm/gtc/random.hpp>
-#include "../../ParticleSystem/ParticleSystem.cpp"
 
 class ParticleSystemInitializer{
 public:

@@ -1,6 +1,8 @@
-//
-// Created by marc on 18/03/23.
-//
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <string>
 
 #ifndef N_BODY_WINDOW_H
 #define N_BODY_WINDOW_H

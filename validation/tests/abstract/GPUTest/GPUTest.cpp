@@ -1,5 +1,5 @@
 #include "GPUTest.h"
-
+#include <iostream>
 
 GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath): Test(){
     this->particles = particleSystem;

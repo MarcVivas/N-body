@@ -1,6 +1,3 @@
-//
-// Created by marc on 5/03/23.
-//
 
 #include "ParticleSimulation.h"
 

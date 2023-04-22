@@ -1,6 +1,3 @@
-//
-// Created by marc on 18/03/23.
-//
 
 #include "RenderLoop.h"
 

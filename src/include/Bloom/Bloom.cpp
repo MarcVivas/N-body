@@ -1,8 +1,7 @@
-//
-// Created by marc on 2/04/23.
-//
 
 #include "Bloom.h"
+#include <glad/glad.h>
+#include <iostream>
 
 Bloom::Bloom(glm::vec2 &windowDim) {
     this->activated = true;

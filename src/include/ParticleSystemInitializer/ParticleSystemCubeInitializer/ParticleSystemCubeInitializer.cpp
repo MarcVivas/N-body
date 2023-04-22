@@ -1,8 +1,6 @@
-//
-// Created by marc on 12/03/23.
-//
-
 #include "ParticleSystemCubeInitializer.h"
+#include <random>
+#include <glm/gtc/random.hpp>
 
 ParticleSystemCubeInitializer::ParticleSystemCubeInitializer(size_t numParticles) : totalParticles(numParticles){}
 

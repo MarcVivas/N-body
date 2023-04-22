@@ -1,6 +1,10 @@
-#include "../../interface/Test.h"
-#include "../../../../src/include/ParticleSolver/interface/ParticleSolver.h"
-#include "../../../../src/include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp"
+#include "Test.h"
+#include <string>
+#include "ParticleSystem.h"
+#include "ParticleSolverGPU.h"
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 #ifndef N_BODY_GPUTEST_H
 #define N_BODY_GPUTEST_H

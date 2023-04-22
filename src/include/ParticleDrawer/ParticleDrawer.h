@@ -1,6 +1,9 @@
-//
-// Created by marc on 5/04/23.
-//
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include "VertexFragmentShader.h"
+#include "Camera.h"
+#include "Bloom.h"
+
 
 #ifndef N_BODY_PARTICLEDRAWER_H
 #define N_BODY_PARTICLEDRAWER_H

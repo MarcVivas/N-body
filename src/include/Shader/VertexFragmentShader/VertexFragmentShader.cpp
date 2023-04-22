@@ -1,7 +1,3 @@
-//
-// Created by marc on 5/04/23.
-//
-
 #include "VertexFragmentShader.h"
 
 VertexFragmentShader::VertexFragmentShader(std::string vertPath, std::string fragPath): Shader() {

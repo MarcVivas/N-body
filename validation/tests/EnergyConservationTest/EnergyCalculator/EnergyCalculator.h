@@ -1,10 +1,9 @@
-//
-// Created by marc on 20/04/23.
-//
+
+#include <cmath>
+#include "ParticleSystem.h"
 
 #ifndef N_BODY_ENERGYCALCULATOR_H
 #define N_BODY_ENERGYCALCULATOR_H
-#include <cmath>
 
 
 class EnergyCalculator {

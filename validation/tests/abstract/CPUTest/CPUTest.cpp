@@ -1,6 +1,3 @@
-//
-// Created by marc on 21/04/23.
-//
 
 #include "CPUTest.h"
 

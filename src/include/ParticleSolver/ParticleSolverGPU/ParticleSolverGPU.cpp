@@ -1,8 +1,6 @@
-//
-// Created by marc on 30/03/23.
-//
 
 #include "ParticleSolverGPU.h"
+#include <glad/glad.h>
 
 ParticleSolverGPU::ParticleSolverGPU(std::string &pathToComputeShader): ParticleSolver() {
     this->computeShader = new ComputeShader(pathToComputeShader);

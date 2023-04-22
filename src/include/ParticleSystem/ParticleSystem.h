@@ -1,6 +1,7 @@
-//
-// Created by marc on 19/04/23.
-//
+#include <glm/glm.hpp>
+#include <vector>
+#include <ostream>
+#include <Particle.h>
 
 #ifndef N_BODY_PARTICLESYSTEM_H
 #define N_BODY_PARTICLESYSTEM_H

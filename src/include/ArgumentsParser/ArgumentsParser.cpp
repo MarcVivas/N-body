@@ -1,8 +1,5 @@
-//
-// Created by marc on 5/03/23.
-//
-
 #include "ArgumentsParser.h"
+#include <iostream>
 
 ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     // Default values

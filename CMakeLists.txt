@@ -53,6 +53,26 @@ FetchContent_MakeAvailable(glfw glad glm)
 set(
         PROJECT_SOURCES
         src/main/main.cpp
+        src/include/ArgumentsParser/ArgumentsParser.cpp
+        src/include/Camera/Camera.cpp
+        src/include/Shader/abstract/Shader.cpp
+        src/include/Shader/ComputeShader/ComputeShader.cpp
+        src/include/Shader/VertexFragmentShader/VertexFragmentShader.cpp
+        src/include/Particle/Particle.cpp
+        src/include/ParticleSystem/ParticleSystem.cpp
+        src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp
+        src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp
+        src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
+        src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
+        src/include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp
+        src/include/Bloom/Bloom.cpp
+        src/include/Window/Window.cpp
+        src/include/RenderTimer/RenderTimer.cpp
+        src/include/ParticleDrawer/ParticleDrawer.cpp
+        src/include/ParticleSimulation/ParticleSimulation.cpp
+        src/include/RenderLoop/RenderLoop.cpp
+        src/include/WindowInputManager/WindowInputManager.cpp
+
 )
 
 # Include OpenMP
@@ -66,5 +86,30 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 add_dependencies(${PROJECT_NAME} glfw glad glm)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(
+        ${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/enums/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ArgumentsParser/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Camera/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Shader/abstract/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Shader/ComputeShader/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Shader/VertexFragmentShader/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Particle/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystem/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/interface/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/interface/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUSequential/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUParallel/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverGPU/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Window/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderTimer/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleDrawer/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSimulation/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderLoop/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/WindowInputManager/
+
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad glm OpenMP::OpenMP_CXX)

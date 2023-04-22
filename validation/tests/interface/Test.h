@@ -1,7 +1,6 @@
+#include <cstddef>
 #ifndef N_BODY_TEST_H
 #define N_BODY_TEST_H
-#include "../../../src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp"
-#include "../EnergyConservationTest/EnergyCalculator/EnergyCalculator.cpp"
 
 class Test{
 public:

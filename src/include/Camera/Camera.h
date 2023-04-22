@@ -3,6 +3,9 @@
 // The code was written with the help of ChatGPT
 //
 
+
+#include <glm/glm.hpp>
+
 #ifndef N_BODY_CAMERA_H
 #define N_BODY_CAMERA_H
 
