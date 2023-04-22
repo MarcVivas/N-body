@@ -1,7 +1,3 @@
-//
-// Created by marc on 5/03/23.
-//
-
 #ifndef N_BODY_ENUMS_H
 #define N_BODY_ENUMS_H
 enum InitializationType{
