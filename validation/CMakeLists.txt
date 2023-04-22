@@ -92,6 +92,7 @@ target_include_directories(
         ../src/include/ParticleSolver/ParticleSolverGPU/
         ../src/include/ParticleSolver/ParticleSolverCPUParallel/
         ../src/include/ParticleSolver/ParticleSolverCPUSequential/
+        ../src/include/ParticleSystemInitializer/interface/
         ../src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/
         ../src/include/ParticleSystem/
         tests/interface/
