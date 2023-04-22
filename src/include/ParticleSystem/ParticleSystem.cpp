@@ -15,6 +15,14 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
     }
 }
 
+
+ParticleSystem::~ParticleSystem() {
+    delete [] this->accelerations;
+    delete [] this->velocities;
+    delete [] this->masses;
+    delete [] this->positions;
+}
+
 /**
  * Updates a particle position
  * Performs the leapfrog integration
