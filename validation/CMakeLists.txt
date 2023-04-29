@@ -53,6 +53,7 @@ FetchContent_MakeAvailable(glfw glad glm)
 set(
         PROJECT_SOURCES
         RunAllTests.cpp
+        ../src/include/ArgumentsParser/ArgumentsParser.cpp
         ../src/include/Shader/abstract/Shader.cpp
         ../src/include/Shader/ComputeShader/ComputeShader.cpp
         ../src/include/Shader/VertexFragmentShader/VertexFragmentShader.cpp
@@ -62,6 +63,7 @@ set(
         ../src/include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp
         ../src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
         ../src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
+        ../src/include/ParticleSystemInitializer/ParticleSystemLagrange/ParticleSystemLagrange.cpp
         tests/abstract/CPUTest/CPUTest.cpp
         tests/abstract/GPUTest/GPUTest.cpp
         tests/EnergyConservationTest/CPUEnergyConservationTest.cpp
@@ -94,7 +96,10 @@ target_include_directories(
         ../src/include/ParticleSolver/ParticleSolverCPUSequential/
         ../src/include/ParticleSystemInitializer/interface/
         ../src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/
+        ../src/include/ParticleSystemInitializer/ParticleSystemLagrange/
         ../src/include/ParticleSystem/
+        ../src/include/ArgumentsParser/
+        ../src/include/enums/
         tests/interface/
         tests/abstract/CPUTest/
         tests/abstract/GPUTest/

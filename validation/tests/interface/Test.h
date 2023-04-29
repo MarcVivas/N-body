@@ -6,6 +6,6 @@ class Test{
 public:
     virtual ~Test() = default;
     Test() = default;
-    virtual void runTest(const size_t iterations, const double stepSize) = 0;
+    virtual void runTest(const size_t iterations) = 0;
 };
 #endif //N_BODY_TEST_H

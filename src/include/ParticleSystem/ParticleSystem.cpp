@@ -6,12 +6,14 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
     this->accelerations = new glm::vec4[this->numParticles]();
     this->positions = new glm::vec4[this->numParticles]();
     this->masses = new glm::vec4[this->numParticles]();
+    this->forces = new glm::vec4[this->numParticles]();
 
     for (int i = 0; i < this->numParticles; i++) {
         this->velocities[i] = particles[i].velocity;
         this->accelerations[i] = particles[i].acceleration;
         this->positions[i] = particles[i].position;
         this->masses[i] = glm::vec4(particles[i].mass, 0, 0, 0);
+        this->forces[i] = glm::vec4(0.f);
     }
 }
 
@@ -24,8 +26,8 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
  * @param deltaTime
  * @param newAcceleration
  */
-void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec3 &newAcceleration) {
-    float dtDividedBy2 = deltaTime/2.f;
+void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec4 force) {
+    float dtDividedBy2 = deltaTime * 0.5f;
 
     // Compute velocity (i + 1/2)
     this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
@@ -34,10 +36,13 @@ void ParticleSystem::updateParticlePosition(unsigned int particleId, float delta
     this->positions[particleId] += this->velocities[particleId] * deltaTime;
 
     // Update acceleration (i+1)
-    this->accelerations[particleId] = glm::vec4(newAcceleration, 0);
+    // F = MA;
+    // A = F/M;  M is cancelled when calculating gravity force
+    this->accelerations[particleId] = force / this->masses[particleId].x;
 
     // Compute next velocity (i+1)
     this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
+
 }
 
 
@@ -59,6 +64,10 @@ glm::vec4* ParticleSystem::getVelocities() {
 
 glm::vec4* ParticleSystem::getAccelerations() {
     return this->accelerations;
+}
+
+glm::vec4* ParticleSystem::getForces() {
+    return this->forces;
 }
 
 void ParticleSystem::setAccelerations(glm::vec4 *newAccelerations) {

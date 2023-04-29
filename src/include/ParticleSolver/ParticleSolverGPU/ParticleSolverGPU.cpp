@@ -2,14 +2,15 @@
 #include "ParticleSolverGPU.h"
 #include <glad/glad.h>
 
-ParticleSolverGPU::ParticleSolverGPU(std::string &pathToComputeShader): ParticleSolver() {
+ParticleSolverGPU::ParticleSolverGPU(float stepSize, float squaredSoft, std::string &pathToComputeShader): ParticleSolver() {
     this->computeShader = new ComputeShader(pathToComputeShader);
-    this->squaredSoftening = 0.5f;
+    this->computeShader->use();
+    this->computeShader->setFloat("deltaTime", stepSize);
+    this->computeShader->setFloat("squaredSoftening", squaredSoft);
 }
 
-void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles, float deltaTime) {
+void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles) {
     this->computeShader->use();
-    this->computeShader->setFloat("deltaTime", deltaTime);
     this->computeShader->setInt("numParticles", particles->size());
     glDispatchCompute(ceil(particles->size() / 64.0), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);

@@ -17,13 +17,13 @@ This project was made to learn `C++`, `OpenGL` and `GPU programming`.
 
 ### Features
 - Different versions/algorithms can be tried.
-- Different intializations can be tried.
+- Different initializations can be tried.
 - The number of bodies to simulate can be customized.
 - The simulation is in a 3D world.
-- The simulation is in realtime.
 - Particles have bloom (only the brightest ones).
 - Leapfrog integrator.
 - Plummer softening.
+- Customizable step size and squared softening.
 
 ## Controls
 | Key/Input      | Action                     |
@@ -103,11 +103,17 @@ Run the compiled program.
 ## Program arguments
 - `-v` Configure which [version](#available-versions) you want to use. 
 - `-i` Configure which [initialization](#available-initializations) you want (How the bodies are initialized).
-- `-n` Configure how many bodies you want to simulate.  
+- `-n` Configure how many bodies you want to simulate. 
+- `-t` Configure the step size. (Smaller the more precise)
+- `-s` Configure the squared softening. 
 
 The default arguments are:
 ```bash
-./N-body -v 1 -i 2 -n 100  
+./N-body -v 1 -i 2 -n 100 -t 0.0035 -s 40.0
+```
+Alternative usage:
+```bash
+./N-body -version 1 -init 2 -n 100 -time-step 0.0035 -softening 40.0
 ```
 
 ## Available versions

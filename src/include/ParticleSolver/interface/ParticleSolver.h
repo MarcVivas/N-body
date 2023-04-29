@@ -8,7 +8,7 @@ class ParticleSolver {
 public:
     virtual ~ParticleSolver() = default;
     ParticleSolver() = default;
-    virtual void updateParticlePositions(ParticleSystem *particles, float deltaTime) = 0;
+    virtual void updateParticlePositions(ParticleSystem *particles) = 0;
     virtual float getSquaredSoftening() = 0;
     virtual bool usesGPU() = 0;
 };

@@ -24,7 +24,7 @@ void RenderLoop::runLoop(ParticleSimulation *particleSimulation) {
         this->renderTimer.updateTime(this->window, this->pauseSimulation);
 
         if(!this->pauseSimulation){
-            particleSimulation->update(this->renderTimer.getDeltaTime());
+            particleSimulation->update();
         }
 
         particleSimulation->draw();

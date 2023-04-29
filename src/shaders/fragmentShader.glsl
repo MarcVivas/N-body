@@ -10,7 +10,7 @@ in float particleSize;
 
 vec4 getParticleColor(){
     // Define a maximum velocity value
-    float maxVelocity = worldSize/11.f;
+    float maxVelocity = worldSize*2;
 
     // Compute the magnitude of the particle's velocity
     float velocityMagnitude = length(particleVelocity);

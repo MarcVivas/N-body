@@ -62,6 +62,7 @@ set(
         src/include/ParticleSystem/ParticleSystem.cpp
         src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp
         src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp
+        src/include/ParticleSystemInitializer/ParticleSystemLagrange/ParticleSystemLagrange.cpp
         src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
         src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
         src/include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp
@@ -110,6 +111,6 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSimulation/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderLoop/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/WindowInputManager/
-
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemLagrange/
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad glm OpenMP::OpenMP_CXX)

@@ -4,6 +4,7 @@ layout( local_size_x = 64, local_size_y =1, local_size_z = 1  ) in;
 
 uniform int numParticles;
 uniform float deltaTime;
+uniform float squaredSoftening;
 
 layout(std430, binding=0) buffer positionsBuffer
 {

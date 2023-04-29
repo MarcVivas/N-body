@@ -7,12 +7,15 @@
 
 class ParticleSolverCPUSequential: public ParticleSolver  {
 public:
-    ParticleSolverCPUSequential();
-    void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
+    ParticleSolverCPUSequential(float timeStep, float squaredSoftening);
+    void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     float getSquaredSoftening() override;
 protected:
     float squaredSoftening;
+    float G;
+    float timeStep;
+    glm::vec4 computeGravityForce(ParticleSystem *particles, const unsigned int particleId);
 };
 
 

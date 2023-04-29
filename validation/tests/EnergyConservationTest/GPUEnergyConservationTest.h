@@ -8,9 +8,9 @@
 
 class GPUEnergyConservationTest: public GPUTest {
 public:
-    GPUEnergyConservationTest(ParticleSystem* particleSystem, std::string& shaderPath);
+    GPUEnergyConservationTest(ParticleSystem* particleSystem, std::string& shaderPath, float stepSize, float softening);
     ~GPUEnergyConservationTest();
-    void runTest(const size_t iterations, const double stepSize);
+    void runTest(const size_t iterations);
 protected:
     EnergyCalculator *energyCalculator;
 

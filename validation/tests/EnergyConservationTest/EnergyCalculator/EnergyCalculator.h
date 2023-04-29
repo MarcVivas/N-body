@@ -8,8 +8,10 @@
 
 class EnergyCalculator {
 public:
-    EnergyCalculator() = default;
-    void computeEnergy(ParticleSystem *particles, const float squaredSoftening);
+    EnergyCalculator(float stepSize, float softening);
+    void computeEnergy(ParticleSystem *particles);
+    float stepSize;
+    float softening;
 
 };
 

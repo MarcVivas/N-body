@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <glm/glm.hpp>
+#include "ArgumentsParser.h"
 
 #include "CPUEnergyConservationTest.h"
 #include "GPUEnergyConservationTest.h"
@@ -9,10 +10,14 @@
 #include "ParticleSolverCPUParallel.h"
 #include "ParticleSolverCPUSequential.h"
 
-int main(){
+int main(int argc, char *argv[]){
+
+    // Get the arguments
+    ArgumentsParser args(argc, argv);
+
     srand(static_cast<unsigned int>(std::time(nullptr)));
-    ParticleSystemInitializer *initializer = new ParticleSystemCubeInitializer(1 + (rand() % 101));
-    ParticleSystem *particleSystem = initializer->generateParticles(glm::vec3(1 + rand() % 700));
+    ParticleSystemInitializer *initializer = new ParticleSystemCubeInitializer(2 + (rand() % 5));
+    ParticleSystem *particleSystem = initializer->generateParticles(glm::vec3(5, 5, 5));
     delete initializer;
 
     glm::vec4* originalPositions = particleSystem->getPositions();
@@ -27,27 +32,27 @@ int main(){
     glm::vec4* copiedAccelerations = new glm::vec4[particleSystem->size()];
     std::copy(originalAccelerations, originalAccelerations + particleSystem->size(), copiedAccelerations);
 
+    const size_t iterations = 30000;
 
-    Test *cpuSeqEnergyConservationTest = new CPUEnergyConservationTest(particleSystem, new ParticleSolverCPUSequential());
-    Test *cpuParallelEnergyConservationTest = new CPUEnergyConservationTest(particleSystem, new ParticleSolverCPUParallel());
+    Test *cpuSeqEnergyConservationTest = new CPUEnergyConservationTest(particleSystem, new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()), args.getTimeStep(), args.getSquaredSoftening());
+    Test *cpuParallelEnergyConservationTest = new CPUEnergyConservationTest(particleSystem, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()), args.getTimeStep(), args.getSquaredSoftening());
 
     std::string shaderPath = "../../src/shaders/ComputeShaders/updateParticles.glsl";
-    Test *gpuEnergyConservationTest = new GPUEnergyConservationTest(particleSystem, shaderPath);
+    Test *gpuEnergyConservationTest = new GPUEnergyConservationTest(particleSystem, shaderPath, args.getTimeStep(), args.getSquaredSoftening());
 
-    const size_t iterations = 100 + (rand() % 401);
-    const double stepSize = 0.0005 + static_cast<double>(rand()) / (static_cast<double>(RAND_MAX / (0.5 - 0.0005)));
+
 
     std::cout << "Energy test: CPU sequential\n";
-    cpuSeqEnergyConservationTest->runTest(iterations, stepSize);
+    cpuSeqEnergyConservationTest->runTest(iterations);
 
     std::cout << "Energy test: CPU parallel\n";
     particleSystem->setAccelerations(copiedAccelerations);
     particleSystem->setPositions(copiedPositions);
     particleSystem->setVelocities(copiedVelocities);
-    cpuParallelEnergyConservationTest->runTest(iterations, stepSize);
+    cpuParallelEnergyConservationTest->runTest(iterations);
 
     std::cout << "Energy test: GPU\n";
-    gpuEnergyConservationTest->runTest(iterations, stepSize);
+    gpuEnergyConservationTest->runTest(iterations);
 
     delete cpuSeqEnergyConservationTest;
     delete cpuParallelEnergyConservationTest;

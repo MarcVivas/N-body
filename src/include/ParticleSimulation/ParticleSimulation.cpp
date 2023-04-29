@@ -24,8 +24,8 @@ void ParticleSimulation::draw() {
     this->lockParticlesBuffer();
 }
 
-void ParticleSimulation::update(double deltaTime) {
-    this->particleSolver->updateParticlePositions(this->particleSystem, deltaTime);
+void ParticleSimulation::update() {
+    this->particleSolver->updateParticlePositions(this->particleSystem);
     this->waitParticlesBuffer();
 }
 

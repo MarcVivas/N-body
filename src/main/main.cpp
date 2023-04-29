@@ -2,6 +2,8 @@
 
 #include "ParticleSystemCubeInitializer.h"
 #include "ParticleSystemGalaxyInitializer.h"
+#include "ParticleSystemLagrange.h"
+
 
 #include "ParticleSolverCPUSequential.h"
 #include "ParticleSolverCPUParallel.h"
@@ -15,7 +17,7 @@ int main(int argc, char *argv[])
     ArgumentsParser args(argc, argv);
 
     // Using meters
-    glm::vec3 worldDimensions(8000.f, 8000.f, 8000.f);
+    glm::vec3 worldDimensions(5.f, 5.f, 5.f);
 
     // Using pixels
     glm::vec2 windowDim(800, 600);
@@ -33,6 +35,9 @@ int main(int argc, char *argv[])
         case InitializationType::CUBE:
             particleSystemInitializer = new ParticleSystemCubeInitializer(args.getNumParticles());
             break;
+        case InitializationType::LAGRANGE:
+            particleSystemInitializer = new ParticleSystemLagrange();
+            break;
         default:
             exit(EXIT_FAILURE);
     }
@@ -42,14 +47,14 @@ int main(int argc, char *argv[])
 
     switch (args.getVersion()){
         case Version::PP_CPU_SEQUENTIAL:
-            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverCPUSequential(), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
             break;
         case Version::PP_CPU_PARALLEL:
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
             break;
         case Version::PP_GPU_PARALLEL:
             std::string computeShader("../src/shaders/ComputeShaders/updateParticles.glsl");
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(computeShader), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(args.getTimeStep(), args.getSquaredSoftening(), computeShader), worldDimensions, windowDim);
             break;
     }
 

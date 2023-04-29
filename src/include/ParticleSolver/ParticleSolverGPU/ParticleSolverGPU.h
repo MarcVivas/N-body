@@ -8,10 +8,10 @@
 
 class ParticleSolverGPU: public ParticleSolver {
 public:
-    ParticleSolverGPU(std::string &pathToComputeShader);
+    ParticleSolverGPU(float stepSize, float squaredSoft, std::string &pathToComputeShader);
     ~ParticleSolverGPU();
     bool usesGPU() override;
-    void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
+    void updateParticlePositions(ParticleSystem *particles) override;
     float getSquaredSoftening() override;
 protected:
     float squaredSoftening;

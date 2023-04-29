@@ -12,9 +12,9 @@
 
 class GPUTest : public Test{
 public:
-    GPUTest(ParticleSystem* particleSystem, std::string& shaderPath);
+    GPUTest(ParticleSystem* particleSystem, std::string& shaderPath, float stepSize, float softening);
     virtual ~GPUTest();
-    virtual void runTest(const size_t iterations, const double stepSize) = 0;
+    virtual void runTest(const size_t iterations) = 0;
 
 protected:
     ParticleSystem *particles;

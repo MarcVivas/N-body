@@ -8,9 +8,9 @@
 
 class CPUEnergyConservationTest: public CPUTest {
 public:
-    CPUEnergyConservationTest(ParticleSystem* particleSystem, ParticleSolver *particleSolver);
+    CPUEnergyConservationTest(ParticleSystem* particleSystem, ParticleSolver *particleSolver, float stepSize, float softening);
     ~CPUEnergyConservationTest();
-    virtual void runTest(const size_t iterations, const double stepSize) override;
+    virtual void runTest(const size_t iterations) override;
 protected:
     EnergyCalculator *energyCalculator;
 };

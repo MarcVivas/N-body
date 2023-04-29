@@ -11,13 +11,15 @@ public:
     Version getVersion();
     InitializationType getInitializationType();
     size_t getNumParticles();
-    bool isTest();
+    float getTimeStep();
+    float getSquaredSoftening();
     bool isBenchmark();
 private:
     Version version;
     InitializationType init;
     size_t numParticles;
-    bool test;
+    float timeStep;
+    float squaredSoftening;
     bool benchmark;
 };
 

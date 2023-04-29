@@ -11,7 +11,7 @@
 #define PARTICLESIMULATION_H
 class ParticleSimulation {
 public:
-    virtual void update(double deltaTime);
+    virtual void update();
     virtual void draw();
     virtual ParticleDrawer* getParticleDrawer();
     ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim);

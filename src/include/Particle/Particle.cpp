@@ -6,7 +6,7 @@ Particle::Particle(glm::vec3 pos, glm::vec3 vel, float m) :position(glm::vec4(po
 Particle::Particle() = default;
 Particle::~Particle() = default;
 
-void Particle::setVelocity(glm::vec3 &vel) {
+void Particle::setVelocity(glm::vec3 vel) {
     this->velocity = glm::vec4(vel, 0.f);
 }
 

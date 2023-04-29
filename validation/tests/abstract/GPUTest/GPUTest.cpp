@@ -1,7 +1,7 @@
 #include "GPUTest.h"
 #include <iostream>
 
-GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath): Test(){
+GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath, float stepSize, float softening): Test(){
     this->particles = particleSystem;
 
     // Initialize GLFW
@@ -54,7 +54,7 @@ GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath): Test(
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles->size(), this->particles->getAccelerations(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    this->solver = new ParticleSolverGPU(shaderPath);
+    this->solver = new ParticleSolverGPU(stepSize, softening, shaderPath);
 
 
 }

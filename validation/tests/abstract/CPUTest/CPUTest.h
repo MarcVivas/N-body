@@ -10,7 +10,7 @@ class CPUTest: public Test {
 public:
     CPUTest(ParticleSystem* particleSystem, ParticleSolver *particleSolver);
     virtual ~CPUTest();
-    virtual void runTest(const size_t iterations, const double stepSize) = 0;
+    virtual void runTest(const size_t iterations) = 0;
 
 protected:
     ParticleSystem *particles;

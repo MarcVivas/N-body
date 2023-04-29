@@ -18,7 +18,7 @@ algorithms = [1, 2, 3] if args.algorithms is None else args.algorithms
 
 
 # Set the number of bodies to test
-bodies = [2**i for i in range(8, 21, 1)]
+bodies = [2**i for i in range(1, 13, 1)]
 
 
 

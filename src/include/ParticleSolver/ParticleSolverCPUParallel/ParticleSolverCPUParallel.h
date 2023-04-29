@@ -7,12 +7,16 @@
 
 class ParticleSolverCPUParallel: public ParticleSolver  {
 public:
-    ParticleSolverCPUParallel();
-    void updateParticlePositions(ParticleSystem *particles, float deltaTime) override;
+    ParticleSolverCPUParallel(float timeStep, float squaredSoftening);
+    void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     float getSquaredSoftening() override;
 protected:
+    float timeStep;
     float squaredSoftening;
+    glm::vec4 computeGravityAcceleration(ParticleSystem *particles, const unsigned int particleId);
+    float G;
+
 };
 
 
