@@ -25,7 +25,7 @@ out float particleSize;
 
 float getParticleSize(){
     // set the particle size based on the distance from the camera to the particle
-    float particleSize = 1.25 / length(cameraPos - positions[gl_VertexID].xyz);
+    float particleSize = 4.0f / length(cameraPos - positions[gl_VertexID].xyz);
 
     // set the point size based on the particle size
     if(pointSize){

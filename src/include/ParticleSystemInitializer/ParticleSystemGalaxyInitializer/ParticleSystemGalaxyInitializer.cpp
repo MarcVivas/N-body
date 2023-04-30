@@ -13,27 +13,26 @@ ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 wor
     std::random_device randomDevice;
     std::mt19937 mt(randomDevice());
     std::uniform_real_distribution<float> randRadius(0.f, worldDimensions.x / 2.f);
-    std::normal_distribution<float> randTheta(0.0f, 2*M_PI);
-    float length = glm::length(worldDimensions) / 20.f;
+    std::uniform_real_distribution<float> randThickness(0.1f, worldDimensions.z / 7.f);
+    std::normal_distribution<float> randTheta(0.0f, M_PI);
+    float length = glm::length(worldDimensions) / 4.f;
 
     // Define the parameters for the bulge
     float bulgeRadius = worldDimensions.x / 10.f;
-    float bulgeMass = totalParticles * 0.2f;
-    float bulgeDensity = bulgeMass / (4.f/3.f * M_PI * pow(bulgeRadius, 3.f));
-    float bulgeSoftening = 0.2f;
+    float bulgeMass = totalParticles * 0.4f;
+    float bulgeDensity = bulgeMass / (4.f/3.f * M_PI * pow(bulgeRadius, 3.f)) / this->totalParticles/2.f;
 
     // Define the parameters for the spiral arms
     float armRadius = worldDimensions.x / 2.f;
-    float armMass = totalParticles * 0.8f;
-    float armDensity = armMass / (4.f/3.f * M_PI * pow(armRadius, 3.f));
-    float armSoftening = 1.5f;
+    float armMass = totalParticles * 0.6f;
+    float armDensity = armMass / (4.f/3.f * M_PI * pow(armRadius, 3.f)) / this->totalParticles/2.f;
 
-    glm::vec3 center = glm::vec3(worldDimensions.x / 2.f, worldDimensions.y / 2.f, worldDimensions.z / 2.f);
+    glm::vec3 center = glm::vec3(worldDimensions.x / 2.f, worldDimensions.y / 2.f, worldDimensions.z );
 
     for (size_t i = 0; i < totalParticles; i++) {
         float radius = randRadius(mt);
         float theta = randTheta(mt) * 2.f * glm::pi<float>();
-        float height = (worldDimensions.z == 0) ? 0 : randRadius(mt) - worldDimensions.x / 2.f;
+        float height = (worldDimensions.z == 0) ? 0 : randThickness(mt)  ;
         glm::vec3 particlePos = center + glm::vec3(radius * std::cos(theta), radius * std::sin(theta), height);
 
         // Compute the mass based on the particle's position
@@ -42,7 +41,10 @@ ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 wor
             mass = bulgeDensity;
         }
         glm::vec3 initialVel = glm::vec3(-length * sin(theta), length * cos(theta), 0.f);
+
+
         particles[i] = Particle(particlePos, initialVel, mass);
+
 
         // Add an additional velocity component for particles in the spiral arms
         if (radius < armRadius) {

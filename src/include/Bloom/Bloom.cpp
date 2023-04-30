@@ -5,7 +5,7 @@
 
 Bloom::Bloom(glm::vec2 &windowDim) {
     this->activated = true;
-    this->intensity = 0.5f;
+    this->intensity = 0.4f;
 
     // set up floating point framebuffer to render scene to
     glGenFramebuffers(1, &this->hdrFrameBuffer);
