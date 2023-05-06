@@ -10,11 +10,14 @@ ParticleSolverCPUSequential::ParticleSolverCPUSequential(float stepSize, float s
 
 void ParticleSolverCPUSequential::updateParticlePositions(ParticleSystem *particles){
     for(size_t i = 0; i<particles->size(); i++){
-        particles->updateParticlePosition(i, this->timeStep, this->computeGravityForce(particles, i));
+        this->computeGravityForce(particles, i);
+    }
+    for(size_t i = 0; i<particles->size(); i++){
+        particles->updateParticlePosition(i, this->timeStep);
     }
 }
 
-glm::vec4
+void
 ParticleSolverCPUSequential::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
 
     glm::vec4 particlePosition = particles->getPositions()[particleId];
@@ -28,7 +31,9 @@ ParticleSolverCPUSequential::computeGravityForce(ParticleSystem *particles, cons
         totalForce += ((G * particleMass * particles->getMasses()[j].x) / distance_i_j) * vector_i_j;
     }
 
-    return totalForce;
+
+    particles->getForces()[particleId] = totalForce;
+
 }
 
 bool ParticleSolverCPUSequential::usesGPU() {return false;}

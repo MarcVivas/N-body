@@ -2,7 +2,7 @@
 #include "ParticleSolverCPUParallel.h"
 #include <omp.h>
 #include <glm/gtx/norm.hpp>
-
+#include <iostream>
 ParticleSolverCPUParallel::ParticleSolverCPUParallel(float stepSize, float squaredSoft): ParticleSolver() {
     this->squaredSoftening = squaredSoft;
     this->timeStep = stepSize;
@@ -10,14 +10,21 @@ ParticleSolverCPUParallel::ParticleSolverCPUParallel(float stepSize, float squar
 }
 
 void ParticleSolverCPUParallel::updateParticlePositions(ParticleSystem *particles){
-#pragma omp parallel for schedule(static) shared(particles)
+
+    #pragma omp parallel for schedule(static) shared(particles)
+    for(size_t i =  0; i < particles->size(); i++){
+        this->computeGravityForce(particles, i);
+    }
+
+    #pragma omp parallel for schedule(static) shared(particles)
     for(size_t i =  0; i<particles->size(); i++){
-        particles->updateParticlePosition(i, this->timeStep, this->computeGravityAcceleration(particles, i));
+        particles->updateParticlePosition(i, this->timeStep);
     }
 }
 
-glm::vec4
-ParticleSolverCPUParallel::computeGravityAcceleration(ParticleSystem *particles, const unsigned int particleId) {
+
+void
+ParticleSolverCPUParallel::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
     glm::vec4 particlePosition = particles->getPositions()[particleId];
     float particleMass = particles->getMasses()[particleId].x;
 
@@ -29,7 +36,7 @@ ParticleSolverCPUParallel::computeGravityAcceleration(ParticleSystem *particles,
         totalForce += ((G * particleMass * particles->getMasses()[j].x) / distance_i_j) * vector_i_j;
     }
 
-    return totalForce;
+    particles->getForces()[particleId] = totalForce;
 }
 
 bool ParticleSolverCPUParallel::usesGPU() {return false;}

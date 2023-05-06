@@ -10,7 +10,7 @@
 class ParticleSystem {
 public:
     ParticleSystem(std::vector<Particle> &particles);
-    void updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec4 force);
+    void updateParticlePosition(unsigned int particleId, float deltaTime);
     unsigned int size();
     glm::vec4* getPositions();
     glm::vec4* getVelocities();

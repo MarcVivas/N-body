@@ -10,7 +10,7 @@ ParticleSystem* ParticleSystemCubeInitializer::generateParticles(glm::vec3 world
     std::random_device randomDevice;
     std::mt19937 mt(randomDevice());
     std::uniform_real_distribution<float> randDist(0, worldDimensions.x);
-    std::uniform_real_distribution<float> mass(1, 3);
+    std::uniform_real_distribution<float> mass(2.8, 3);
 
 
     float length = glm::length(worldDimensions) / 20.f;

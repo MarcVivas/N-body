@@ -26,7 +26,7 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
  * @param deltaTime
  * @param newAcceleration
  */
-void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime, glm::vec4 force) {
+void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime) {
     float dtDividedBy2 = deltaTime * 0.5f;
 
     // Compute velocity (i + 1/2)
@@ -38,7 +38,7 @@ void ParticleSystem::updateParticlePosition(unsigned int particleId, float delta
     // Update acceleration (i+1)
     // F = MA;
     // A = F/M;  M is cancelled when calculating gravity force
-    this->accelerations[particleId] = force / this->masses[particleId].x;
+    this->accelerations[particleId] = this->forces[particleId] / this->masses[particleId].x;
 
     // Compute next velocity (i+1)
     this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;

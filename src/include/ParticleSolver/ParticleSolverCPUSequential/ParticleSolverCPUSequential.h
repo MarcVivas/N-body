@@ -15,7 +15,7 @@ protected:
     float squaredSoftening;
     float G;
     float timeStep;
-    glm::vec4 computeGravityForce(ParticleSystem *particles, const unsigned int particleId);
+    void computeGravityForce(ParticleSystem *particles, const unsigned int particleId);
 };
 
 
