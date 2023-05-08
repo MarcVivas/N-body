@@ -48,6 +48,14 @@ void ParticleSimulation::createBuffers(bool usesGPU) {
     glGenBuffers(1, &this->accelerations_SSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->accelerations_SSBO);
 
+    // This SSBO stores particles accelerations
+    glGenBuffers(1, &this->masses_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, this->masses_SSBO);
+
+    // This SSBO stores particles accelerations
+    glGenBuffers(1, &this->forces_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, this->forces_SSBO);
+
 
     if(usesGPU){
         this->configureGpuBuffers();
@@ -67,6 +75,12 @@ void ParticleSimulation::configureGpuBuffers() {
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getAccelerations(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->masses_SSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getMasses(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->forces_SSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getForces(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 

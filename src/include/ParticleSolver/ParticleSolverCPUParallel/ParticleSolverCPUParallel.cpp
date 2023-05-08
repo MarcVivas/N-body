@@ -26,14 +26,12 @@ void ParticleSolverCPUParallel::updateParticlePositions(ParticleSystem *particle
 void
 ParticleSolverCPUParallel::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
     glm::vec4 particlePosition = particles->getPositions()[particleId];
-    float particleMass = particles->getMasses()[particleId].x;
-
     glm::vec4 totalForce (0.f);
 
     for(size_t j = 0; j < particles->size(); j++){
         const glm::vec4 vector_i_j = particles->getPositions()[j] - particlePosition;
         const float distance_i_j = std::pow(glm::length2(vector_i_j) + this->squaredSoftening, 1.5);
-        totalForce += ((G * particleMass * particles->getMasses()[j].x) / distance_i_j) * vector_i_j;
+        totalForce += ((G * particles->getMasses()[j].x) / distance_i_j) * vector_i_j;
     }
 
     particles->getForces()[particleId] = totalForce;

@@ -38,7 +38,7 @@ void ParticleSystem::updateParticlePosition(unsigned int particleId, float delta
     // Update acceleration (i+1)
     // F = MA;
     // A = F/M;  M is cancelled when calculating gravity force
-    this->accelerations[particleId] = this->forces[particleId] / this->masses[particleId].x;
+    this->accelerations[particleId] = this->forces[particleId];
 
     // Compute next velocity (i+1)
     this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
