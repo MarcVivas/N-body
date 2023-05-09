@@ -136,7 +136,7 @@ There's a benchmark (written in Python) available for measuring the performance 
 ## Program structure
 Here you can see the class diagram. It should be relativley easy to add new initializations and versions.  
 
-![Class diagram](path/to/image)
+![Class diagram](media/classdiagram.svg.svg)
 
 
 An example of how a new simulation version can be added is by creating a new class that implements the `ParticleSolver` interface and then including the new version in the list of available version options in the `ArgumentsParser` class. This way, the user can select the new version through the input arguments.   
