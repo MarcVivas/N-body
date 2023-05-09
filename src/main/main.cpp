@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
 
     ParticleSimulation* particleSimulation;
 
+    std::string positionsCalculatorPath;
+    std::string forceCalculatorPath;
+
     switch (args.getVersion()){
         case Version::PP_CPU_SEQUENTIAL:
             particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
@@ -53,8 +56,13 @@ int main(int argc, char *argv[])
             particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
             break;
         case Version::PP_GPU_PARALLEL:
-            std::string positionsCalculatorPath("../src/shaders/ComputeShaders/updateParticles.glsl");
-            std::string forceCalculatorPath("../src/shaders/ComputeShaders/forceCalculation.glsl");
+            positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
+            forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculation.glsl";
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
+            break;
+        case Version::PP_GPU_OPTIMIZED:
+            positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
+            forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculation.glsl";
             particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
             break;
     }

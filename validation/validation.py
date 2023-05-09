@@ -52,6 +52,9 @@ for line in output:
     elif "Energy test: CPU parallel" in line:
         plot_energy(energy_df, 'CPU sequential')
         energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
+    elif "Energy test: GPU optimized" in line:
+        plot_energy(energy_df, 'GPU')
+        energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
     elif "Energy test: GPU" in line:
         plot_energy(energy_df, 'CPU parallel')
         energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
@@ -69,7 +72,7 @@ for line in output:
         energy_df = pd.concat([energy_df, new_row], ignore_index=True)
 
 
-plot_energy(energy_df, 'GPU')
+plot_energy(energy_df, 'GPU optimized')
 
 
 

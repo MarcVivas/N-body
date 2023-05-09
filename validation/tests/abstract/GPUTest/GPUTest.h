@@ -12,14 +12,14 @@
 
 class GPUTest : public Test{
 public:
-    GPUTest(ParticleSystem* particleSystem, std::string& shaderPath, float stepSize, float softening);
+    GPUTest(ParticleSystem* particleSystem, std::string& positionsShaderPath, std::string& forcesShaderPath, float stepSize, float softening);
     virtual ~GPUTest();
     virtual void runTest(const size_t iterations) = 0;
 
 protected:
     ParticleSystem *particles;
     ParticleSolver *solver;
-    GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO;
+    GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO, forces_SSBO, masses_SSBO;
     GLFWwindow* window;
     virtual void updateParticleSystemBuffers();
 

@@ -1,7 +1,7 @@
 #include "GPUTest.h"
 #include <iostream>
 
-GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath, float stepSize, float softening): Test(){
+GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& positionsShaderPath, std::string& forcesShaderPath, float stepSize, float softening): Test(){
     this->particles = particleSystem;
 
     // Initialize GLFW
@@ -44,6 +44,14 @@ GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath, float 
     glGenBuffers(1, &this->accelerations_SSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, this->accelerations_SSBO);
 
+    // This SSBO stores particles accelerations
+    glGenBuffers(1, &this->masses_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, this->masses_SSBO);
+
+    // This SSBO stores particles accelerations
+    glGenBuffers(1, &this->forces_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, this->forces_SSBO);
+
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles->size(), this->particles->getPositions(), GL_DYNAMIC_DRAW);
 
@@ -52,24 +60,22 @@ GPUTest::GPUTest(ParticleSystem* particleSystem, std::string& shaderPath, float 
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles->size(), this->particles->getAccelerations(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->masses_SSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles->size(), this->particles->getMasses(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->forces_SSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particles->size(), this->particles->getForces(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    this->solver = new ParticleSolverGPU(stepSize, softening, shaderPath);
+    this->solver = new ParticleSolverGPU(stepSize, softening, positionsShaderPath, forcesShaderPath);
 
 
 }
 
 void GPUTest::updateParticleSystemBuffers() {
-    // Bind the position SSBO
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
-    // Map the position SSBO memory to CPU-accessible memory
-    glm::vec4* positions = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
     int numParticles = this->particles->size();
-    glm::vec4* copiedPositions = new glm::vec4[numParticles];
-    std::copy(positions, positions + numParticles, copiedPositions);
-    this->particles->setPositions(copiedPositions);
-    // Unmap the position SSBO
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
 
     // Bind the velocity SSBO
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->velocities_SSBO);
@@ -78,16 +84,17 @@ void GPUTest::updateParticleSystemBuffers() {
     glm::vec4* copiedVelocities = new glm::vec4[numParticles];
     std::copy(velocities, velocities + numParticles, copiedVelocities);
     this->particles->setVelocities(copiedVelocities);
-    // Unmap the position SSBO
+    // Unmap the velocity SSBO
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
-    // Bind the acceleration SSBO
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
-    // Map the acceleration SSBO memory to CPU-accessible memory
-    glm::vec4* accelerations = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
-    glm::vec4* copiedAccelerations = new glm::vec4[numParticles];
-    std::copy(accelerations, accelerations + numParticles, copiedAccelerations);
-    this->particles->setAccelerations(copiedAccelerations);
+
+    // Bind the position SSBO
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
+    // Map the position SSBO memory to CPU-accessible memory
+    glm::vec4* positions = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+    glm::vec4* copiedPositions = new glm::vec4[numParticles];
+    std::copy(positions, positions + numParticles, copiedPositions);
+    this->particles->setPositions(copiedPositions);
     // Unmap the position SSBO
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 

@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
     ArgumentsParser args(argc, argv);
 
     srand(static_cast<unsigned int>(std::time(nullptr)));
-    ParticleSystemInitializer *initializer = new ParticleSystemCubeInitializer(2 + (rand() % 5));
+    ParticleSystemInitializer *initializer = new ParticleSystemCubeInitializer(4 + (rand() % 6));
     ParticleSystem *particleSystem = initializer->generateParticles(glm::vec3(5, 5, 5));
     delete initializer;
 
@@ -37,28 +37,62 @@ int main(int argc, char *argv[]){
     Test *cpuSeqEnergyConservationTest = new CPUEnergyConservationTest(particleSystem, new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()), args.getTimeStep(), args.getSquaredSoftening());
     Test *cpuParallelEnergyConservationTest = new CPUEnergyConservationTest(particleSystem, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()), args.getTimeStep(), args.getSquaredSoftening());
 
-    std::string shaderPath = "../../src/shaders/ComputeShaders/updateParticles.glsl";
-    Test *gpuEnergyConservationTest = new GPUEnergyConservationTest(particleSystem, shaderPath, args.getTimeStep(), args.getSquaredSoftening());
+    std::string positionsShaderPath = "../../src/shaders/ComputeShaders/updateParticles.glsl";
+    std::string forcesShaderPath = "../../src/shaders/ComputeShaders/forceCalculation.glsl";
 
 
 
     std::cout << "Energy test: CPU sequential\n";
     cpuSeqEnergyConservationTest->runTest(iterations);
+    delete cpuSeqEnergyConservationTest;
 
     std::cout << "Energy test: CPU parallel\n";
+    originalPositions = copiedPositions;
+    glm::vec4* newCopiedPositions = new glm::vec4[particleSystem->size()];
+    std::copy(originalPositions, originalPositions + particleSystem->size(), newCopiedPositions);
+
+    originalVelocities = copiedVelocities;
+    glm::vec4* newCopiedVelocities = new glm::vec4[particleSystem->size()];
+    std::copy(originalVelocities, originalVelocities + particleSystem->size(), newCopiedVelocities);
+
+    originalAccelerations = copiedAccelerations;
+    glm::vec4* newCopiedAccelerations = new glm::vec4[particleSystem->size()];
+    std::copy(originalAccelerations, originalAccelerations + particleSystem->size(), newCopiedAccelerations);
+    particleSystem->setAccelerations(newCopiedAccelerations);
+    particleSystem->setPositions(newCopiedPositions);
+    particleSystem->setVelocities(newCopiedVelocities);
+    cpuParallelEnergyConservationTest->runTest(iterations);
+    delete cpuParallelEnergyConservationTest;
+
+    std::cout << "Energy test: GPU\n";
+    originalPositions = copiedPositions;
+    std::copy(originalPositions, originalPositions + particleSystem->size(), newCopiedPositions);
+
+    originalVelocities = copiedVelocities;
+    std::copy(originalVelocities, originalVelocities + particleSystem->size(), newCopiedVelocities);
+
+    originalAccelerations = copiedAccelerations;
+    std::copy(originalAccelerations, originalAccelerations + particleSystem->size(), newCopiedAccelerations);
+    particleSystem->setAccelerations(newCopiedAccelerations);
+    particleSystem->setPositions(newCopiedPositions);
+    particleSystem->setVelocities(newCopiedVelocities);
+    Test *gpuEnergyConservationTest = new GPUEnergyConservationTest(particleSystem, positionsShaderPath, forcesShaderPath, args.getTimeStep(), args.getSquaredSoftening());
+    gpuEnergyConservationTest->runTest(iterations);
+    delete gpuEnergyConservationTest;
+
     particleSystem->setAccelerations(copiedAccelerations);
     particleSystem->setPositions(copiedPositions);
     particleSystem->setVelocities(copiedVelocities);
-    cpuParallelEnergyConservationTest->runTest(iterations);
+    Test *gpuOptimizedEnergyConservationTest = new GPUEnergyConservationTest(particleSystem, positionsShaderPath, forcesShaderPath, args.getTimeStep(), args.getSquaredSoftening());
+    std::cout << "Energy test: GPU optimized\n";
+    gpuOptimizedEnergyConservationTest->runTest(iterations);
+    delete gpuOptimizedEnergyConservationTest;
 
-    std::cout << "Energy test: GPU\n";
-    gpuEnergyConservationTest->runTest(iterations);
-
-    delete cpuSeqEnergyConservationTest;
-    delete cpuParallelEnergyConservationTest;
-    delete gpuEnergyConservationTest;
     delete particleSystem;
     delete[] copiedVelocities;
     delete[] copiedPositions;
     delete[] copiedAccelerations;
+    delete[] newCopiedVelocities;
+    delete[] newCopiedAccelerations;
+    delete[] newCopiedPositions;
 }

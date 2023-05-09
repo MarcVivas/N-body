@@ -2,7 +2,7 @@
 #include "GPUEnergyConservationTest.h"
 #include <iostream>
 
-GPUEnergyConservationTest::GPUEnergyConservationTest(ParticleSystem* particleSystem, std::string& shaderPath, float stepSize, float softening) : GPUTest(particleSystem, shaderPath, stepSize, softening){
+GPUEnergyConservationTest::GPUEnergyConservationTest(ParticleSystem* particleSystem, std::string& positionsShaderPath, std::string& forcesShaderPath, float stepSize, float softening) : GPUTest(particleSystem, positionsShaderPath, forcesShaderPath, stepSize, softening){
     this->energyCalculator = new EnergyCalculator(stepSize, softening);
 }
 
