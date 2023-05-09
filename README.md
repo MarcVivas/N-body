@@ -119,14 +119,16 @@ Alternative usage:
 ## Available versions
 There is a total of `3` versions you can try:
 - `-v 1` Particle-particle sequential algorithm (n^2 complexity) using the CPU.
-- `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU.
-- `-v 3` Particle-particle parallel algorithm (n^2 complexity) using the GPU.
+- `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU (OpenMP).
+- `-v 3` Particle-particle parallel algorithm (n^2 complexity) using the GPU (Compute shaders).
+- `-v 4` Optimized version 3. Implementaion of [Nvidia - Fast N-body simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda). (Compute shaders)
 
 
 ## Available initializations
 You can try the next initializations:
-- `-i 1` Particles form a cube and have random velocities and masses.
-- `-i 2` Particles form a galaxy.
+- `-i 1` Particles form a cube.
+- `-i 2` Particles form a disk.
+- `-i 3` Particles form an equilateral triangle. (Only 3 particles)
 
 ## Benchmark
 There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.
