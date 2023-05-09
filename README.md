@@ -10,7 +10,7 @@
 - [Program arguments](#program-arguments)  
 - [Available versions](#available-versions)  
 - [Available initializations](#available-initializations)  
-
+- [Program structure](#program-structure)
 
 ## About this project  
 This project was made to learn `C++`, `OpenGL` and `GPU programming`.
@@ -132,3 +132,20 @@ You can try the next initializations:
 
 ## Benchmark
 There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.
+
+## Program structure
+Here you can see the class diagram. It should be relativley easy to add new initializations and versions.  
+
+![Class diagram](path/to/image)
+
+
+An example of how a new simulation version can be added is by creating a new class that implements the `ParticleSolver` interface and then including the new version in the list of available version options in the `ArgumentsParser` class. This way, the user can select the new version through the input arguments.   
+
+Similarly, to add a new initialization, a new class that implements the `ParticleSystemInitializer` interface can be created and the new option can be added to the list of initialization options in the `ArgumentsParser` class.   
+
+Finally, you would have to use the new initalization or version you created in `main.cpp`.
+
+
+
+
+
