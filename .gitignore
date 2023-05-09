@@ -1,6 +1,7 @@
 # CLion files and directories
 .idea/
 cmake-build-debug/
+.vs/
 
 # VSCode files and directories
 .vscode/
