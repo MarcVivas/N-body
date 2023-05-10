@@ -129,6 +129,7 @@ You can try the next initializations:
 - `-i 1` Particles form a cube.
 - `-i 2` Particles form a disk.
 - `-i 3` Particles form an equilateral triangle. (Only 3 particles)
+- `-i 4` Particles form a sphere. (Only the surface)
 
 ## Benchmark
 There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.

@@ -3,7 +3,7 @@
 #include "ParticleSystemCubeInitializer.h"
 #include "ParticleSystemGalaxyInitializer.h"
 #include "ParticleSystemLagrange.h"
-
+#include "ParticleSystemSphere.h"
 
 #include "ParticleSolverCPUSequential.h"
 #include "ParticleSolverCPUParallel.h"
@@ -38,9 +38,14 @@ int main(int argc, char *argv[])
         case InitializationType::LAGRANGE:
             particleSystemInitializer = new ParticleSystemLagrange();
             break;
+        case InitializationType::SPHERE_1:
+            particleSystemInitializer = new ParticleSystemSphere(args.getNumParticles());
+            break;
         default:
             exit(EXIT_FAILURE);
     }
+
+
 
 
     ParticleSimulation* particleSimulation;

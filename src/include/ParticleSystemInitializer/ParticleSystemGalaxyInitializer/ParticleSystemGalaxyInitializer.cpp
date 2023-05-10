@@ -13,19 +13,18 @@ ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 wor
     std::random_device randomDevice;
     std::mt19937 mt(randomDevice());
     std::uniform_real_distribution<float> randRadius(0.f, worldDimensions.x / 2.f);
-    std::uniform_real_distribution<float> randThickness(0.1f, worldDimensions.z / 7.f);
-    std::normal_distribution<float> randTheta(0.0f, M_PI);
+    std::uniform_real_distribution<float> randThickness(0.1f, worldDimensions.z / 6.f);
+    std::normal_distribution<float> randTheta(0.0f, M_PI*50);
     float length = glm::length(worldDimensions) / 4.f;
+
+    float worldVolume = worldDimensions.x * worldDimensions.y * worldDimensions.z;
+    float particleMass = (worldVolume / this->totalParticles) * 0.5;
 
     // Define the parameters for the bulge
     float bulgeRadius = worldDimensions.x / 10.f;
-    float bulgeMass = totalParticles * 0.4f;
-    float bulgeDensity = bulgeMass / (4.f/3.f * M_PI * pow(bulgeRadius, 3.f)) / this->totalParticles/2.f;
 
     // Define the parameters for the spiral arms
     float armRadius = worldDimensions.x / 2.f;
-    float armMass = totalParticles * 0.6f;
-    float armDensity = armMass / (4.f/3.f * M_PI * pow(armRadius, 3.f)) / this->totalParticles/2.f;
 
     glm::vec3 center = glm::vec3(worldDimensions.x / 2.f, worldDimensions.y / 2.f, worldDimensions.z );
 
@@ -36,14 +35,12 @@ ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 wor
         glm::vec3 particlePos = center + glm::vec3(radius * std::cos(theta), radius * std::sin(theta), height);
 
         // Compute the mass based on the particle's position
-        float mass = armDensity;
         if (radius < bulgeRadius) {
-            mass = bulgeDensity;
+            particleMass = (worldVolume / this->totalParticles) * 0.7;
         }
         glm::vec3 initialVel = glm::vec3(-length * sin(theta), length * cos(theta), 0.f);
 
-
-        particles[i] = Particle(particlePos, initialVel, mass);
+        particles[i] = Particle(particlePos, initialVel, particleMass );
 
 
         // Add an additional velocity component for particles in the spiral arms
