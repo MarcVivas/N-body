@@ -18,14 +18,15 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "Available versions: \n";
     std::cout << "-v 1 (Particle-Particle algorithm CPU sequential)\n";
     std::cout << "-v 2 (Particle-Particle algorithm CPU parallel)\n";
-    std::cout << "-v 3 (Particle-Particle algorithm GPU parallel)\n\n";
+    std::cout << "-v 3 (Particle-Particle algorithm GPU parallel)\n";
+    std::cout << "-v 4 (Optimized version 3. GPU parallel Fast N-body Particle-Particle)\n\n";
 
     std::cout << "Number of particles: \n";
     std::cout << "-n (Any positive number)\n\n";
 
     std::cout << "Available initializations: \n";
-    std::cout << "-i 1 (Particles form a CUBE, have random velocities and masses) \n";
-    std::cout << "-i 2 (Particles form a GALAXY, have random velocities and masses) \n";
+    std::cout << "-i 1 (Particles form a CUBE) \n";
+    std::cout << "-i 2 (Particles form a DISK) \n";
     std::cout << "-i 3 (Particles form a equilateral triangle, have equal masses and 0 velocity)\n\n";
 
     std::cout << "Time step: \n";
