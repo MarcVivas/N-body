@@ -2,6 +2,7 @@
 #include <random>
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <chrono>
 
 ParticleSystemGalaxyInitializer::ParticleSystemGalaxyInitializer(size_t numParticles) :totalParticles(numParticles){
 }
@@ -10,8 +11,7 @@ ParticleSystemGalaxyInitializer::ParticleSystemGalaxyInitializer(size_t numParti
 ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 worldDimensions) {
     Particle* particles = new Particle[this->totalParticles];
 
-    std::random_device randomDevice;
-    std::mt19937 mt(randomDevice());
+    std::mt19937 mt(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_real_distribution<float> randRadius(0.f, worldDimensions.x / 2.f);
     std::uniform_real_distribution<float> randThickness(0.1f, worldDimensions.z / 6.f);
     std::normal_distribution<float> randTheta(0.0f, M_PI*50);

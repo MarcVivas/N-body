@@ -1,14 +1,14 @@
 #include "ParticleSystemCubeInitializer.h"
 #include <random>
 #include <glm/gtc/random.hpp>
+#include <chrono>
 
 ParticleSystemCubeInitializer::ParticleSystemCubeInitializer(size_t numParticles) : totalParticles(numParticles){}
 
 ParticleSystem* ParticleSystemCubeInitializer::generateParticles(glm::vec3 worldDimensions) {
     Particle* particles = new Particle[this->totalParticles];
 
-    std::random_device randomDevice;
-    std::mt19937 mt(randomDevice());
+    std::mt19937 mt(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_real_distribution<float> randDist(0, worldDimensions.x);
     std::uniform_real_distribution<float> mass(0.8, 1.3);
 

@@ -19,7 +19,7 @@ vec4 getParticleColor(){
     float normalizedVelocity = clamp(velocityMagnitude / maxVelocity, 0.0, 1.0);
 
     // Define three colors for the gradient (e.g. red, orange, yellow)
-    vec3 colorLow = vec3(0.0, 0.0, 0.5); // blue (slowest)
+    vec3 colorLow = vec3(0.0, 0.0, 1.0); // blue (slowest)
     vec3 colorMid = vec3(1.0, 0.5, 0.0); // orange (middle)
     vec3 colorHigh = vec3(1.0, 1.0, 0.0); // yellow (fastest)
 

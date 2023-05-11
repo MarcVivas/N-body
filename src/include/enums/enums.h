@@ -4,7 +4,8 @@ enum InitializationType{
     CUBE = 1,
     GALAXY = 2,
     LAGRANGE = 3,
-    SPHERE_1 = 4
+    SPHERE = 4,
+    BALL = 5
 };
 
 enum Version {
