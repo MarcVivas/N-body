@@ -64,6 +64,7 @@ set(
         src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp
         src/include/ParticleSystemInitializer/ParticleSystemSphere/ParticleSystemSphere.cpp
         src/include/ParticleSystemInitializer/ParticleSystemBall/ParticleSystemBall.cpp
+        src/include/ParticleSystemInitializer/ParticleSystemCubeSurface/ParticleSystemCubeSurface.cpp
         src/include/ParticleSystemInitializer/ParticleSystemLagrange/ParticleSystemLagrange.cpp
         src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
         src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
@@ -104,6 +105,7 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemSphere/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemBall/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemCubeSurface/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/interface/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUSequential/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUParallel/

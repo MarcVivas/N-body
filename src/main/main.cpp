@@ -5,6 +5,8 @@
 #include "ParticleSystemLagrange.h"
 #include "ParticleSystemSphere.h"
 #include "ParticleSystemBall.h"
+#include "ParticleSystemCubeSurface.h"
+
 
 #include "ParticleSolverCPUSequential.h"
 #include "ParticleSolverCPUParallel.h"
@@ -44,6 +46,9 @@ int main(int argc, char *argv[])
             break;
         case InitializationType::BALL:
             particleSystemInitializer = new ParticleSystemBall(args.getNumParticles());
+            break;
+        case InitializationType::CUBE_SURFACE:
+            particleSystemInitializer = new ParticleSystemCubeSurface(args.getNumParticles());
             break;
         default:
             exit(EXIT_FAILURE);

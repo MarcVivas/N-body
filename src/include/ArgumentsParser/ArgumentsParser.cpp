@@ -29,7 +29,9 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "-i 2 (Particles form a DISK) \n";
     std::cout << "-i 3 (Particles form a equilateral TRIANGLE, have equal masses and 0 velocity)\n";
     std::cout << "-i 4 (Particles form a SPHERE (Only the surface))\n";
-    std::cout << "-i 5 (Particles form a BALL)\n\n";
+    std::cout << "-i 5 (Particles form a BALL)\n";
+    std::cout << "-i 6 (Particles form a CUBE (Only the surface))\n\n";
+
 
     std::cout << "Time step: \n";
     std::cout << "-t (Any positive decimal number)\n\n";
@@ -63,7 +65,7 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
         } else if ((arg == "-init" || arg == "-i") && i + 1 < argc) {
             int value = std::stoi(argv[i + 1]);
             if (value >= static_cast<int>(InitializationType::CUBE) &&
-                value <= static_cast<int>(InitializationType::BALL)) {
+                value <= static_cast<int>(InitializationType::CUBE_SURFACE)) {
                 this->init = static_cast<InitializationType>(value);
             } else {
                 std::cerr << "Invalid initialization type\n";
