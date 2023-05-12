@@ -20,7 +20,7 @@ This project was made to learn `C++`, `OpenGL` and `GPU programming`.
 - Different initializations can be tried.
 - The number of bodies to simulate can be customized.
 - The simulation is in a 3D world.
-- Particles have bloom (only the brightest ones).
+- Particles have bloom.
 - Leapfrog integrator.
 - Plummer softening.
 - Customizable step size and squared softening.
