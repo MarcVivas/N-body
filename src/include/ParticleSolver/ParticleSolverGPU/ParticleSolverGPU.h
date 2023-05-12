@@ -9,6 +9,7 @@
 class ParticleSolverGPU: public ParticleSolver {
 public:
     ParticleSolverGPU(float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
+    ParticleSolverGPU(double block_size, float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
     ~ParticleSolverGPU();
     bool usesGPU() override;
     void updateParticlePositions(ParticleSystem *particles) override;

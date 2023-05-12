@@ -14,6 +14,19 @@ ParticleSolverGPU::ParticleSolverGPU(float stepSize, float squaredSoft, std::str
     this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
 }
 
+ParticleSolverGPU::ParticleSolverGPU(double block_size, float stepSize, float squaredSoft,
+                                     std::string &positionCalculatorPath, std::string &forceCalculatorPath) {
+    this->blockSize = block_size;
+
+    this->positionCalculator = new ComputeShader(positionCalculatorPath);
+    this->positionCalculator->use();
+    this->positionCalculator->setFloat("deltaTime", stepSize);
+
+    this->forceCalculator = new ComputeShader(forceCalculatorPath);
+    this->forceCalculator->use();
+    this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
+}
+
 void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles) {
     this->forceCalculator->use();
     this->forceCalculator->setInt("numParticles", particles->size());
@@ -22,7 +35,7 @@ void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles) {
 
     this->positionCalculator->use();
     this->positionCalculator->setInt("numParticles", particles->size());
-    glDispatchCompute(ceil(particles->size() / this->blockSize), 1, 1);
+    glDispatchCompute(ceil(particles->size() / 64.0), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
