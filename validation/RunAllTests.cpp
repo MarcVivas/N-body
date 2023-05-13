@@ -83,6 +83,7 @@ int main(int argc, char *argv[]){
     particleSystem->setAccelerations(copiedAccelerations);
     particleSystem->setPositions(copiedPositions);
     particleSystem->setVelocities(copiedVelocities);
+    forcesShaderPath = "../../src/shaders/ComputeShaders/forceCalculationOptimized.glsl";
     Test *gpuOptimizedEnergyConservationTest = new GPUEnergyConservationTest(particleSystem, positionsShaderPath, forcesShaderPath, args.getTimeStep(), args.getSquaredSoftening());
     std::cout << "Energy test: GPU optimized\n";
     gpuOptimizedEnergyConservationTest->runTest(iterations);

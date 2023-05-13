@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
             break;
         case Version::PP_GPU_OPTIMIZED:
             positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
-            forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculation.glsl";
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
+            forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculationOptimized.glsl";
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(320.0, args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
             break;
     }
 
