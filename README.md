@@ -122,7 +122,7 @@ There is a total of `3` versions you can try:
 - `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU (OpenMP).
 - `-v 3` Particle-particle parallel algorithm (n^2 complexity) using the GPU (Compute shaders).
 - `-v 4` Optimized version 3. Implementaion of [Nvidia - Fast N-body simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda). (Compute shaders)
-
+- `-v 5` Fixed grid algorithm CPU parallel.
 
 ## Available initializations
 You can try the next initializations:
