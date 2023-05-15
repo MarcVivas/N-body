@@ -76,6 +76,9 @@ set(
         src/include/ParticleSimulation/ParticleSimulation.cpp
         src/include/RenderLoop/RenderLoop.cpp
         src/include/WindowInputManager/WindowInputManager.cpp
+        src/include/Bucket/Bucket.cpp
+        src/include/Grid/GridCPU.cpp
+        src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
 
 )
 
@@ -110,12 +113,15 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUSequential/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUParallel/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverGPU/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUGrid/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bucket/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Window/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderTimer/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleDrawer/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSimulation/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderLoop/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Grid/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/WindowInputManager/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemLagrange/
 )

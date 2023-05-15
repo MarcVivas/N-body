@@ -11,6 +11,8 @@
 #include "ParticleSolverCPUSequential.h"
 #include "ParticleSolverCPUParallel.h"
 #include "ParticleSolverGPU.h"
+#include "ParticleSolverCPUGrid.h"
+
 
 #include "WindowInputManager.h"
 
@@ -78,6 +80,9 @@ int main(int argc, char *argv[])
             positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
             forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculationOptimized.glsl";
             particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(320.0, args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
+            break;
+        case Version::GRID_CPU:
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUGrid(new GridCPU(worldDimensions, args.getNumParticles(), 4), args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
             break;
     }
 
