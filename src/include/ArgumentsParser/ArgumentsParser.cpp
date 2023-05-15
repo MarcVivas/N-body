@@ -20,7 +20,9 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "-v 2 (Particle-Particle algorithm CPU parallel)\n";
     std::cout << "-v 3 (Particle-Particle algorithm GPU parallel)\n";
     std::cout << "-v 4 (Optimized version 3. GPU parallel Fast N-body Particle-Particle)\n";
-    std::cout << "-v 5 Fixed grid CPU\n\n";
+    std::cout << "-v 5 Fixed grid CPU\n";
+    std::cout << "-v 5 Fixed grid GPU\n\n";
+
 
     std::cout << "Number of particles: \n";
     std::cout << "-n (Any positive number)\n\n";
@@ -47,7 +49,7 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
         if ((arg == "-version" || arg == "-v") && i + 1 < argc) {
             int value = std::stoi(argv[i + 1]);
             if (value >= static_cast<int>(Version::PP_CPU_SEQUENTIAL) &&
-                value <= static_cast<int>(Version::GRID_CPU)) {
+                value <= static_cast<int>(Version::GRID_GPU)) {
                 this->version = static_cast<Version>(value);
             } else {
                 std::cerr << "Invalid version\n";

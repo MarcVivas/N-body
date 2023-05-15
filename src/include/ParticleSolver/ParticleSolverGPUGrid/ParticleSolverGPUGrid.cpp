@@ -1,20 +1,20 @@
 
-#include "ParticleSolverGPU.h"
+#include "ParticleSolverGPUGrid.h"
 #include <glad/glad.h>
-
-ParticleSolverGPU::ParticleSolverGPU(float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath): ParticleSolver() {
+#include <iostream>
+ParticleSolverGPUGrid::ParticleSolverGPUGrid(GridGPU *gridGpu, float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath): ParticleSolver() {
     this->blockSize = 64.0;
 
     this->positionCalculator = new ComputeShader(positionCalculatorPath);
     this->positionCalculator->use();
     this->positionCalculator->setFloat("deltaTime", stepSize);
 
+
     this->forceCalculator = new ComputeShader(forceCalculatorPath);
-    this->forceCalculator->use();
-    this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
+    this->grid = gridGpu;
 }
 
-ParticleSolverGPU::ParticleSolverGPU(double block_size, float stepSize, float squaredSoft,
+ParticleSolverGPUGrid::ParticleSolverGPUGrid(GridGPU *gridGpu, double block_size, float stepSize, float squaredSoft,
                                      std::string &positionCalculatorPath, std::string &forceCalculatorPath) {
     this->blockSize = block_size;
 
@@ -23,13 +23,12 @@ ParticleSolverGPU::ParticleSolverGPU(double block_size, float stepSize, float sq
     this->positionCalculator->setFloat("deltaTime", stepSize);
 
     this->forceCalculator = new ComputeShader(forceCalculatorPath);
-    this->forceCalculator->use();
-    this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
+    this->grid = gridGpu;
+
 }
 
-void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles) {
+void ParticleSolverGPUGrid::updateParticlePositions(ParticleSystem *particles) {
     this->forceCalculator->use();
-    this->forceCalculator->setInt("numParticles", particles->size());
     glDispatchCompute(ceil(particles->size() / this->blockSize), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
@@ -40,13 +39,14 @@ void ParticleSolverGPU::updateParticlePositions(ParticleSystem *particles) {
 }
 
 
-ParticleSolverGPU::~ParticleSolverGPU() noexcept {
+ParticleSolverGPUGrid::~ParticleSolverGPUGrid() noexcept {
     delete this->positionCalculator;
     delete this->forceCalculator;
+    delete this->grid;
 }
 
-bool ParticleSolverGPU::usesGPU() {return true;}
+bool ParticleSolverGPUGrid::usesGPU() {return true;}
 
-float ParticleSolverGPU::getSquaredSoftening() {
+float ParticleSolverGPUGrid::getSquaredSoftening() {
     return this->squaredSoftening;
 }
