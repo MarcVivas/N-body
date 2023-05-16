@@ -1,17 +1,16 @@
 
 #include "ParticleSolver.h"
 #include "ComputeShader.h"
-#include "GridGPU.h"
 
-#ifndef N_BODY_PARTICLESOLVERGPUGRID_H
-#define N_BODY_PARTICLESOLVERGPUGRID_H
+#ifndef N_BODY_PARTICLESOLVERGPU_H
+#define N_BODY_PARTICLESOLVERGPU_H
 
 
-class ParticleSolverGPUGrid: public ParticleSolver {
+class ParticleSolverGPU: public ParticleSolver {
 public:
-    ParticleSolverGPUGrid(GridGPU *gridGpu, float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
-    ParticleSolverGPUGrid(GridGPU *gridGpu, double block_size, float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
-    ~ParticleSolverGPUGrid();
+    ParticleSolverGPU(float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
+    ParticleSolverGPU(double block_size, float stepSize, float squaredSoft, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
+    ~ParticleSolverGPU();
     bool usesGPU() override;
     void updateParticlePositions(ParticleSystem *particles) override;
     float getSquaredSoftening() override;
@@ -19,8 +18,7 @@ protected:
     float squaredSoftening;
     Shader *positionCalculator, *forceCalculator;
     double blockSize;
-    GridGPU *grid;
 };
 
 
-#endif //N_BODY_PARTICLESOLVERGPUGRID_H
+#endif //N_BODY_PARTICLESOLVERGPU_H

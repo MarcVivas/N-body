@@ -12,7 +12,6 @@
 #include "ParticleSolverCPUParallel.h"
 #include "ParticleSolverGPU.h"
 #include "ParticleSolverCPUGrid.h"
-#include "ParticleSolverGPUGrid.h"
 
 
 #include "WindowInputManager.h"
@@ -84,12 +83,6 @@ int main(int argc, char *argv[])
             break;
         case Version::GRID_CPU:
             particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUGrid(new GridCPU(worldDimensions, args.getNumParticles(), 4), args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
-            break;
-        case Version::GRID_GPU:
-            std::string gridShader = "../src/shaders/ComputeShaders/Grid/grid.glsl";
-            std::string gridSolver = "../src/shaders/ComputeShaders/Grid/gridForceSolver.glsl";
-            positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPUGrid(new GridGPU(gridShader, worldDimensions, args.getNumParticles(), 4), args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, gridSolver), worldDimensions, windowDim);
             break;
     }
 
