@@ -27,25 +27,25 @@ shared float blockMasses[BLOCK_SIZE];
 
 void main() {
     const uint index = gl_GlobalInvocationID.x;
+    const bool isValidIndex = index < numParticles;
 
     const float G = 1.0f;
-    vec3 totalForce = vec3(0);
-    const vec3 particlePosition = positions[index].xyz;
+    vec3 totalForce = vec3(0.0f);
+    vec3 particlePosition = positions[index].xyz;
     const uint blockIndex = index % BLOCK_SIZE;
 
     for(uint b = 0; b < numParticles; b+=BLOCK_SIZE){
 
         // Store particles into shared memory
-        if(index < numParticles){
-            blockPositions[blockIndex] = positions[blockIndex + b].xyz;
-            blockMasses[blockIndex] = masses[blockIndex + b].x;
+        const uint particleIndex = blockIndex + b;
+        if(particleIndex < numParticles){
+            blockPositions[blockIndex] = positions[particleIndex].xyz;
+            blockMasses[blockIndex] = masses[particleIndex].x;
         }
         else{
-            // Just in case the number of particles is not multiple of block size
             blockPositions[blockIndex] = vec3(0);
-            blockMasses[blockIndex] = 0.f;
+            blockMasses[blockIndex] = 0.0f;
         }
-
 
         // Ensure shared memory writes are visible to work group
         memoryBarrierShared();
@@ -53,17 +53,19 @@ void main() {
         // Ensure all threads in work group have executed statements above
         barrier();
 
-        for(uint j = 0; j < BLOCK_SIZE; ++j){
-            const vec3 vector_i_j = blockPositions[j] - particlePosition;
-            const float inv_distance_i_j = 1.0f / pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
-            totalForce += G * blockMasses[j] * inv_distance_i_j * vector_i_j;
+        if (isValidIndex){
+            for(uint j = 0; j < BLOCK_SIZE; ++j){
+                const vec3 vector_i_j = blockPositions[j] - particlePosition;
+                const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
+                totalForce += ((G * blockMasses[j]) / distance_i_j) * vector_i_j;
+            }
         }
 
         // Ensure all threads in work group have executed statements above
         barrier();
     }
 
-    if(index < numParticles){
+    if(isValidIndex){
         // Write to global memory the result
         forces[index] = vec4(totalForce, 0.0f);
     }
