@@ -117,7 +117,7 @@ Alternative usage:
 ```
 
 ## Available versions
-There is a total of `3` versions you can try:
+These are the available versions you can try:
 - `-v 1` Particle-particle sequential algorithm (n^2 complexity) using the CPU.
 - `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU (OpenMP).
 - `-v 3` Particle-particle parallel algorithm (n^2 complexity) using the GPU (Compute shaders).
