@@ -55,8 +55,8 @@ void main() {
 
         for(uint j = 0; j < BLOCK_SIZE; ++j){
             const vec3 vector_i_j = blockPositions[j] - particlePosition;
-            const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
-            totalForce += ((G * blockMasses[j]) / distance_i_j) * vector_i_j;
+            const float inv_distance_i_j = 1.0f / pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
+            totalForce += G * blockMasses[j] * inv_distance_i_j * vector_i_j;
         }
 
         // Ensure all threads in work group have executed statements above
