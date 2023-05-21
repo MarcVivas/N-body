@@ -159,9 +159,9 @@ void Camera::zoomCallback(float mouseWheelYOffset) {
     }
 
     // Update near and far clip planes based on camera position
-    float distanceToCenter = glm::distance(this->position, this->worldCenter+this->worldCenter);
+    float distanceToCenter = glm::distance(this->position, this->worldCenter+this->worldCenter*3.f);
     //this->nearClipPlane = distanceToCenter * 0.001f;
-    this->farClipPlane = distanceToCenter * distanceToCenter;
+    this->farClipPlane = distanceToCenter * 3.f;
 
     // Update the world dimensions
     this->worldDimensions = newWorldDimensions;
