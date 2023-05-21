@@ -26,13 +26,13 @@ shared vec3 blockPositions[BLOCK_SIZE];
 shared float blockMasses[BLOCK_SIZE];
 
 void main() {
-    const uint index = gl_GlobalInvocationID.x;
-    const bool isValidIndex = index < numParticles;
+    const uint index = gl_GlobalInvocationID.x % numParticles;
+    const bool isValidIndex = gl_GlobalInvocationID.x < numParticles;
 
     const float G = 1.0f;
     vec3 totalForce = vec3(0.0f);
     vec3 particlePosition = positions[index].xyz;
-    const uint blockIndex = index % BLOCK_SIZE;
+    const uint blockIndex = gl_GlobalInvocationID.x % BLOCK_SIZE;
 
     for(uint b = 0; b < numParticles; b+=BLOCK_SIZE){
 
