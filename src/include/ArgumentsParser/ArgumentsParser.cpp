@@ -11,8 +11,8 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     this->benchmark = false;
 
     std::cout << "============================================ \n\n";
-    std::cout << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init] [-t timeStep] [-s squaredSoftening]\n";
-    std::cout << "Alternative usage: " << argv[0] << " [-version version] [-n numParticles] [-init init] [-time-step timeStep] [-softening squaredSoftening] \n";
+    std::cout << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init] [-t timeStep] [-s squaredSoftening] [-f filePath]\n";
+    std::cout << "Alternative usage: " << argv[0] << " [-version version] [-n numParticles] [-init init] [-time-step timeStep] [-softening squaredSoftening] [-file filePath] \n";
     std::cout << "Default: " << argv[0] << " -v 1 -n 100 -i 2 -t 0.00004\n\n";
 
     std::cout << "Available versions: \n";
@@ -33,6 +33,8 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "-i 5 (Particles form a BALL)\n";
     std::cout << "-i 6 (Particles form a CUBE (Only the surface))\n\n";
 
+    std::cout << "File initialization: \n";
+    std::cout << "-f path/to/initialization/file \n\n";
 
     std::cout << "Time step: \n";
     std::cout << "-t (Any positive decimal number)\n\n";
@@ -85,21 +87,33 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
             this->squaredSoftening = std::stof(argv[i+1]);
             i++;
         }
+        else if ((arg == "-file" || arg == "-f") && i + 1 < argc) {
+            filePath = argv[i + 1];
+            i++;
+            this->init = static_cast<InitializationType>(7);
+            std::cout << "------------------------------------ \n\n";
+            std::cout << "Now using: \n\n";
+            std::cout << "File initialization\n";
+            std::cout << "------------------------------------ \n\n";
+            return;
+        }
         else {
-            std::cerr << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init] [-t timeStep] [-s squaredSoftening]\n";
-            std::cerr << "Alternative usage: " << argv[0] << " [-version version] [-n numParticles] [-init init] [-time-step timeStep] [-softening squaredSoftening]\n";
+            std::cerr << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init] [-t timeStep] [-s squaredSoftening] [-f filePath]\n";
+            std::cerr << "Alternative usage: " << argv[0] << " [-version version] [-n numParticles] [-init init] [-time-step timeStep] [-softening squaredSoftening] [-file filePath] \n";
             exit(EXIT_FAILURE);
         }
     }
 
-    std::cout << "------------------------------------ \n\n";
-    std::cout << "Now using: \n\n";
-    std::cout << "Version: " << version << "\n";
-    std::cout << "Num particles: " << numParticles << "\n";
-    std::cout << "Init: " << init << '\n';
-    std::cout << "Time step: " << timeStep << '\n';
-    std::cout << "Squared softening: " << squaredSoftening << "\n\n";
-    std::cout << "------------------------------------ \n\n";
+    if(filePath.empty()){
+        std::cout << "------------------------------------ \n\n";
+        std::cout << "Now using: \n\n";
+        std::cout << "Version: " << version << "\n";
+        std::cout << "Num particles: " << numParticles << "\n";
+        std::cout << "Init: " << init << '\n';
+        std::cout << "Time step: " << timeStep << '\n';
+        std::cout << "Squared softening: " << squaredSoftening << "\n\n";
+        std::cout << "------------------------------------ \n\n";
+    }
 }
 
 Version ArgumentsParser::getVersion() {
@@ -124,4 +138,8 @@ float ArgumentsParser::getSquaredSoftening() {
 
 bool ArgumentsParser::isBenchmark(){
     return this->benchmark;
+}
+
+std::string ArgumentsParser::getFilePath() {
+    return this->filePath;
 }

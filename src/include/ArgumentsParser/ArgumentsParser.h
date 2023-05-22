@@ -1,5 +1,6 @@
 #include "enums.h"
 #include <cstddef>
+#include <string>
 
 #ifndef N_BODY_ARGUMENTSPARSER_H
 #define N_BODY_ARGUMENTSPARSER_H
@@ -14,6 +15,7 @@ public:
     float getTimeStep();
     float getSquaredSoftening();
     bool isBenchmark();
+    std::string getFilePath();
 private:
     Version version;
     InitializationType init;
@@ -21,6 +23,7 @@ private:
     float timeStep;
     float squaredSoftening;
     bool benchmark;
+    std::string filePath;
 };
 
 

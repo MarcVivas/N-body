@@ -6,6 +6,7 @@
 #include "ParticleSystemSphere.h"
 #include "ParticleSystemBall.h"
 #include "ParticleSystemCubeSurface.h"
+#include "ParticleSystemFile.h"
 
 
 #include "ParticleSolverCPUSequential.h"
@@ -33,6 +34,8 @@ int main(int argc, char *argv[])
 
     ParticleSystemInitializer* particleSystemInitializer;
 
+    std::string filePath = args.getFilePath();
+
     switch (args.getInitializationType()) {
         case InitializationType::GALAXY:
             particleSystemInitializer = new ParticleSystemGalaxyInitializer(args.getNumParticles());
@@ -52,11 +55,12 @@ int main(int argc, char *argv[])
         case InitializationType::CUBE_SURFACE:
             particleSystemInitializer = new ParticleSystemCubeSurface(args.getNumParticles());
             break;
+        case InitializationType::SYSTEM_FILE:
+            particleSystemInitializer = new ParticleSystemFile(filePath);
+            break;
         default:
             exit(EXIT_FAILURE);
     }
-
-
 
 
     ParticleSimulation* particleSimulation;
@@ -85,7 +89,6 @@ int main(int argc, char *argv[])
             particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUGrid(new GridCPU(worldDimensions, args.getNumParticles(), 4), args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
             break;
     }
-
 
     WindowInputManager windowInputManager(&window, &renderLoop, particleSimulation);
 

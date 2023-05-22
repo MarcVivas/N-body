@@ -106,6 +106,7 @@ Run the compiled program.
 - `-n` Configure how many bodies you want to simulate. 
 - `-t` Configure the step size. (Smaller the more precise)
 - `-s` Configure the squared softening. 
+- `-f` Provide a [particle system file](#particle-system-file).
 
 The default arguments are:
 ```bash
@@ -121,7 +122,7 @@ These are the available versions you can try:
 - `-v 1` Particle-particle sequential algorithm (n^2 complexity) using the CPU.
 - `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU (OpenMP).
 - `-v 3` Particle-particle parallel algorithm (n^2 complexity) using the GPU (Compute shaders).
-- `-v 4` Optimized version 3. Implementaion of [Nvidia - Fast N-body simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda). (Compute shaders)
+- `-v 4` Optimized version 3. Implementation of [Nvidia - Fast N-body simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda). (Compute shaders)
 - `-v 5` Fixed grid algorithm CPU parallel.
 
 ## Available initializations
@@ -132,6 +133,39 @@ You can try the next initializations:
 - `-i 4` Particles form a sphere. (Only the surface)
 - `-i 5` Particles form a ball.
 - `-i 6` Particles form a cube. (Only the surface)
+
+## Particle system file
+The files you give to the program must follow this format:
+```html
+Particle System with 3 particles:
+Particle ID: 0
+Position: (5.8337, 4.6008, 3.35599)
+Velocity: (-1.15428, 1.8317, 0)
+Acceleration: (0, 0, 0)
+Mass: 0.625
+Particle ID: 1
+Position: (2.13544, 2.37607, 3.12727)
+Velocity: (1.01254, -1.94254, 0)
+Acceleration: (0.4, 3.0, 0)
+Mass: 0.875
+Particle ID: 2
+Position: (2.74389, 2.46503, 3.42229)
+Velocity: (0.0960527, 2.17343, 0)
+Acceleration: (0, 0, -8.0)
+Mass: 0.875
+Particle ID: 3
+Position: (3.38766, 0.977181, 2.78489)
+Velocity: (1.10174, 2.40912, 0)
+Acceleration: (-8.0, 0, 0)
+Mass: 0.625
+```
+> Note: The world dimensions are (5, 5, 5)
+
+This is how you can use the `-f` argument:
+````bash
+./N-body -f path/to/file
+````
+
 ## Benchmark
 There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.
 

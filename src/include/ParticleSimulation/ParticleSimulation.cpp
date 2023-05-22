@@ -1,6 +1,5 @@
 
 #include "ParticleSimulation.h"
-
 ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
                                        ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim){
 

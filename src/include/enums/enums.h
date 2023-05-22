@@ -6,7 +6,8 @@ enum InitializationType{
     LAGRANGE = 3,
     SPHERE = 4,
     BALL = 5,
-    CUBE_SURFACE = 6
+    CUBE_SURFACE = 6,
+    SYSTEM_FILE = 7
 };
 
 enum Version {

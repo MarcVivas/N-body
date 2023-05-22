@@ -13,6 +13,7 @@ public:
     float mass;
     Particle();
     Particle(glm::vec3 pos, glm::vec3 vel, float mass);
+    Particle(glm::vec3 pos, glm::vec3 vel, glm::vec3 acc, float mass);
     ~Particle();
 
     void setVelocity(glm::vec3 vel);
