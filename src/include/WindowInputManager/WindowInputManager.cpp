@@ -39,6 +39,16 @@ void WindowInputManager::setKeyCallback() {
                                glfwSetWindowShouldClose(win, true);
                            }
 
+                           // Save the initial simulation
+                           if (key == GLFW_KEY_S && action == GLFW_PRESS){
+                               inputManager->getParticleSimulation()->saveInitialState();
+                           }
+
+                           // Save the current state of the simulation
+                           if (key == GLFW_KEY_C && action == GLFW_PRESS){
+                               inputManager->getParticleSimulation()->saveCurrentState();
+                           }
+
                            // Pause/start the simulation when space is pressed
                            if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
                                inputManager->getRenderLoop()->setPauseSimulation(!inputManager->getRenderLoop()->getPauseSimulation());

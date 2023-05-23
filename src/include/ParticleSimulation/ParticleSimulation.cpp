@@ -1,4 +1,6 @@
-
+#include <fstream>
+#include <sstream>
+#include <iostream>
 #include "ParticleSimulation.h"
 ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
                                        ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim){
@@ -6,6 +8,7 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
     this->particleSolver = particleSysSolver;
     this->particleDrawer = new ParticleDrawer(worldDim, windowDim);
     this->particleSystem = particleSystemInitializer->generateParticles(worldDim);
+    this->initialParticleSystem = particleSystemInitializer->generateParticles(worldDim);
     this->createBuffers(this->particleSolver->usesGPU());
 }
 
@@ -130,6 +133,83 @@ void ParticleSimulation::waitParticlesBuffer()
                 return;
         }
     }
+}
+
+
+void ParticleSimulation::saveInitialState() {
+    this->saveSimulationFile(this->initialParticleSystem);
+}
+
+void ParticleSimulation::saveCurrentState() {
+    if(this->particleSolver->usesGPU()){
+        int numParticles = this->particleSystem->size();
+
+
+        // Bind the velocity SSBO
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->velocities_SSBO);
+        // Map the velocity SSBO memory to CPU-accessible memory
+        glm::vec4* velocities = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+        glm::vec4* copiedVelocities = new glm::vec4[numParticles];
+        std::copy(velocities, velocities + numParticles, copiedVelocities);
+        this->particleSystem->setVelocities(copiedVelocities);
+        // Unmap the velocity SSBO
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+
+        // Bind the position SSBO
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
+        // Map the position SSBO memory to CPU-accessible memory
+        glm::vec4* positions = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+        glm::vec4* copiedPositions = new glm::vec4[numParticles];
+        std::copy(positions, positions + numParticles, copiedPositions);
+        this->particleSystem->setPositions(copiedPositions);
+        // Unmap the position SSBO
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+        // Bind the acceleration SSBO
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
+        // Map the acceleration SSBO memory to CPU-accessible memory
+        glm::vec4* accelerations = static_cast<glm::vec4*>(glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY));
+        glm::vec4* copiedAccelerations = new glm::vec4[numParticles];
+        std::copy(accelerations, accelerations + numParticles, copiedAccelerations);
+        this->particleSystem->setAccelerations(copiedAccelerations);
+        // Unmap the acceleration SSBO
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+        // Unbind the shader storage buffers
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    }
+    this->saveSimulationFile(this->particleSystem);
+}
+
+void ParticleSimulation::saveSimulationFile(ParticleSystem *particleSys) {
+    static int saveCount = 1;
+    std::string fileName = "save" + std::to_string(saveCount) + ".sim";
+
+    // Check if the file already exists
+    std::ifstream file(fileName);
+    while (file.good()) {
+        file.close();
+        saveCount++;
+        fileName = "save" + std::to_string(saveCount) + ".sim";
+        file.open(fileName);
+    }
+    file.close();
+
+    // Open the file for writing
+    std::ofstream outFile(fileName);
+    if (!outFile.is_open()) {
+        std::cout << "Failed to open the save file." << std::endl;
+        return;
+    }
+
+    // Write the ParticleSystem data to the file
+    outFile << *particleSys;
+
+    // Close the file
+    outFile.close();
+
+    std::cout << "Particle system saved to " << fileName << std::endl;
 }
 
 

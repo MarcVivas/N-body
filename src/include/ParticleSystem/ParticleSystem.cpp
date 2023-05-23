@@ -70,18 +70,22 @@ glm::vec4* ParticleSystem::getForces() {
 }
 
 void ParticleSystem::setAccelerations(glm::vec4 *newAccelerations) {
+    delete [] this->accelerations;
     this->accelerations = newAccelerations;
 }
 
 void ParticleSystem::setMasses(glm::vec4 *newMasses) {
+    delete [] this->masses;
     this->masses = newMasses;
 }
 
 void ParticleSystem::setPositions(glm::vec4 *newPositions) {
+    delete [] this->positions;
     this->positions = newPositions;
 }
 
 void ParticleSystem::setVelocities(glm::vec4 *newVelocities) {
+    delete [] this->velocities;
     this->velocities = newVelocities;
 }
 

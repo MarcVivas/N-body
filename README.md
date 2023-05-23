@@ -26,16 +26,19 @@ This project was made to learn `C++`, `OpenGL` and `GPU programming`.
 - Customizable step size and squared softening.
 
 ## Controls
-| Key/Input      | Action                     |
-|----------------|----------------------------|
-| Esc            | Close the program          |
-| Space          | Pause/start the simulation |
-| Mouse scroll   | Zoom in/out                |
-| Click and drag | Move the camera            |
-| B              | Activate/Deactivate bloom  |
-| I              | Increase bloom intensity   |
-| D              | Decrease bloom intensity   |
-| Q              | Enable/disable point size  |
+| Key/Input      | Action                                   |
+|----------------|------------------------------------------|
+| Esc            | Close the program                        |
+| Space          | Pause/start the simulation               |
+| Mouse scroll   | Zoom in/out                              |
+| Click and drag | Move the camera                          |
+| B              | Activate/Deactivate bloom                |
+| I              | Increase bloom intensity                 |
+| D              | Decrease bloom intensity                 |
+| Q              | Enable/disable point size                |
+| S              | Save the initial state of the simulation |
+| C              | Save the current state of the simulation |
+
   
 
 ## How to run the project
@@ -165,6 +168,15 @@ This is how you can use the `-f` argument:
 ````bash
 ./N-body -f path/to/file
 ````
+
+### Save simulations 
+You have two options to save a simulation:
+
+1. Save the initial state of the simulation by pressing `S`.
+2. Save the current state of the simulation by pressing `C`.
+
+The saved files will be stored in the same location as the compiled program.
+
 
 ## Benchmark
 There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.

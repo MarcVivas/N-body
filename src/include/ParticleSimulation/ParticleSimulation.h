@@ -13,12 +13,15 @@ class ParticleSimulation {
 public:
     virtual void update();
     virtual void draw();
+    virtual void saveCurrentState();
+    virtual void saveInitialState();
     virtual ParticleDrawer* getParticleDrawer();
     ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim);
     ~ParticleSimulation();
 
 protected:
     ParticleSolver *particleSolver;
+    ParticleSystem *initialParticleSystem;
     ParticleDrawer *particleDrawer;
     ParticleSystem *particleSystem;
     GLuint VAO;
@@ -31,6 +34,7 @@ protected:
     void createBuffers(bool usesGPU);
     void configureGpuBuffers();
     void configureCpuBuffers();
+    void saveSimulationFile(ParticleSystem* particleSys);
 
 };
 #endif // PARTICLESIMULATION_H

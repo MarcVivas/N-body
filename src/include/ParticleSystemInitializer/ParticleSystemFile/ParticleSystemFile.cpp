@@ -48,7 +48,6 @@ ParticleSystem* ParticleSystemFile::generateParticles(glm::vec3 worldDimensions)
             position.x = std::stof(posX);
             position.y = std::stof(posY);
             position.z = std::stof(posZ);
-            std::cout << "Position: " << position.x << ", " << position.y << ", " << position.z << std::endl;
         } else if (line.find("Velocity:") != std::string::npos) {
             // Extract particle velocity
             iss.ignore(std::numeric_limits<std::streamsize>::max(), '(');
@@ -59,7 +58,6 @@ ParticleSystem* ParticleSystemFile::generateParticles(glm::vec3 worldDimensions)
             velocity.x = std::stof(velX);
             velocity.y = std::stof(velY);
             velocity.z = std::stof(velZ);
-            std::cout << "Velocity: " << velocity.x << ", " << velocity.y << ", " << velocity.z << std::endl;
         }
         else if (line.find("Acceleration:") != std::string::npos) {
             // Extract particle acceleration
@@ -71,12 +69,10 @@ ParticleSystem* ParticleSystemFile::generateParticles(glm::vec3 worldDimensions)
             acceleration.x = std::stof(accX);
             acceleration.y = std::stof(accY);
             acceleration.z = std::stof(accZ);
-            std::cout << "Acceleration: " << acceleration.x << ", " << acceleration.y << ", " << acceleration.z << std::endl;
         } else if (line.find("Mass:") != std::string::npos) {
             // Extract particle mass
             std::string massStr = line.substr(line.find(":") + 1);
             mass = std::stof(massStr);
-            std::cout << "Mass: " << mass << std::endl;
 
             // Create Particle instance with extracted data
             particles[currentParticleIndex] = Particle(position, velocity, acceleration, mass);
