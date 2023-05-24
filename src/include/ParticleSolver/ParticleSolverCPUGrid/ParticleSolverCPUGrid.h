@@ -9,6 +9,7 @@
 class ParticleSolverCPUGrid: public ParticleSolver  {
 public:
     ParticleSolverCPUGrid(GridCPU *gridCpu, float timeStep, float squaredSoftening);
+    ~ParticleSolverCPUGrid();
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     float getSquaredSoftening() override;

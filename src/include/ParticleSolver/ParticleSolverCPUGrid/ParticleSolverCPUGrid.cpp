@@ -1,6 +1,5 @@
 
 #include "ParticleSolverCPUGrid.h"
-#include <omp.h>
 #include <glm/gtx/norm.hpp>
 #include <iostream>
 ParticleSolverCPUGrid::ParticleSolverCPUGrid(GridCPU *grid, float stepSize, float squaredSoft): ParticleSolver() {
@@ -63,6 +62,9 @@ ParticleSolverCPUGrid::computeGravityForce(ParticleSystem *particles, const unsi
 
 bool ParticleSolverCPUGrid::usesGPU() {return false;}
 
+ParticleSolverCPUGrid::~ParticleSolverCPUGrid() noexcept {
+    delete this->gridCpu;
+}
 
 float ParticleSolverCPUGrid::getSquaredSoftening() {
     return this->squaredSoftening;

@@ -36,8 +36,10 @@ program_dir = os.path.dirname(program_path)
 program_name = os.path.basename(program_path)
 os.chdir(program_dir)
 
-output = subprocess.check_output([os.path.join('.', program_name), '-s', str(squared_softening), '-t', str(step_size)])
+
+output = subprocess.check_output([os.path.join('.', program_name), '-s', str(squared_softening), '-t', str(step_size)], stderr=subprocess.STDOUT)
 output = output.decode('utf-8').split('\n')
+
 
 # Parse the output
 energy_cpu_sequential = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
@@ -49,11 +51,14 @@ print("Executing tests...")
 for line in output:
     if "Energy test: CPU sequential" in line:
         energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
-    elif "Energy test: CPU parallel" in line:
-        plot_energy(energy_df, 'CPU sequential')
-        energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
     elif "Energy test: GPU optimized" in line:
         plot_energy(energy_df, 'GPU')
+        energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
+    elif "Energy test: CPU parallel grid" in line:
+        plot_energy(energy_df, 'GPU optimized')
+        energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
+    elif "Energy test: CPU parallel" in line:
+        plot_energy(energy_df, 'CPU sequential')
         energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
     elif "Energy test: GPU" in line:
         plot_energy(energy_df, 'CPU parallel')
@@ -72,7 +77,7 @@ for line in output:
         energy_df = pd.concat([energy_df, new_row], ignore_index=True)
 
 
-plot_energy(energy_df, 'GPU optimized')
+plot_energy(energy_df, 'CPU parallel grid')
 
 
 

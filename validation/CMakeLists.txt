@@ -64,6 +64,9 @@ set(
         ../src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
         ../src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
         ../src/include/ParticleSystemInitializer/ParticleSystemLagrange/ParticleSystemLagrange.cpp
+        ../src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
+        ../src/include/Grid/GridCPU.cpp
+        ../src/include/Bucket/Bucket.cpp
         tests/abstract/CPUTest/CPUTest.cpp
         tests/abstract/GPUTest/GPUTest.cpp
         tests/EnergyConservationTest/CPUEnergyConservationTest.cpp
@@ -94,12 +97,15 @@ target_include_directories(
         ../src/include/ParticleSolver/ParticleSolverGPU/
         ../src/include/ParticleSolver/ParticleSolverCPUParallel/
         ../src/include/ParticleSolver/ParticleSolverCPUSequential/
+        ../src/include/ParticleSolver/ParticleSolverCPUGrid/
         ../src/include/ParticleSystemInitializer/interface/
         ../src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/
         ../src/include/ParticleSystemInitializer/ParticleSystemLagrange/
         ../src/include/ParticleSystem/
         ../src/include/ArgumentsParser/
         ../src/include/enums/
+        ../src/include/Grid/
+        ../src/include/Bucket/
         tests/interface/
         tests/abstract/CPUTest/
         tests/abstract/GPUTest/
