@@ -35,8 +35,13 @@ void GridCPU::updateGrid(ParticleSystem *particles) {
 }
 
 Bucket *GridCPU::getBucketByPosition(glm::vec4 particlePos) {
-    const glm::ivec4 bucketCoords = glm::clamp(glm::ivec4(particlePos / bucketSize), minDimensions, maxDimensions);
-    const unsigned int bucketIndex = bucketCoords.x + bucketCoords.y * bucketsPerDimension + bucketCoords.z * bucketsPerDimension * bucketsPerDimension;
+    const glm::ivec4 bucketCoords = glm::clamp(
+            glm::ivec4(particlePos / bucketSize),
+            minDimensions,
+            maxDimensions
+            );
+    const unsigned int bucketIndex = bucketCoords.x + bucketCoords.y * bucketsPerDimension +
+            bucketCoords.z * bucketsPerDimension * bucketsPerDimension;
     return this->buckets[bucketIndex];
 }
 
