@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 # Create an argument parser to handle the program path argument
 parser = argparse.ArgumentParser(description='Run N-body simulation and analyze performance')
 parser.add_argument('path', type=str, help='Path to the compiled C++ program')
-parser.add_argument('--algorithms', type=int, nargs='+', choices=[1, 2, 3, 4],
-                    help='Algorithms to test (choose from 1, 2, 3)')
+parser.add_argument('--algorithms', type=int, nargs='+', choices=[1, 2, 3, 4, 5],
+                    help='Algorithms to test (choose from 1, 2, 3, 4, 5)')
 args = parser.parse_args()
 program_path = args.path
 
 
 # Set the algorithms to test
-algorithms = [1, 2, 3, 4] if args.algorithms is None else args.algorithms
+algorithms = [1, 2, 3, 4, 5] if args.algorithms is None else args.algorithms
 
 
 # Set the number of bodies to test
@@ -52,7 +52,13 @@ for algorithm in algorithms:
                                 'Iterations': iterations, 'Total iterations in 1 second': average_fps * n * n}, index=[0])
         df = pd.concat([df, new_row], ignore_index=True)
 
-algorithm_names = {1: "Sequential Particle-particle CPU", 2: "Parallel Particle-particle CPU", 3: "Parallel Particle-particle GPU", 4: "Fast Particle-Particle GPU"}
+algorithm_names = {
+    1: "Sequential Particle-particle CPU",
+    2: "Parallel Particle-particle CPU",
+    3: "Parallel Particle-particle GPU",
+    4: "Fast Particle-Particle GPU",
+    5: "Parallel Grid CPU"
+}
 df['Algorithm'] = df['Algorithm'].replace(algorithm_names)
 
 def plot_results(x, y, hue, kind, ylabel):
