@@ -17,6 +17,23 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
     }
 }
 
+ParticleSystem::ParticleSystem(ParticleSystem * other) {
+    this->numParticles = other->size();
+    this->velocities = new glm::vec4[this->numParticles]();
+    this->accelerations = new glm::vec4[this->numParticles]();
+    this->positions = new glm::vec4[this->numParticles]();
+    this->masses = new glm::vec4[this->numParticles]();
+    this->forces = new glm::vec4[this->numParticles]();
+
+    for (int i = 0; i < this->numParticles; i++) {
+        this->velocities[i] = other->getVelocities()[i];
+        this->accelerations[i] = other->getAccelerations()[i];
+        this->positions[i] = other->positions[i];
+        this->masses[i] = other->masses[i];
+        this->forces[i] = other->forces[i];
+    }
+}
+
 
 
 /**
@@ -45,7 +62,7 @@ void ParticleSystem::updateParticlePosition(unsigned int particleId, float delta
 }
 
 
-unsigned int ParticleSystem::size() {
+unsigned int ParticleSystem::size() const {
     return this->numParticles;
 }
 

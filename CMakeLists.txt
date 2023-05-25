@@ -80,7 +80,6 @@ set(
         src/include/Bucket/Bucket.cpp
         src/include/Grid/GridCPU.cpp
         src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
-
 )
 
 # Include OpenMP

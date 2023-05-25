@@ -70,6 +70,7 @@ set(
         tests/abstract/CPUTest/CPUTest.cpp
         tests/abstract/GPUTest/GPUTest.cpp
         tests/EnergyConservationTest/CPUEnergyConservationTest.cpp
+        tests/DeterministicSolverTest/DeterministicSolverTest.cpp
         tests/EnergyConservationTest/GPUEnergyConservationTest.cpp
         tests/EnergyConservationTest/EnergyCalculator/EnergyCalculator.cpp
 )
@@ -112,6 +113,7 @@ target_include_directories(
         tests/EnergyConservationTest/
         tests/EnergyConservationTest/
         tests/EnergyConservationTest/EnergyCalculator/
+        tests/DeterministicSolverTest/
 
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad glm OpenMP::OpenMP_CXX)

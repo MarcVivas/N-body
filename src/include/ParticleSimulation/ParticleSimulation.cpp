@@ -8,7 +8,7 @@ ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystem
     this->particleSolver = particleSysSolver;
     this->particleDrawer = new ParticleDrawer(worldDim, windowDim);
     this->particleSystem = particleSystemInitializer->generateParticles(worldDim);
-    this->initialParticleSystem = particleSystemInitializer->generateParticles(worldDim);
+    this->initialParticleSystem = new ParticleSystem(particleSystem);
     this->createBuffers(this->particleSolver->usesGPU());
 }
 
