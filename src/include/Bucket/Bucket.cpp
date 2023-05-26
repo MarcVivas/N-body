@@ -51,6 +51,6 @@ unsigned int Bucket::getBucketId(){
 }
 
 void Bucket::resetBucket() {
-    this->centerOfMass = glm::vec4(0);
+    this->centerOfMass = glm::vec4(0.f);
     this->numParticles = glm::uvec4(0);
 }

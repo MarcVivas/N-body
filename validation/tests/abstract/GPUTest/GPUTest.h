@@ -15,6 +15,7 @@ public:
     GPUTest(ParticleSystem* particleSystem, std::string& positionsShaderPath, std::string& forcesShaderPath, float stepSize, float softening);
     virtual ~GPUTest();
     virtual void runTest(const size_t iterations) = 0;
+    virtual void resetSSBO();
 
 protected:
     ParticleSystem *particles;

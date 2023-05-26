@@ -47,7 +47,7 @@ energy_cpu_parallel = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Pote
 energy_gpu = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
 
 print("Executing tests...")
-
+b = 0
 for line in output:
     if "Energy test: CPU sequential" in line:
         energy_df = pd.DataFrame(columns=['Iteration', 'Kinetic Energy', 'Potential Energy', 'Total Energy'])
@@ -75,10 +75,15 @@ for line in output:
         new_row = pd.DataFrame({'Iteration': iteration, 'Kinetic Energy': kinetic_energy,
                                 'Potential Energy': potential_energy, 'Total Energy': total_energy}, index=[0])
         energy_df = pd.concat([energy_df, new_row], ignore_index=True)
-
+    elif "Passed" in line:
+        b += 1
 
 plot_energy(energy_df, 'CPU parallel grid')
 
+if b == 4:
+    print("All versions are deterministic")
+else:
+    print("There is at least one version that is not deterministic")
 
 
 

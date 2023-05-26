@@ -42,11 +42,12 @@ ParticleSolverCPUGrid::computeGravityForce(ParticleSystem *particles, const unsi
     }
 
     // Compute the forces with other buckets
+
     Bucket *otherBucket = nullptr;
     for(size_t bucketId = 0; bucketId < this->gridCpu->getTotalBuckets(); bucketId++){
         otherBucket = this->gridCpu->getBucketById(bucketId);
-        const glm::vec4 centerOfMass = otherBucket->getCenterOfMass();
-        if (bucket->getCenterOfMass() != centerOfMass){
+        if (bucket->getBucketId() != otherBucket->getBucketId()){
+            const glm::vec4 centerOfMass = otherBucket->getCenterOfMass();
             const float mass = centerOfMass.w;
             const glm::vec4 centerOfMassPosition = glm::vec4(centerOfMass.x, centerOfMass.y, centerOfMass.z, 0.f);
             const glm::vec4 vector_i_j = centerOfMassPosition - particlePosition;
@@ -54,8 +55,6 @@ ParticleSolverCPUGrid::computeGravityForce(ParticleSystem *particles, const unsi
             totalForce += ((G * mass) / distance_i_j) * vector_i_j;
         }
     }
-
-
 
     particles->getForces()[particleId] = totalForce;
 }

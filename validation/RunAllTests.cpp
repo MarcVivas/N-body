@@ -5,6 +5,8 @@
 
 #include "CPUEnergyConservationTest.h"
 #include "GPUEnergyConservationTest.h"
+#include "DeterministicCPUSolverTest.h"
+#include "DeterministicGPUSolverTest.h"
 
 #include "ParticleSystemCubeInitializer.h"
 #include "ParticleSolverCPUParallel.h"
@@ -22,7 +24,7 @@ int main(int argc, char *argv[]){
     ParticleSystem *particleSystem = initializer->generateParticles(glm::vec3(5, 5, 5));
     delete initializer;
 
-    const size_t iterations = 3000;
+    const size_t iterations = 30000;
 
 
     std::string positionsShaderPath = "../../src/shaders/ComputeShaders/updateParticles.glsl";
@@ -66,6 +68,33 @@ int main(int argc, char *argv[]){
     cpuParallelGridEnergyConservationTest->runTest(iterations);
     delete cpuParallelGridEnergyConservationTest;
     delete copy;
+
+    std::cout << "Version 1 - Deterministic test\n";
+    copy = new ParticleSystem(particleSystem);
+    Test * version = new DeterministicCPUSolverTest(copy, new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()));
+    version->runTest(iterations);
+    delete version;
+
+    std::cout << "Version 2 - Deterministic test\n";
+    copy = new ParticleSystem(particleSystem);
+    version = new DeterministicCPUSolverTest(copy, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()));
+    version->runTest(iterations);
+    delete version;
+
+    std::cout << "Version 3 - Deterministic test\n";
+    copy = new ParticleSystem(particleSystem);
+    forcesShaderPath = "../../src/shaders/ComputeShaders/forceCalculation.glsl";
+    version = new DeterministicGPUSolverTest(copy, positionsShaderPath, forcesShaderPath, args.getTimeStep(), args.getSquaredSoftening());
+    version->runTest(iterations);
+    delete version;
+
+    std::cout << "Version 4 - Deterministic test\n";
+    copy = new ParticleSystem(particleSystem);
+    forcesShaderPath = "../../src/shaders/ComputeShaders/forceCalculationOptimized.glsl";
+    version = new DeterministicGPUSolverTest(copy, positionsShaderPath, forcesShaderPath, args.getTimeStep(), args.getSquaredSoftening());
+    version->runTest(iterations);
+    delete version;
+
 
     delete particleSystem;
 

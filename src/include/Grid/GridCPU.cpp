@@ -9,7 +9,7 @@ GridCPU::GridCPU(glm::vec3 worldDim, unsigned int bucketCap, unsigned int bucket
     this->bucketCapacity = bucketCap;
     this->bucketSize = worldDimensions / (float) bucketsPerDimension;
     this->buckets = new Bucket*[this->totalBuckets];
-    bucketLocks.reserve(totalBuckets);
+    bucketLocks = new omp_lock_t[totalBuckets];
     for (int i = 0; i < this->totalBuckets; i++) {
         this->buckets[i] = new Bucket(bucketCapacity, i);
         omp_init_lock(&bucketLocks[i]);
@@ -50,7 +50,7 @@ Bucket *GridCPU::getBucketById(unsigned int bucketId) {
 }
 
 void GridCPU::resetGrid() {
-#pragma omp parallel for schedule(static) shared(buckets)
+    #pragma omp parallel for schedule(static)
     for(unsigned int i = 0; i < totalBuckets; i++){
         this->buckets[i]->resetBucket();
     }
@@ -63,5 +63,6 @@ GridCPU::~GridCPU(){
         delete this->buckets[i];
         omp_destroy_lock(&bucketLocks[i]);
     }
-    delete[] this->buckets;
+    delete [] this->bucketLocks;
+    delete [] this->buckets;
 }

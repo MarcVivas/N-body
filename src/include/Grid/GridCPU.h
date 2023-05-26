@@ -7,7 +7,7 @@
 
 class GridCPU: public Grid{
 public:
-    std::vector<omp_lock_t> bucketLocks;
+    omp_lock_t* bucketLocks;
     GridCPU(glm::vec3 worldDimensions, unsigned int bucketCapacity, unsigned int bucketsPerDimension);
     void updateGrid(ParticleSystem *particleSystem) override;
     ~GridCPU() override;

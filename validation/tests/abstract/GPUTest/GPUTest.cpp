@@ -98,10 +98,52 @@ void GPUTest::updateParticleSystemBuffers() {
     // Unmap the position SSBO
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
+    // Bind the acceleration SSBO
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
+    // Map the acceleration SSBO memory to CPU-accessible memory
+    glm::vec4* accelerations = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+    glm::vec4* copiedAccelerations = new glm::vec4[numParticles];
+    std::copy(accelerations, accelerations + numParticles, copiedAccelerations);
+    this->particles->setAccelerations(copiedAccelerations);
+    // Unmap the acceleration SSBO
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
     // Unbind the SSBOs
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+void GPUTest::resetSSBO() {
+    // Create a copy of the initial data
+    glm::vec4* initialPositions = this->particles->getPositions();
+    glm::vec4* initialVelocities = this->particles->getVelocities();
+    glm::vec4* initialAccelerations = this->particles->getAccelerations();
+    glm::vec4* initialMasses = this->particles->getMasses();
+    glm::vec4* initialForces = this->particles->getForces();
+
+    // Bind the SSBOs
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->postitions_SSBO);
+    glm::vec4* positions = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    std::copy(initialPositions, initialPositions + this->particles->size(), positions);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->velocities_SSBO);
+    glm::vec4* velocities = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    std::copy(initialVelocities, initialVelocities + this->particles->size(), velocities);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->accelerations_SSBO);
+    glm::vec4* accelerations = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    std::copy(initialAccelerations, initialAccelerations + this->particles->size(), accelerations);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->forces_SSBO);
+    glm::vec4* forces = (glm::vec4*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    std::copy(initialForces, initialForces + this->particles->size(), forces);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    // Unbind the SSBOs
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
 
 GPUTest::~GPUTest() noexcept {
     delete this->solver;

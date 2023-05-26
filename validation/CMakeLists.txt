@@ -70,7 +70,8 @@ set(
         tests/abstract/CPUTest/CPUTest.cpp
         tests/abstract/GPUTest/GPUTest.cpp
         tests/EnergyConservationTest/CPUEnergyConservationTest.cpp
-        tests/DeterministicSolverTest/DeterministicSolverTest.cpp
+        tests/DeterministicSolverTest/DeterministicCPUSolverTest.cpp
+        tests/DeterministicSolverTest/DeterministicGPUSolverTest.cpp
         tests/EnergyConservationTest/GPUEnergyConservationTest.cpp
         tests/EnergyConservationTest/EnergyCalculator/EnergyCalculator.cpp
 )
