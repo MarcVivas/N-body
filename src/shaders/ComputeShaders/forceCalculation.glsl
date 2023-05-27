@@ -1,4 +1,4 @@
-#version 440 core
+#version 430 core
 
 layout( local_size_x = 64, local_size_y =1, local_size_z = 1  ) in;
 
@@ -27,14 +27,14 @@ void main() {
     if (index < numParticles) {
 
 
-        float G = 1.0f;
+        float G = 1.0;
         vec4 totalForce = vec4(0);
         vec4 particlePosition = positions[index];
 
 
-        for (uint j = 0;  j < numParticles; ++j){
+        for (uint j = 0;  j < numParticles; j++){
             const vec4 vector_i_j = positions[j] - particlePosition;
-            const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
+            const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5);
             totalForce += ((G * masses[j].x) / distance_i_j) * vector_i_j;
         }
 

@@ -1,4 +1,4 @@
-#version 440 core
+#version 430 core
 
 layout( local_size_x = 64, local_size_y =1, local_size_z = 1  ) in;
 
@@ -33,7 +33,7 @@ void main() {
 
         // Leapfrog integrator
 
-        float dtDividedBy2 = deltaTime/2.f;
+        float dtDividedBy2 = deltaTime/2.0;
 
         // Compute velocity (i + 1/2)
         velocities[index] += accelerations[index] * dtDividedBy2;

@@ -1,4 +1,4 @@
-#version 440 core
+#version 430 core
 
 #define BLOCK_SIZE 320
 
@@ -29,8 +29,8 @@ void main() {
     const uint index = gl_GlobalInvocationID.x % numParticles;
     const bool isValidIndex = gl_GlobalInvocationID.x < numParticles;
 
-    const float G = 1.0f;
-    vec3 totalForce = vec3(0.0f);
+    const float G = 1.0;
+    vec3 totalForce = vec3(0.0);
     vec3 particlePosition = positions[index].xyz;
     const uint blockIndex = gl_GlobalInvocationID.x % BLOCK_SIZE;
 
@@ -44,7 +44,7 @@ void main() {
         }
         else{
             blockPositions[blockIndex] = vec3(0);
-            blockMasses[blockIndex] = 0.0f;
+            blockMasses[blockIndex] = 0.0;
         }
 
         // Ensure shared memory writes are visible to work group
@@ -54,9 +54,9 @@ void main() {
         barrier();
 
         if (isValidIndex){
-            for(uint j = 0; j < BLOCK_SIZE; ++j){
+            for(uint j = 0; j < BLOCK_SIZE; j++){
                 const vec3 vector_i_j = blockPositions[j] - particlePosition;
-                const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
+                const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5);
                 totalForce += ((G * blockMasses[j]) / distance_i_j) * vector_i_j;
             }
         }
@@ -67,7 +67,7 @@ void main() {
 
     if(isValidIndex){
         // Write to global memory the result
-        forces[index] = vec4(totalForce, 0.0f);
+        forces[index] = vec4(totalForce, 0.0);
     }
 
 }
