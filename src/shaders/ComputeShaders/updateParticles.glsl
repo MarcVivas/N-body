@@ -33,21 +33,21 @@ void main() {
 
         // Leapfrog integrator
 
-        float dtDividedBy2 = deltaTime/2.0;
+        float dtDividedBy2 = deltaTime * 0.5;
 
         // Compute velocity (i + 1/2)
-        velocities[index] += accelerations[index] * dtDividedBy2;
+        velocities[index].xyz += accelerations[index].xyz * dtDividedBy2;
 
         // Compute next position (i+1)
-        positions[index] += velocities[index] * deltaTime;
+        positions[index].xyz += velocities[index].xyz * deltaTime;
 
         // Update acceleration (i+1)
         // F = M * A
         // A = F/M; M is cancelled while calculating gravity
-        accelerations[index] = forces[index];
+        accelerations[index].xyz = forces[index].xyz;
 
         // Compute next velocity (i + 1)
-        velocities[index] += accelerations[index] * dtDividedBy2;
+        velocities[index].xyz += accelerations[index].xyz * dtDividedBy2;
     }
 
 }

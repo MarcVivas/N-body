@@ -28,19 +28,19 @@ void main() {
 
 
         float G = 1.0;
-        vec4 totalForce = vec4(0);
-        vec4 particlePosition = positions[index];
+        vec3 totalForce = vec3(0);
+        vec3 particlePosition = positions[index].xyz;
 
 
         for (uint j = 0;  j < numParticles; j++){
-            const vec4 vector_i_j = positions[j] - particlePosition;
+            const vec3 vector_i_j = positions[j].xyz - particlePosition;
             const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5);
             totalForce += ((G * masses[j].x) / distance_i_j) * vector_i_j;
         }
 
 
         // Write to global memory the result
-        forces[index] = totalForce;
+        forces[index] = vec4(totalForce, 0);
 
     }
 
