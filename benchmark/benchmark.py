@@ -18,7 +18,7 @@ algorithms = [1, 2, 3, 4, 5] if args.algorithms is None else args.algorithms
 
 
 # Set the number of bodies to test
-bodies = [2**i for i in range(5, 17, 1)]
+bodies = [2**i for i in range(2, 12, 1)]
 
 
 
@@ -34,7 +34,7 @@ for algorithm in algorithms:
         output = subprocess.check_output([program_path, '-v', str(algorithm), '-n', str(n), '-b', '-i' , '1'])
         output = output.decode('utf-8').split('\n')
 
-
+        print(output)
         # Parse the output
         for line in output:
             if "Total elapsed time" in line:
@@ -49,7 +49,7 @@ for algorithm in algorithms:
         # Store the results in the DataFrame
         new_row = pd.DataFrame({'Algorithm': algorithm, 'Bodies': n, 'Elapsed Time': elapsed_time,
                                 'Average FPS': average_fps, 'Average Frame Time': average_frame_time,
-                                'Iterations': iterations, 'Total iterations in 1 second': average_fps * n * n}, index=[0])
+                                'Iterations': iterations, 'Total iterations in 1 second': average_fps * n}, index=[0])
         df = pd.concat([df, new_row], ignore_index=True)
 
 algorithm_names = {
@@ -75,9 +75,9 @@ def plot_results(x, y, hue, kind, ylabel):
     plt.ylabel(ylabel)
     plt.show()
 
-plot_results(x="Bodies", y="Average Frame Time", hue="Algorithm", kind="bar", ylabel="Average Frame Time\nLess is better")
-plot_results(x="Bodies", y="Average Frame Time", hue="Algorithm", kind="line", ylabel="Average Frame Time\nLess is better")
-plot_results(x="Bodies", y="Total iterations in 1 second", hue="Algorithm", kind="bar", ylabel="Total iterations in 1 second\nMore is better")
+plot_results(x="Bodies", y="Average Frame Time", hue="Algorithm", kind="bar", ylabel="Average Frame Time (ms)\nLess is better")
+plot_results(x="Bodies", y="Average Frame Time", hue="Algorithm", kind="line", ylabel="Average Frame Time (ms)\nLess is better")
+plot_results(x="Bodies", y="Total iterations in 1 second", hue="Algorithm", kind="bar", ylabel="Particle updates per second\n More is better")
 
 #plot_results(x="Bodies", y="Average FPS", hue="Algorithm", kind="bar", ylabel="Average FPS\nMore is better")
 #plot_results(x="Bodies", y="Iterations", hue="Algorithm", kind="line", ylabel="Iterations in 8 seconds\nMore is better")
