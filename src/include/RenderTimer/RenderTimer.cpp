@@ -92,6 +92,10 @@ void RenderTimer::printFinalStats() {
 
 }
 
+int RenderTimer::getIteration() {
+    return this->totalIterations;
+}
+
 double RenderTimer::getTotalElapsedTime() {
     return this->totalElapsedTime;
 }

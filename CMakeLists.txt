@@ -79,6 +79,7 @@ set(
         src/include/WindowInputManager/WindowInputManager.cpp
         src/include/Bucket/Bucket.cpp
         src/include/Grid/GridCPU.cpp
+        src/include/ParticleSystemSaver/ParticleSystemSaver.cpp
         src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
 )
 
@@ -122,6 +123,7 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSimulation/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderLoop/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Grid/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemSaver/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/WindowInputManager/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemLagrange/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemFile/

@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
     ParticleSystem *particleSystem = initializer->generateParticles(glm::vec3(5, 5, 5));
     delete initializer;
 
-    const size_t iterations = 30000;
+    const size_t iterations = 150000;
 
 
     std::string positionsShaderPath = "../../src/shaders/ComputeShaders/updateParticles.glsl";

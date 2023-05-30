@@ -14,6 +14,7 @@ public:
     void setPauseSimulation(bool pause);
     bool getPauseSimulation();
     void setIsBenchmark(bool bench);
+    int getIteration();
     ~RenderLoop();
 private:
     Window window;

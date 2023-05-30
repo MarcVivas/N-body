@@ -16,6 +16,7 @@ public:
     float getSquaredSoftening();
     bool isBenchmark();
     std::string getFilePath();
+    std::string getSaveFileName();
 private:
     Version version;
     InitializationType init;
@@ -24,6 +25,7 @@ private:
     float squaredSoftening;
     bool benchmark;
     std::string filePath;
+    std::string saveFileName;
 };
 
 

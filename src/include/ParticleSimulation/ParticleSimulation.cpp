@@ -1,19 +1,20 @@
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include "ParticleSimulation.h"
-ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
-                                       ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim){
 
+ParticleSimulation::ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer,
+                                       ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim, std::string saveFileName){
     this->particleSolver = particleSysSolver;
     this->particleDrawer = new ParticleDrawer(worldDim, windowDim);
     this->particleSystem = particleSystemInitializer->generateParticles(worldDim);
-    this->initialParticleSystem = new ParticleSystem(particleSystem);
+    this->saver = new ParticleSystemSaver(saveFileName);
+    saver->saveInitialState(particleSystem);
     this->createBuffers(this->particleSolver->usesGPU());
 }
 
 
 ParticleSimulation::~ParticleSimulation() {
+    updateGPUParticleSystem();
+    saver->saveFinalState(particleSystem);
+    delete this->saver;
     delete this->particleDrawer;
     delete this->particleSolver;
     delete this->particleSystem;
@@ -136,11 +137,7 @@ void ParticleSimulation::waitParticlesBuffer()
 }
 
 
-void ParticleSimulation::saveInitialState() {
-    this->saveSimulationFile(this->initialParticleSystem);
-}
-
-void ParticleSimulation::saveCurrentState() {
+void ParticleSimulation::updateGPUParticleSystem() {
     if(this->particleSolver->usesGPU()){
         int numParticles = this->particleSystem->size();
 
@@ -179,37 +176,12 @@ void ParticleSimulation::saveCurrentState() {
         // Unbind the shader storage buffers
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
-    this->saveSimulationFile(this->particleSystem);
 }
 
-void ParticleSimulation::saveSimulationFile(ParticleSystem *particleSys) {
-    static int saveCount = 1;
-    std::string fileName = "save" + std::to_string(saveCount) + ".sim";
 
-    // Check if the file already exists
-    std::ifstream file(fileName);
-    while (file.good()) {
-        file.close();
-        saveCount++;
-        fileName = "save" + std::to_string(saveCount) + ".sim";
-        file.open(fileName);
-    }
-    file.close();
-
-    // Open the file for writing
-    std::ofstream outFile(fileName);
-    if (!outFile.is_open()) {
-        std::cout << "Failed to open the save file." << std::endl;
-        return;
-    }
-
-    // Write the ParticleSystem data to the file
-    outFile << *particleSys;
-
-    // Close the file
-    outFile.close();
-
-    std::cout << "Particle system saved to " << fileName << std::endl;
+void ParticleSimulation::saveCurrentState(int iteration) {
+    updateGPUParticleSystem();
+    this->saver->saveCurrentState(iteration, particleSystem);
 }
 
 

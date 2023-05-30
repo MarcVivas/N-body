@@ -104,12 +104,13 @@ Run the compiled program.
 ```
 
 ## Program arguments
-- `-v` Configure which [version](#available-versions) you want to use. 
-- `-i` Configure which [initialization](#available-initializations) you want (How the bodies are initialized).
-- `-n` Configure how many bodies you want to simulate. 
-- `-t` Configure the step size. (Smaller the more precise)
-- `-s` Configure the squared softening. 
-- `-f` Provide a [particle system file](#particle-system-file).
+- `-v (number)` Configure which [version](#available-versions) you want to use. 
+- `-i (number)` Configure which [initialization](#available-initializations) you want (How the bodies are initialized).
+- `-n (number)` Configure how many bodies you want to simulate. 
+- `-t (decimalNumber)` Configure the step size. (Smaller the more precise)
+- `-s (decimalNumber)` Configure the squared softening. 
+- `-f (path/to/file)` Provide a [particle system file](#particle-system-file).
+- `-o (customFileName)` [Save the simulation](#save-simulations).
 
 The default arguments are:
 ```bash
@@ -170,12 +171,15 @@ This is how you can use the `-f` argument:
 ````
 
 ### Save simulations 
-You have two options to save a simulation:
+The program offers the ability to save various states of the simulation. It includes the following features:
 
-1. Save the initial state of the simulation by pressing `S`.
-2. Save the current state of the simulation by pressing `C`.
+1. Saving the initial state: The program automatically saves the initial state at the start of the simulation.
+2. Saving the current state: By pressing the "S" key during the simulation, you can save the current state for later analysis.
+3. Saving the final state: At the end of the simulation, the program saves the final state.
 
-The saved files will be stored in the same location as the compiled program.
+The saved states are stored in files located in the compiled directory of the program. To save the states, you need to provide a filename using the `-output` or `-o` argument when running the program.
+
+These saving functionalities allow capturing different moments of the simulation for further analysis and study.
 
 
 ## Benchmark

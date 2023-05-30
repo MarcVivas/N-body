@@ -41,12 +41,8 @@ void WindowInputManager::setKeyCallback() {
 
                            // Save the initial simulation
                            if (key == GLFW_KEY_S && action == GLFW_PRESS){
-                               inputManager->getParticleSimulation()->saveInitialState();
-                           }
-
-                           // Save the current state of the simulation
-                           if (key == GLFW_KEY_C && action == GLFW_PRESS){
-                               inputManager->getParticleSimulation()->saveCurrentState();
+                               int iteration = inputManager->getRenderLoop()->getIteration();
+                               inputManager->getParticleSimulation()->saveCurrentState(iteration);
                            }
 
                            // Pause/start the simulation when space is pressed

@@ -36,6 +36,9 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "File initialization: \n";
     std::cout << "-f path/to/initialization/file \n\n";
 
+    std::cout << "Name of simulation saves: \n";
+    std::cout << "-o customFileName \n\n";
+
     std::cout << "Time step: \n";
     std::cout << "-t (Any positive decimal number)\n\n";
 
@@ -97,6 +100,10 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
             std::cout << "------------------------------------ \n\n";
             return;
         }
+        else if ((arg == "-o" || arg == "-output") && i + 1 < argc) {
+            saveFileName = argv[i + 1];
+            i++;
+        }
         else {
             std::cerr << "Usage: " << argv[0] << " [-v version] [-n numParticles] [-i init] [-t timeStep] [-s squaredSoftening] [-f filePath]\n";
             std::cerr << "Alternative usage: " << argv[0] << " [-version version] [-n numParticles] [-init init] [-time-step timeStep] [-softening squaredSoftening] [-file filePath] \n";
@@ -118,6 +125,10 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
 
 Version ArgumentsParser::getVersion() {
     return this->version;
+}
+
+std::string ArgumentsParser::getSaveFileName() {
+    return saveFileName;
 }
 
 InitializationType ArgumentsParser::getInitializationType() {

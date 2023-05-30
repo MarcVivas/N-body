@@ -50,6 +50,10 @@ bool RenderLoop::getPauseSimulation(){
     return this->pauseSimulation;
 }
 
+int RenderLoop::getIteration() {
+    return this->renderTimer.getIteration();
+}
+
 
 RenderLoop::~RenderLoop(){
     this->renderTimer.printFinalStats();

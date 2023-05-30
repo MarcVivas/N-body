@@ -14,6 +14,7 @@ public:
     void updateTime(Window& window, bool paused);
     void printFinalStats();
     double getTotalElapsedTime();
+    int getIteration();
 private:
     double deltaTime;
     bool showFPS;

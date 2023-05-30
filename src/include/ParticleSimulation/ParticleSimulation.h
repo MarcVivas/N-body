@@ -5,7 +5,7 @@
 #include "ParticleSystemGalaxyInitializer.h"
 #include "ParticleSolver.h"
 #include "ParticleDrawer.h"
-
+#include "ParticleSystemSaver.h"
 
 #ifndef PARTICLESIMULATION_H
 #define PARTICLESIMULATION_H
@@ -13,10 +13,9 @@ class ParticleSimulation {
 public:
     virtual void update();
     virtual void draw();
-    virtual void saveCurrentState();
-    virtual void saveInitialState();
+    virtual void saveCurrentState(int iteration);
     virtual ParticleDrawer* getParticleDrawer();
-    ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim);
+    ParticleSimulation(ParticleSystemInitializer *particleSystemInitializer, ParticleSolver *particleSysSolver, glm::vec3 worldDim, glm::vec2 windowDim, std::string saveFileName);
     ~ParticleSimulation();
 
 protected:
@@ -24,6 +23,7 @@ protected:
     ParticleSystem *initialParticleSystem;
     ParticleDrawer *particleDrawer;
     ParticleSystem *particleSystem;
+    ParticleSystemSaver *saver;
     GLuint VAO;
     GLuint VBO;
     GLsync gSync = nullptr;
@@ -34,7 +34,7 @@ protected:
     void createBuffers(bool usesGPU);
     void configureGpuBuffers();
     void configureCpuBuffers();
-    void saveSimulationFile(ParticleSystem* particleSys);
+    virtual void updateGPUParticleSystem();
 
 };
 #endif // PARTICLESIMULATION_H

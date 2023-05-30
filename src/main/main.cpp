@@ -70,26 +70,25 @@ int main(int argc, char *argv[])
 
     switch (args.getVersion()){
         case Version::PP_CPU_SEQUENTIAL:
-            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverCPUSequential(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim, args.getSaveFileName());
             break;
         case Version::PP_CPU_PARALLEL:
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUParallel(args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim, args.getSaveFileName());
             break;
         case Version::PP_GPU_PARALLEL:
             positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
             forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculation.glsl";
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim, args.getSaveFileName());
             break;
         case Version::PP_GPU_OPTIMIZED:
             positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
             forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalculationOptimized.glsl";
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(320.0, args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverGPU(320.0, args.getTimeStep(), args.getSquaredSoftening(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim, args.getSaveFileName());
             break;
         case Version::GRID_CPU:
-            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUGrid(new GridCPU(worldDimensions, args.getNumParticles(), 4), args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim);
+            particleSimulation = new ParticleSimulation(particleSystemInitializer, new ParticleSolverCPUGrid(new GridCPU(worldDimensions, args.getNumParticles(), 4), args.getTimeStep(), args.getSquaredSoftening()), worldDimensions, windowDim, args.getSaveFileName());
             break;
     }
-
     WindowInputManager windowInputManager(&window, &renderLoop, particleSimulation);
 
     renderLoop.runLoop(particleSimulation);
