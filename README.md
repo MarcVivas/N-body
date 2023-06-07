@@ -1,7 +1,11 @@
 
 # N-body simulation
 
-## Preview
+## Overview
+![Overview](media/overview.gif)
+![Overview](media/37000.gif)
+![Overview](media/system.png)
+
 
 ## Table of contents
 - [About this project](#about-this-project)  
