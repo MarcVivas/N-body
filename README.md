@@ -40,8 +40,7 @@ This project was made to learn `C++`, `OpenGL` and `GPU programming`.
 | I              | Increase bloom intensity                 |
 | D              | Decrease bloom intensity                 |
 | Q              | Enable/disable point size                |
-| S              | Save the initial state of the simulation |
-| C              | Save the current state of the simulation |
+| S              | Save the current state of the simulation |
 
   
 
