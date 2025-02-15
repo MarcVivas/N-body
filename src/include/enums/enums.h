@@ -15,7 +15,8 @@ enum Version {
     PP_CPU_PARALLEL = 2,
     PP_GPU_PARALLEL = 3,
     PP_GPU_OPTIMIZED = 4,
-    GRID_CPU = 5
+    GRID_CPU = 5,
+    BARNES_HUT = 6
 };
 
 #endif //N_BODY_ENUMS_H

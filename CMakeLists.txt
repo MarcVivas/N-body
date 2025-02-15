@@ -78,9 +78,13 @@ set(
         src/include/RenderLoop/RenderLoop.cpp
         src/include/WindowInputManager/WindowInputManager.cpp
         src/include/Bucket/Bucket.cpp
+        src/include/Octree/Octree.cpp
+        src/include/Octree/Node/Node.cpp
         src/include/Grid/GridCPU.cpp
         src/include/ParticleSystemSaver/ParticleSystemSaver.cpp
         src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
+        src/include/ParticleSolver/ParticleSolverBarnesHut/ParticleSolverBarnesHut.cpp
+
 )
 
 # Include OpenMP
@@ -115,6 +119,7 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUParallel/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverGPU/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUGrid/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBarnesHut/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bucket/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Window/
@@ -127,6 +132,10 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/WindowInputManager/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemLagrange/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemFile/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Octree/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Octree/Node/
+
+
 
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad glm OpenMP::OpenMP_CXX)
