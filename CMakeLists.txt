@@ -46,7 +46,7 @@ FetchContent_Declare(
 # fetch dependencies
 #
 FetchContent_MakeAvailable(glfw glad glm)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -ffast-math")
 #
 # N-body source code
 #
