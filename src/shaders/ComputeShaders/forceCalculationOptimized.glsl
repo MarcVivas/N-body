@@ -56,7 +56,7 @@ void main() {
         if (isValidIndex){
             for(uint j = 0; j < BLOCK_SIZE; j++){
                 const vec3 vector_i_j = blockPositions[j] - particlePosition;
-                const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5);
+                const float distance_i_j = dot(vector_i_j, vector_i_j) + squaredSoftening;
                 totalForce += ((G * blockMasses[j]) / distance_i_j) * vector_i_j;
             }
         }

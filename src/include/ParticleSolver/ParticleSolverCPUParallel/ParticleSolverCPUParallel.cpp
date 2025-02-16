@@ -30,7 +30,7 @@ ParticleSolverCPUParallel::computeGravityForce(ParticleSystem *particles, const 
 
     for(size_t j = 0; j < particles->size(); j++){
         const glm::vec4 vector_i_j = particles->getPositions()[j] - particlePosition;
-        const float distance_i_j = std::pow(glm::length2(vector_i_j) + this->squaredSoftening, 1.5);
+        const float distance_i_j = glm::length2(vector_i_j) + this->squaredSoftening;
         totalForce += ((G * particles->getMasses()[j].x) / distance_i_j) * vector_i_j;
     }
 
