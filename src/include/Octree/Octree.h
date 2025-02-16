@@ -19,7 +19,7 @@ class Octree {
       ~Octree();
       void insert(glm::vec4 pos, glm::vec4 mass);
       void propagate();
-      glm::vec4 computeGravityForce(glm::vec4 pos, const float squaredSoftening, const float G);
+      glm::vec4 computeGravityForce(glm::vec4& pos, const float squaredSoftening, const float G);
 
     private:
       void adjustBoundingBox(ParticleSystem* p);

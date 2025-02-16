@@ -36,55 +36,12 @@ ParticleSystem::ParticleSystem(ParticleSystem * other) {
 
 
 
-/**
- * Updates a particle position
- * Performs the leapfrog integration
- * @param particleId
- * @param deltaTime
- */
-void ParticleSystem::updateParticlePosition(unsigned int particleId, float deltaTime) {
-    float dtDividedBy2 = deltaTime * 0.5f;
-
-    // Compute velocity (i + 1/2)
-    this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
-
-    // Compute next position (i+1)
-    this->positions[particleId] += this->velocities[particleId] * deltaTime;
-
-    // Update acceleration (i+1)
-    // F = MA;
-    // A = F/M;  M is cancelled when calculating gravity force
-    this->accelerations[particleId] = this->forces[particleId];
-
-    // Compute next velocity (i+1)
-    this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
-
-}
 
 
-unsigned int ParticleSystem::size() const {
-    return this->numParticles;
-}
 
-glm::vec4* ParticleSystem::getMasses(){
-    return this->masses;
-}
 
-glm::vec4* ParticleSystem::getPositions() {
-    return this->positions;
-}
 
-glm::vec4* ParticleSystem::getVelocities() {
-    return this->velocities;
-}
 
-glm::vec4* ParticleSystem::getAccelerations() {
-    return this->accelerations;
-}
-
-glm::vec4* ParticleSystem::getForces() {
-    return this->forces;
-}
 
 void ParticleSystem::setAccelerations(glm::vec4 *newAccelerations) {
     delete [] this->accelerations;

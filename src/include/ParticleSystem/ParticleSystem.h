@@ -11,19 +11,62 @@ class ParticleSystem {
 public:
     ParticleSystem(std::vector<Particle> &particles);
     ParticleSystem(ParticleSystem* other);
-    void updateParticlePosition(unsigned int particleId, float deltaTime);
-    unsigned int size() const;
-    glm::vec4* getPositions();
-    glm::vec4* getVelocities();
-    glm::vec4* getAccelerations();
-    glm::vec4* getMasses();
-    glm::vec4* getForces();
+
     void setMasses(glm::vec4* newMasses);
     void setPositions(glm::vec4* newPositions);
     void setAccelerations(glm::vec4* newAccelerations);
     void setVelocities(glm::vec4* newVelocities);
     friend std::ostream& operator<<(std::ostream& os, const ParticleSystem& system);
 
+
+    /**
+    * Updates a particle position
+    * Performs the leapfrog integration
+    * @param particleId
+    * @param deltaTime
+    */
+    void updateParticlePosition(unsigned int particleId, float deltaTime) {
+        float dtDividedBy2 = deltaTime * 0.5f;
+
+        // Compute velocity (i + 1/2)
+        this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
+
+        // Compute next position (i+1)
+        this->positions[particleId] += this->velocities[particleId] * deltaTime;
+
+        // Update acceleration (i+1)
+        // F = MA;
+        // A = F/M;  M is cancelled when calculating gravity force
+        this->accelerations[particleId] = this->forces[particleId];
+
+        // Compute next velocity (i+1)
+        this->velocities[particleId] += this->accelerations[particleId] * dtDividedBy2;
+
+    }
+
+    unsigned int size()  {
+        return this->numParticles;
+    }
+
+    glm::vec4* getMasses() {
+        return this->masses;
+    }
+
+    glm::vec4* getPositions() const{
+        return this->positions;
+    }
+
+    glm::vec4* getVelocities() const {
+        return this->velocities;
+    }
+
+    glm::vec4* getAccelerations() const {
+        return this->accelerations;
+    }
+
+    glm::vec4* getForces() const {
+        return this->forces;
+    }
 protected:
 
     unsigned int numParticles;
