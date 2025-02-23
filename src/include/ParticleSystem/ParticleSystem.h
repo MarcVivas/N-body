@@ -13,6 +13,7 @@ public:
     ParticleSystem(ParticleSystem* other);
 
     void setMasses(glm::vec4* newMasses);
+    void setForces(glm::vec4* newForces);
     void setPositions(glm::vec4* newPositions);
     void setAccelerations(glm::vec4* newAccelerations);
     void setVelocities(glm::vec4* newVelocities);

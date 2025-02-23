@@ -1,17 +1,19 @@
 #include "Node.h"
 
-Node::Node(glm::vec4 centerOfMass, glm::vec4 mass){
-  this->centerOfMass = centerOfMass;
-  this->mass = mass;
-  this->firstChild = -1;
-  this->next = -1;
+
+/**
+ * Node constructor
+ * @param capacity Max nodes of the tree
+ */
+Node::Node(int capacity){
+  this->centerOfMass = new glm::vec4[capacity];
+  this->mass = new glm::vec4[capacity];
+  this->minBoundary = new glm::vec4[capacity];
 }
 
-Node::Node(){
-  this->firstChild = -1;
-  this->centerOfMass = glm::vec4();
-  this->mass = glm::vec4();
-}
 
+Node::~Node() {
+  // Not freeing memory because opengl does it for me
+}
 
 

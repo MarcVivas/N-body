@@ -53,6 +53,11 @@ void ParticleSystem::setMasses(glm::vec4 *newMasses) {
     this->masses = newMasses;
 }
 
+void ParticleSystem::setForces(glm::vec4 *newForces) {
+    delete [] this->forces;
+    this->forces = newForces;
+}
+
 void ParticleSystem::setPositions(glm::vec4 *newPositions) {
     delete [] this->positions;
     this->positions = newPositions;

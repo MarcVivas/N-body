@@ -6,13 +6,16 @@
 #define N_BODY_PARTICLESOLVERBarnesHut
 
 
-class ParticleSolverBarnesHut: public ParticleSolver  {
+class ParticleSolverBHutCPUSeq: public ParticleSolver  {
 public:
-    ParticleSolverBarnesHut(float timeStep, float squaredSoftening, int n);
+    ParticleSolverBHutCPUSeq(float timeStep, float squaredSoftening, int n);
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
+    bool usesBH() override;
     float getSquaredSoftening() override;
-    ~ParticleSolverBarnesHut();
+    ~ParticleSolverBHutCPUSeq();
+    Octree* getOctree();
+
 protected:
     Octree *octree;
     float squaredSoftening;

@@ -124,13 +124,20 @@ Alternative usage:
 ./N-body -version 1 -init 2 -n 100 -time-step 0.0035 -softening 40.0
 ```
 
-## Available versions
+## Available Versions
+
 These are the available versions you can try:
-- `-v 1` Particle-particle sequential algorithm (n^2 complexity) using the CPU.
-- `-v 2` Particle-particle parallel algorithm (n^2 complexity) using the CPU (OpenMP).
-- `-v 3` Particle-particle parallel algorithm (n^2 complexity) using the GPU (Compute shaders).
-- `-v 4` Optimized version 3. Implementation of [Nvidia - Fast N-body simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda). (Compute shaders)
-- `-v 5` Fixed grid algorithm CPU parallel.
+
+| Version | Description                                                                                                                                                                                                                                       | Time Complexity                                                   |
+|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+| `-v 1`  | Naïve particle-particle interaction computed sequentially on the CPU. Every particle interacts with every other particle directly.                                                                                                                | O(n^2)                                                            |
+| `-v 2`  | Parallelized version of `-v 1` using OpenMP for CPU multithreading, improving performance.                                                                                                                            | O(n^2)                                                            |
+| `-v 3`  | GPU-accelerated particle-particle interaction using compute shaders. Leverages massive parallelism but still follows a brute-force approach.                                                                                                      | O(n^2)                                                            |
+| `-v 4`  | Optimized version of `-v 3` based on [NVIDIA’s Fast N-body Simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda), reducing memory bottlenecks and improving GPU efficiency. | O(n^2)                                                            |
+| `-v 5`  | Fixed grid algorithm for spatial partitioning, allowing more efficient force calculations by limiting interactions to nearby particles.                                                                                                           | This version can be further improved and has mistakes to be fixed |
+| `-v 6`  | Iterative, stackless Octree Barnes-Hut algorithm computed sequentially on the CPU. Approximates distant particle groups as single bodies to reduce complexity.                                                                                    | O(n log n)                                                        |
+| `-v 7`  | Hybrid version of `-v 6`. The octree is built sequentially on the CPU, but force calculations and particle updates are parallelized using CPU multithreading.                                                                                     | O(n log n)                                                        |
+| `-v 8`  | Hybrid approach: octree construction remains sequential on the CPU, while force computation and particle updates are offloaded to the GPU for parallel execution.                                                                                 | O(n log n)                                                        |
 
 ## Available initializations
 You can try the next initializations:

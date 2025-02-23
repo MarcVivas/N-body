@@ -1,3 +1,5 @@
+#include <Octree.h>
+
 #include "ParticleSystem.h"
 
 #ifndef N_BODY_PARTICLESOLVER_H
@@ -11,6 +13,9 @@ public:
     virtual void updateParticlePositions(ParticleSystem *particles) = 0;
     virtual float getSquaredSoftening() = 0;
     virtual bool usesGPU() = 0;
+    virtual bool usesBH() = 0;
+    virtual Octree* getOctree() = 0;
+
 };
 
 

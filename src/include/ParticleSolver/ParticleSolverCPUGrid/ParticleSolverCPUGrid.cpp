@@ -23,8 +23,13 @@ void ParticleSolverCPUGrid::updateParticlePositions(ParticleSystem *particles){
         particles->updateParticlePosition(i, this->timeStep);
     }
 }
+bool ParticleSolverCPUGrid::usesBH() {
+    return false;
+}
 
-
+Octree* ParticleSolverCPUGrid::getOctree() {
+    return nullptr;
+}
 void
 ParticleSolverCPUGrid::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
     glm::vec4 particlePosition = particles->getPositions()[particleId];

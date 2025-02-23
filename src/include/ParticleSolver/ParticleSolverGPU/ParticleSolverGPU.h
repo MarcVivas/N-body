@@ -14,6 +14,8 @@ public:
     bool usesGPU() override;
     void updateParticlePositions(ParticleSystem *particles) override;
     float getSquaredSoftening() override;
+    bool usesBH() override;
+    Octree* getOctree() override;
 protected:
     float squaredSoftening;
     Shader *positionCalculator, *forceCalculator;

@@ -83,8 +83,9 @@ set(
         src/include/Grid/GridCPU.cpp
         src/include/ParticleSystemSaver/ParticleSystemSaver.cpp
         src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
-        src/include/ParticleSolver/ParticleSolverBarnesHut/ParticleSolverBarnesHut.cpp
-
+        src/include/ParticleSolver/ParticleSolverBHutCPUSeq/ParticleSolverBHutCPUSeq.cpp
+        src/include/ParticleSolver/ParticleSolverBHutCPUParallel/ParticleSolverBHutCPUParallel.cpp
+        src/include/ParticleSolver/ParticleSolverBHutGPU/ParticleSolverBHutGPU.cpp
 )
 
 # Include OpenMP
@@ -119,7 +120,9 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUParallel/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverGPU/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUGrid/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBarnesHut/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUSeq/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUParallel/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPU/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bucket/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Window/

@@ -52,7 +52,7 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
         if ((arg == "-version" || arg == "-v") && i + 1 < argc) {
             int value = std::stoi(argv[i + 1]);
             if (value >= static_cast<int>(Version::PP_CPU_SEQUENTIAL) &&
-                value <= static_cast<int>(Version::BARNES_HUT)) {
+                value <= static_cast<int>(Version::BARNES_HUT_GPU_PARALLEL_HYBRID)) {
                 this->version = static_cast<Version>(value);
             } else {
                 std::cerr << "Invalid version\n";

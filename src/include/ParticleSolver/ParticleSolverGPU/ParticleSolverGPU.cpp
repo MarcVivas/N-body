@@ -14,6 +14,13 @@ ParticleSolverGPU::ParticleSolverGPU(float stepSize, float squaredSoft, std::str
     this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
 }
 
+bool ParticleSolverGPU::usesBH() {
+    return false;
+}
+Octree* ParticleSolverGPU::getOctree() {
+    return nullptr;
+}
+
 ParticleSolverGPU::ParticleSolverGPU(double block_size, float stepSize, float squaredSoft,
                                      std::string &positionCalculatorPath, std::string &forceCalculatorPath) {
     this->blockSize = block_size;

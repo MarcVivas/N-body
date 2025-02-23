@@ -11,6 +11,9 @@ public:
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     float getSquaredSoftening() override;
+    bool usesBH() override;
+    Octree* getOctree() override;
+
 protected:
     float squaredSoftening;
     float G;

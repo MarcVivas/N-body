@@ -33,9 +33,11 @@ void main() {
 
 
         for (uint j = 0;  j < numParticles; j++){
-            const vec3 vector_i_j = positions[j].xyz - particlePosition;
-            const float distance_i_j = dot(vector_i_j, vector_i_j) + squaredSoftening;
-            totalForce += ((G * masses[j].x) / distance_i_j) * vector_i_j;
+            if(index != j){
+                const vec3 vector_i_j = positions[j].xyz - particlePosition;
+                const float distance_i_j = pow(dot(vector_i_j, vector_i_j) + squaredSoftening, 1.5f);
+                totalForce += ((G * masses[j].x) / distance_i_j) * vector_i_j;
+            }
         }
 
 

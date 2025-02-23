@@ -12,6 +12,9 @@ public:
     ~ParticleSolverCPUGrid();
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
+    bool usesBH() override;
+    Octree* getOctree() override;
+
     float getSquaredSoftening() override;
 protected:
     float timeStep;

@@ -2,18 +2,25 @@
 #include <iostream>
 #include <glm/gtx/norm.hpp>
 
+/**
+ * Constructor
+ * @param n number of particles
+ */
 Octree::Octree(int n){
   this->maxNodes = n < 200 ? n*20 : n*8;
-  this->nodes = new Node[this->maxNodes];
-  this->parents = new size_t[this->maxNodes];
+  this->nodes = new Node(maxNodes);
+  this->parents = new int[this->maxNodes];
   std::cout <<"Max Nodes " <<  maxNodes << std::endl;
   this->nodeCount = 0;
   this->parentCount = 0;
   this->theta = 0.5f *0.5f;
 }
 
-// Establish the bounding box of the first node
-// O(n)
+/**
+ * Establishes the bounding box of the root node
+ * O(n)
+ * @param p Particles
+ */
 void Octree::adjustBoundingBox(ParticleSystem* p){
   float min_x = std::numeric_limits<float>::max();
   float min_y = min_x;
@@ -22,6 +29,7 @@ void Octree::adjustBoundingBox(ParticleSystem* p){
   float max_y = max_x;
   float max_z = max_x;
 
+  // Find the max and min positions
   for (int i = 0;  i < p->size(); ++i){
     const glm::vec4 pos = p->getPositions()[i];
 
@@ -45,58 +53,63 @@ void Octree::adjustBoundingBox(ParticleSystem* p){
     }
   }
 
-  this->nodes[0].setBoundingBox(glm::vec4(min_x, min_y, min_z, 0.f), glm::vec4(max_x, max_y, max_z, 0.f));
+  // Set the bounding box of the root node
+  this->nodes->setBoundingBox(glm::vec4(min_x, min_y, min_z, 0.f), glm::vec4(max_x, max_y, max_z, 0.f), 0);
 }
 
-// Clear the tree and recompute the bounding box
-// O(n)
+/**
+ * Clears the tree and recomputes the root's bounding box
+ * O(n)
+ * @param p Particles
+ */
 void Octree::reset(ParticleSystem* p){
   this->adjustBoundingBox(p);
-  this->nodes[0].setFirstChild(-1);
-  this->nodes[0].setMass(glm::vec4(-1.f, 0.f, 0.f, 0.f));
+  this->nodes->setFirstChild(-1, 0);
+  this->nodes->setMass(glm::vec4(-1.f, 0.f, 0.f, 0.f), 0);
   this->nodeCount = 1;
   this->parentCount = 0;
-  this->nodes[0].setNext(-1);
+  this->nodes->setNext(-1, 0);
 }
 
 
-// Inserts a particle to the octree (iteratively)
-// O(n logBase8(n))
+/**
+ * Inserts a particle into the octree (iteratively and stackless)
+ * Average O(n log(n))
+ * @param pos Particle position
+ * @param mass Particle mass
+ */
 void Octree::insert(glm::vec4 pos, glm::vec4 mass){
   // Start at the root of the octree
-  size_t i = 0;
-
-
+  int i = 0;
 
   while(i < this->maxNodes){
-    Node& currentNode = this->nodes[i];
 
     // Case 1: The node is an empty leaf
-    if(currentNode.isLeaf() && !currentNode.isOccupied()){
+    if(this->nodes->isLeaf(i) && !this->nodes->isOccupied(i)){
       // Proceed to insert the particle
       this->insertParticle(pos, mass, i);
       return;
     }
 
     // Case 2: The node is an occupied leaf.
-    if(currentNode.isLeaf() && currentNode.isOccupied()){
+    if(this->nodes->isLeaf(i) && this->nodes->isOccupied(i)){
       // Get the current particle's position and mass
-      glm::vec4 pos2 = currentNode.getCenterOfMass();
-      glm::vec4 mass2 = currentNode.getMass();
+      glm::vec4 pos2 = this->nodes->getCenterOfMass(i);
+      glm::vec4 mass2 = glm::vec4(this->nodes->getMass(i), 0.f, 0.f, 0.f);
 
       // Subdivide the current node
       this->subdivide(i);
 
       // Get child indexes
-      size_t childIndex1 = this->getNextNode(pos, i);
-      size_t childIndex2 = this->getNextNode(pos2, i);
-      const float dist = glm::length(pos2-pos);
+      int childIndex1 = this->getNextNode(pos, i);
+      int childIndex2 = this->getNextNode(pos2, i);
+      const float dist = glm::length2(pos2-pos);
 
       // If both particles go to the same child node we need to keep subdividing
       while (childIndex1 == childIndex2) {
         // Edge case: Both particles are in the same position or very close
         if (dist < 1e-6) {
-          this->insertParticle(pos, mass + mass, childIndex1);  // In this case, insert both particles anyway
+          this->insertParticle(pos, glm::vec4(mass2.x + mass.x, 0.f, 0.f, 0.f), childIndex1);  // In this case, insert both particles anyway
           return;
         }
 
@@ -125,11 +138,15 @@ void Octree::insert(glm::vec4 pos, glm::vec4 mass){
 }
 
 
-// Create 8 new empty leaf nodes for the current node
-void Octree::subdivide(size_t i){
-  const Node& parent = this->nodes[i];
+
+/**
+ * Creates 8 new empty leaf nodes for the given node
+ * @param i Node index
+ */
+void Octree::subdivide(int i){
+
   // Set the first child to the current node count
-  this->nodes[i].setFirstChild(this->nodeCount);
+  this->nodes->setFirstChild(this->nodeCount, i);
 
   // Mark this node as a parent
   this->parents[this->parentCount] = i;
@@ -138,34 +155,34 @@ void Octree::subdivide(size_t i){
   // Create the next child nodes
   this->nodeCount += 8;
 
-  const glm::vec4 maxB = parent.getMaxBoundary();
-  const glm::vec4 minB = parent.getMinBoundary();
+  const glm::vec4 maxB = this->nodes->getMaxBoundary(i);
+  const glm::vec4 minB = this->nodes->getMinBoundary(i);
 
   const float width = maxB.x - minB.x;
   const float height = maxB.y - minB.y;
   const float depth = maxB.z - minB.z;
 
-  int currentChild = parent.getFirstChild();
+  int currentChild = this->nodes->getFirstChild(i);
   int firstChild = currentChild;
 
 #pragma unroll
   for (int j = 0; j < 8; ++j) {
-    // Create a new child node
+    // Create the boundaries for the new node
     glm::vec4 minBoundary(0.f);
     glm::vec4 maxBoundary(0.f);
 
     // Check the 3rd bit
-    if (j >> 2 == 1) {
+    if (j & 4) {
       minBoundary.z = minB.z;
       maxBoundary.z = minB.z + (depth/2.f);
     }
     else {
       minBoundary.z = minB.z + (depth/2.f);
-      maxBoundary.z = minB.z;
+      maxBoundary.z = maxB.z;
     }
 
     // Check the second bit
-    if (j & (1 << 1)) {
+    if (j & 2) {
       minBoundary.y = minB.y;
       maxBoundary.y = minB.y + (height/2.f);
     }
@@ -183,101 +200,148 @@ void Octree::subdivide(size_t i){
       minBoundary.x = minB.x + (width/2.f);
       maxBoundary.x = maxB.x;
     }
-    this->nodes[currentChild].createEmptyNode(minBoundary, maxBoundary);
+
+    this->nodes->createEmptyNode(minBoundary, maxBoundary, currentChild);
 
     // Set the next node
-    this->nodes[currentChild].setNext(firstChild+ j + 1);
+    if (j < 7) {
+      // The last child is different
+      this->nodes->setNext(firstChild+ j + 1, currentChild);
+    }
 
     // Next child node
     currentChild = firstChild + j + 1;
   }
 
   // The last child node points to the parent's next
-  this->nodes[firstChild+ 7].setNext(parent.getNext());
+  this->nodes->setNext(this->nodes->getNext(i), firstChild+7);
 }
 
-// Get the next node based on the quadrant the particle is in
-size_t Octree::getNextNode(glm::vec4 pos, size_t i){
-  const glm::vec4 quadCenter = this->nodes[i].getQuadrantCenter();
-  const int quadrantIndex = (pos.x < quadCenter.x) | (pos.y < quadCenter.y) << 1 | (pos.z < quadCenter.z) << 2;
-  return this->nodes[i].getFirstChild() + quadrantIndex;
-}
 
-// Once the particles are all inserted, propagate (bottom-up) the masses and centers of mass
+/**
+ * Once the particles are all inserted, propagate (bottom-up) the masses and centers of mass
+ * O(p*8) where p is the number of parent nodes
+ */
 void Octree::propagate() {
 
   for (int i = parentCount - 1; i >= 0; i--) {
     // Compute the center of mass and mass of the current parent node
-    size_t parentIndex = parents[i];
+    int parentIndex = parents[i];
     glm::vec4 centerOfMass(0.f);
     glm::vec4 mass(0.f);
 
-    Node& parentNode = this->nodes[parentIndex];
-
     #pragma unroll
     for (int j = 0; j < 8; ++j) {
-      const int childIndex = parentNode.getFirstChild() + j;
-      Node& childNode = this->nodes[childIndex];
-      if (!childNode.isOccupied())  continue; // The leaf is empty
-      centerOfMass += childNode.getCenterOfMass() * childNode.getMass().x;
-      mass.x += childNode.getMass().x;
+      const int childIndex = this->nodes->getFirstChild(parentIndex) + j;
+      if (!this->nodes->isOccupied(childIndex))  continue; // The leaf is empty
+      centerOfMass += this->nodes->getCenterOfMass(childIndex) * this->nodes->getMass(childIndex);
+      mass.x += this->nodes->getMass(childIndex);
     }
-    parentNode.setCenterOfMass(centerOfMass/mass.x);
-    parentNode.setMass(mass);
+    this->nodes->setCenterOfMass(centerOfMass/mass.x, parentIndex);
+    this->nodes->setMass(mass, parentIndex);
   }
-
 }
 
-// Computes the force for a single particle
+/**
+ * Removes the empty nodes from the tree.
+ * O(p*8) where p is the number of parent nodes
+ */
+void Octree::prune() {
+  for (int i = 0; i < parentCount; i++) {
+    int parentIndex = parents[i];
+    int firstChild = -1;
+    int lastChild = -1;
+    for (int j = 0; j < 8; j++) {
+      const int childIndex = this->nodes->getFirstChild(parentIndex)+ j;
+
+      if (this->nodes->isOccupied(childIndex)) {
+        if (firstChild == -1) {
+          firstChild = childIndex;
+          lastChild = childIndex;
+          continue;
+        }
+        this->nodes->setNext(childIndex, lastChild);
+        lastChild = childIndex;
+
+      }
+
+    }
+
+    this->nodes->setNext(this->nodes->getNext(parentIndex), lastChild);
+    this->nodes->setFirstChild(firstChild, parentIndex);
+  }
+}
+
+/**
+ * Computes the force for a single particle
+ * @param pos
+ * @param squaredSoftening
+ * @param G
+ * @return
+ */
 glm::vec4 Octree::computeGravityForce(glm::vec4& pos, const float squaredSoftening, const float G) {
   glm::vec4 force = glm::vec4(0.f);
 
   int i = 0; // Root of the tree
 
-  while (true){
-    // Get node reference
-    Node &currentNode = this->nodes[i];
+  while (i >= 0){
+
 
     // We need to compute the size and the distance between the particle and the node
-    glm::vec4 size = currentNode.getMaxBoundary() - currentNode.getMinBoundary();
+    glm::vec4 size = this->nodes->getMaxBoundary(i) - this->nodes->getMinBoundary(i);
     float s = glm::max(glm::max(size.x, size.y), size.z);
     float s_squared = s*s;
 
-    glm::vec4 centerOfMass = currentNode.getCenterOfMass();
+    glm::vec4 centerOfMass = this->nodes->getCenterOfMass(i);
     const glm::vec4 vector_i_j = centerOfMass - pos;
     const float dist_squared = glm::length2(vector_i_j);  // Squared distance
 
 
     // If the node is an occupied leaf OR satisfies the criteria
-    if (currentNode.isLeaf() || s_squared < this->theta * dist_squared) {
+    if (this->nodes->isLeaf(i) || s_squared < this->theta * dist_squared) {
       // Compute the force
-      if (currentNode.isOccupied() && dist_squared > 0) {
+      if (this->nodes->isOccupied(i) && dist_squared > 0) {
         const float effective_dist_squared = dist_squared + squaredSoftening; // Apply softening to avoid 0 division
-        const float inv_dist = 1.0f / effective_dist_squared;
-        force += ((vector_i_j * (G * currentNode.getMass().x)) * inv_dist);
+        const float inv_dist = 1.0f / std::pow(effective_dist_squared, 1.5f);
+        force += ((vector_i_j * (G * this->nodes->getMass(i))) * inv_dist);
       }
 
-
-      if (currentNode.getNext() == -1) break; // End, exit the loop
-
       // Go to the next sibling or parent
-      i = currentNode.getNext();
+      i = this->nodes->getNext(i);
     }
     else {
       // Go down the tree
-      i = currentNode.getFirstChild();
+      i = this->nodes->getFirstChild(i);
     }
   }
 
   return force;
 }
 
-void Octree::insertParticle(glm::vec4 centerOfMass, glm::vec4 mass, size_t i){
-  this->nodes[i].setCenterOfMass(centerOfMass);
-  this->nodes[i].setMass(mass);
+/**
+ * Inserts the particle into the node i
+ * @param centerOfMass
+ * @param mass
+ * @param i
+ */
+void Octree::insertParticle(glm::vec4 centerOfMass, glm::vec4 mass, int i){
+  this->nodes->setCenterOfMass(centerOfMass, i);
+  this->nodes->setMass(mass, i);
+}
+
+Node* Octree::getNodes() {
+  return this->nodes;
+}
+
+int Octree::getMaxNodes() {
+  return this->maxNodes;
 }
 
 Octree::~Octree(){
-  delete[] this->nodes;
+  delete this->nodes;
   delete[] this->parents;
+}
+
+int Octree::getNodeCount() {
+  return nodeCount;
 }

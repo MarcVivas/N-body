@@ -27,13 +27,15 @@ protected:
     GLuint VAO;
     GLuint VBO;
     GLsync gSync = nullptr;
-    GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO, masses_SSBO, forces_SSBO;
+    GLuint postitions_SSBO, velocities_SSBO, accelerations_SSBO, masses_SSBO, forces_SSBO, nodeMasses_SSBO, centerOfMass_SSBO, minBoundary_SSBO;
 
     void lockParticlesBuffer();
     void waitParticlesBuffer();
     void createBuffers(bool usesGPU);
     void configureGpuBuffers();
     void configureCpuBuffers();
+    void configureBHBuffers();
+
     virtual void updateGPUParticleSystem();
 
 };
