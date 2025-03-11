@@ -6,7 +6,7 @@
 #include <glm/gtx/norm.hpp>
 #include <Octree.h>
 
-ParticleSolverBHutCPUParallel::ParticleSolverBHutCPUParallel(float stepSize, float squaredSoft, int n): ParticleSolver() {
+ParticleSolverBHutCPUHybrid::ParticleSolverBHutCPUHybrid(float stepSize, float squaredSoft, int n): ParticleSolver() {
     this->squaredSoftening = squaredSoft;
     this->timeStep = stepSize;
     this->G = 1.0f;
@@ -14,15 +14,15 @@ ParticleSolverBHutCPUParallel::ParticleSolverBHutCPUParallel(float stepSize, flo
 }
 
 
-bool ParticleSolverBHutCPUParallel::usesBH() {
+bool ParticleSolverBHutCPUHybrid::usesBH() {
     return true;
 }
 
-Octree* ParticleSolverBHutCPUParallel::getOctree() {
+Octree* ParticleSolverBHutCPUHybrid::getOctree() {
     return octree;
 }
 
-void ParticleSolverBHutCPUParallel::updateParticlePositions(ParticleSystem *particles){
+void ParticleSolverBHutCPUHybrid::updateParticlePositions(ParticleSystem *particles){
 
     this->octree->reset(particles);
 
@@ -54,17 +54,17 @@ void ParticleSolverBHutCPUParallel::updateParticlePositions(ParticleSystem *part
 }
 
 void
-ParticleSolverBHutCPUParallel::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
+ParticleSolverBHutCPUHybrid::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
     particles->getForces()[particleId] = this->octree->computeGravityForce(particles->getPositions()[particleId], this->squaredSoftening, this->G);
 }
 
-bool ParticleSolverBHutCPUParallel::usesGPU() {return false;}
+bool ParticleSolverBHutCPUHybrid::usesGPU() {return false;}
 
 
-float ParticleSolverBHutCPUParallel::getSquaredSoftening() {
+float ParticleSolverBHutCPUHybrid::getSquaredSoftening() {
     return this->squaredSoftening;
 }
 
-ParticleSolverBHutCPUParallel::~ParticleSolverBHutCPUParallel() {
+ParticleSolverBHutCPUHybrid::~ParticleSolverBHutCPUHybrid() {
    delete this->octree;
 }

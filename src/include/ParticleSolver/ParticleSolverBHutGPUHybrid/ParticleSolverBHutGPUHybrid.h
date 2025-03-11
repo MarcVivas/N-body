@@ -8,9 +8,9 @@
 #define N_BODY_PARTICLESOLVERBarnesHutParallel_GPUH
 
 
-class ParticleSolverBHutGPU: public ParticleSolver  {
+class ParticleSolverBHutGPUHybrid: public ParticleSolver  {
 public:
-    ParticleSolverBHutGPU(float timeStep, float squaredSoftening, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
+    ParticleSolverBHutGPUHybrid(float timeStep, float squaredSoftening, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     float getSquaredSoftening() override;
@@ -18,7 +18,7 @@ public:
     Octree* getOctree();
     GLsync gSync;
 
-    ~ParticleSolverBHutGPU();
+    ~ParticleSolverBHutGPUHybrid();
 protected:
     Octree *octree;
     float squaredSoftening;
