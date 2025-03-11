@@ -1,10 +1,7 @@
 
-#include "ParticleSolverBHutCPUParallel.h"
+#include "ParticleSolverBHutCPUHybrid.h"
 
-#include <chrono>
-#include <iostream>
 #include <glm/gtx/norm.hpp>
-#include <Octree.h>
 
 ParticleSolverBHutCPUHybrid::ParticleSolverBHutCPUHybrid(float stepSize, float squaredSoft, int n): ParticleSolver() {
     this->squaredSoftening = squaredSoft;
@@ -40,7 +37,7 @@ void ParticleSolverBHutCPUHybrid::updateParticlePositions(ParticleSystem *partic
 
 
 
-    #pragma omp parallel for schedule(static) shared(particles)
+    #pragma omp parallel for schedule(dynamic) shared(particles)
     for(size_t i = 0; i<particles->size(); i++){
         this->computeGravityForce(particles, i);
     }

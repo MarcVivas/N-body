@@ -6,104 +6,89 @@
 
 struct alignas(16) Node {
   public:
-    glm::vec4* mass; // mass = mass.x; firstChild=mass.y; next=mass.z; maxBoundary.x=mass.w
-    glm::vec4* centerOfMass; // (x1*m1 + x2*m2) / (m1 + m2); maxBoundary.y = centerOfMass.w
-    glm::vec4* minBoundary;  // maxBoundary.z = minBoundary.w
+    glm::vec4 mass; // mass = mass.x; firstChild=mass.y; next=mass.z; maxBoundary.x=mass.w
+    glm::vec4 centerOfMass; // (x1*m1 + x2*m2) / (m1 + m2); maxBoundary.y = centerOfMass.w
+    glm::vec4 minBoundary;  // maxBoundary.z = minBoundary.w
 
-    Node(int capacity);
+    Node();
     ~Node();
 
-    void setFirstChild(int firstChild, int i){
-        this->mass[i].y = static_cast<float>(firstChild);
+    void setFirstChild(int firstChild){
+        this->mass.y = static_cast<float>(firstChild);
     }
 
-    inline int getFirstChild(int i) const{
-        return static_cast<int>(this->mass[i].y);
+    inline int getFirstChild() const{
+        return static_cast<int>(this->mass.y);
     }
 
-    void setNext(int next, int node) {
-        this->mass[node].z = static_cast<float>(next);
+    void setNext(int next) {
+        this->mass.z = static_cast<float>(next);
     }
 
-    inline int getNext(int node) const{
-        return static_cast<int>(this->mass[node].z);
+    inline int getNext() const{
+        return static_cast<int>(this->mass.z);
     }
 
-    void setMass(glm::vec4 mass, int node){
-        this->mass[node].x = mass.x;
+    void setMass(glm::vec4 mass){
+        this->mass.x = mass.x;
     }
 
-    void setCenterOfMass(glm::vec4 centerOfMass, int node){
-        this->centerOfMass[node].x = centerOfMass.x;
-        this->centerOfMass[node].y = centerOfMass.y;
-        this->centerOfMass[node].z = centerOfMass.z;
-    }
-
-
-    inline void setBoundingBox(glm::vec4 minBoundary, glm::vec4 maxBoundary, int node){
-        this->minBoundary[node].x = minBoundary.x;
-        this->minBoundary[node].y = minBoundary.y;
-        this->minBoundary[node].z = minBoundary.z;
-        this->mass[node].w = maxBoundary.x;
-        this->centerOfMass[node].w = maxBoundary.y;
-        this->minBoundary[node].w = maxBoundary.z;
+    void setCenterOfMass(glm::vec4 centerOfMass){
+        this->centerOfMass.x = centerOfMass.x;
+        this->centerOfMass.y = centerOfMass.y;
+        this->centerOfMass.z = centerOfMass.z;
     }
 
 
-    inline void createEmptyNode(glm::vec4 minBoundary, glm::vec4 maxBoundary, int node) {
-        this->mass[node].x = -1.f;
-        this->setFirstChild(-1, node);
-        this->setBoundingBox(minBoundary, maxBoundary, node);
+    inline void setBoundingBox(glm::vec4 minBoundary, glm::vec4 maxBoundary){
+        this->minBoundary.x = minBoundary.x;
+        this->minBoundary.y = minBoundary.y;
+        this->minBoundary.z = minBoundary.z;
+        this->mass.w = maxBoundary.x;
+        this->centerOfMass.w = maxBoundary.y;
+        this->minBoundary.w = maxBoundary.z;
     }
 
-    inline glm::vec4 getMinBoundary(int node) const{
-        glm::vec4 v = this->minBoundary[node];
+
+    inline void createEmptyNode(glm::vec4 minBoundary, glm::vec4 maxBoundary) {
+        this->mass.x = -1.f;
+        this->setFirstChild(-1);
+        this->setBoundingBox(minBoundary, maxBoundary);
+    }
+
+    inline glm::vec4 getMinBoundary() const{
+        glm::vec4 v = this->minBoundary;
         return {v.x, v.y, v.z, 0.f};
     }
-    inline glm::vec4 getMaxBoundary(int node) const{
-        return {mass[node].w, centerOfMass[node].w, minBoundary[node].w, 0.f};
+    inline glm::vec4 getMaxBoundary() const{
+        return {mass.w, centerOfMass.w, minBoundary.w, 0.f};
     }
 
-    inline glm::vec4 getCenterOfMass(int node) const {
-        glm::vec4 c = centerOfMass[node];
+    inline glm::vec4 getCenterOfMass() const {
+        glm::vec4 c = centerOfMass;
         return {c.x, c.y, c.z, 0.f};
     }
 
-    inline float getMass(int node) const{
-        return this->mass[node].x;
+    inline float getMass() const{
+        return this->mass.x;
     }
 
 
-    inline bool isLeaf(int node) const{
-        return getFirstChild(node) < 0;
+    inline bool isLeaf() const{
+        return getFirstChild() < 0;
     }
 
-    inline bool isOccupied(int node) const{
-        return this->mass[node].x > 0.f;
+    inline bool isOccupied() const{
+        return this->mass.x > 0.f;
     }
 
-    inline glm::vec4 getQuadrantCenter(int node) const {
-        glm::vec4 maxBoundary = getMaxBoundary(node);
-        glm::vec4 minBoundary = getMinBoundary(node);
+    inline glm::vec4 getQuadrantCenter() const {
+        glm::vec4 maxBoundary = getMaxBoundary();
+        glm::vec4 minBoundary = getMinBoundary();
         const float width = maxBoundary.x - minBoundary.x;
         const float height = maxBoundary.y - minBoundary.y;
         const float depth = maxBoundary.z - minBoundary.z;
         return {minBoundary.x + (width / 2.f), minBoundary.y + (height / 2.f), minBoundary.z + (depth / 2.f), 0.f};
-    }
-
-    void setMasses(glm::vec4* ptr) {
-        delete[] this->mass;
-        this->mass = ptr;
-    }
-
-    void setCenterOfMasses(glm::vec4* ptr) {
-        delete[] this->centerOfMass;
-        this->centerOfMass = ptr;
-    }
-
-    void setMinBoundaries(glm::vec4* ptr) {
-        delete[] this->minBoundary;
-        this->minBoundary = ptr;
     }
 };
 

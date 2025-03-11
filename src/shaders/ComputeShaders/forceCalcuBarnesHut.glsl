@@ -9,6 +9,12 @@ uniform float G;
 uniform int numParticles;
 uniform float theta;
 
+struct Node{
+    vec4 mass; // mass = mass.x; firstChild=mass.y; next=mass.z; maxBoundary.x=mass.w
+    vec4 centerOfMass; // (x1*m1 + x2*m2) / (m1 + m2); maxBoundary.y = centerOfMass.w
+    vec4 minBoundary;  // maxBoundary.z = minBoundary.w
+};
+
 layout(std430, binding=0) buffer positionsBuffer
 {
     vec4 positions[];
@@ -20,21 +26,10 @@ layout(std430, binding=4) buffer forcesBuffer
     vec4 forces[];
 };
 
-layout(std430, binding=5) buffer nodeMassBuffer
+layout(std430, binding=5) buffer nodesBuffer
 {
-    vec4 masses[];  // mass = mass.x; firstChild=mass.y; next=mass.z; maxBoundary.x=mass.w
+    Node nodes[];
 };
-
-layout(std430, binding=6) buffer centerOfMassBuffer
-{
-    vec4 centerOfMasses[];  // (x1*m1 + x2*m2) / (m1 + m2); maxBoundary.y = centerOfMass.w
-};
-
-layout(std430, binding=7) buffer minBoundaryBuffer
-{
-    vec4 minBoundaries[];  // maxBoundary.z = minBoundary.w
-};
-
 
 bool isLeaf(float firstChild){
     return firstChild < 0.f;
@@ -58,9 +53,11 @@ void main() {
         while (i >= 0){
 
             // Get node i
-            vec4 mass = masses[i];
-            vec4 centerOfMass = centerOfMasses[i];
-            vec4 minBoundary = minBoundaries[i];
+            Node node = nodes[i];
+
+            vec4 mass = node.mass;
+            vec4 centerOfMass = node.centerOfMass;
+            vec4 minBoundary = node.minBoundary;
             vec3 maxBoundary = vec3(mass.w, centerOfMass.w, minBoundary.w);
 
             // We need to compute the size and the distance between the particle and the node

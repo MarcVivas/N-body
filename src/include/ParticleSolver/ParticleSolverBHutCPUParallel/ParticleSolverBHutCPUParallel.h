@@ -1,22 +1,22 @@
 
 #include "ParticleSolver.h"
-#include "Octree.h"
+#include "ParallelOctreeCPU.h"
 
-#ifndef N_BODY_PARTICLESOLVERBarnesHutHybrid_H
-#define N_BODY_PARTICLESOLVERBarnesHutHybrid_H
+#ifndef N_BODY_PARTICLESOLVERBarnesHutParallel_H
+#define N_BODY_PARTICLESOLVERBarnesHutParallel_H
 
 
-class ParticleSolverBHutCPUHybrid: public ParticleSolver  {
+class ParticleSolverBHutCPUParallel: public ParticleSolver  {
 public:
-    ParticleSolverBHutCPUHybrid(float timeStep, float squaredSoftening, int n);
+    ParticleSolverBHutCPUParallel(float timeStep, float squaredSoftening, int n);
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     bool usesBH() override;
     float getSquaredSoftening() override;
-    ~ParticleSolverBHutCPUHybrid();
+    ~ParticleSolverBHutCPUParallel();
     Octree* getOctree();
 protected:
-    Octree *octree;
+    ParallelOctreeCPU *octree;
     float squaredSoftening;
     float G;
     float timeStep;

@@ -14,12 +14,15 @@
 #include "ParticleSolverGPU.h"
 #include "ParticleSolverCPUGrid.h"
 #include "ParticleSolverBHutCPUSeq.h"
+#include "ParticleSolverBHutCPUHybrid.h"
+#include "ParticleSolverBHutGPUHybrid.h"
 #include "ParticleSolverBHutCPUParallel.h"
 #include "ParticleSolverBHutGPU.h"
 
 
 
 #include "WindowInputManager.h"
+#include "../include/ParticleSolver/ParticleSolverBHutCPUHybrid/ParticleSolverBHutCPUHybrid.h"
 
 int main(int argc, char *argv[])
 {
@@ -96,13 +99,21 @@ int main(int argc, char *argv[])
             particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutCPUSeq(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles()), worldDimensions, windowDim, args.getSaveFileName());
             break;
         case Version::BARNES_HUT_CPU_PARALLEL_HYBRID:
-            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutCPUParallel(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles()), worldDimensions, windowDim, args.getSaveFileName());
-        break;
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutCPUHybrid(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles()), worldDimensions, windowDim, args.getSaveFileName());
+            break;
         case Version::BARNES_HUT_GPU_PARALLEL_HYBRID:
             positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
             forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalcuBarnesHut.glsl";
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutGPUHybrid(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim, args.getSaveFileName());
+            break;
+        case Version::BARNES_HUT_CPU_PARALLEL:
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutCPUParallel(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles()), worldDimensions, windowDim, args.getSaveFileName());
+            break;
+        case Version::BARNES_HUT_GPU_PARALLEL:
+            positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
+            forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalcuBarnesHut.glsl";
             particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutGPU(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim, args.getSaveFileName());
-        break;
+            break;
     }
     WindowInputManager windowInputManager(&window, &renderLoop, particleSimulation);
 

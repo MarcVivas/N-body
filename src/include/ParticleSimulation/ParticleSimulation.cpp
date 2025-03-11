@@ -44,17 +44,10 @@ ParticleSimulation::~ParticleSimulation() {
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);  // Unmap the persistent mapping
     glDeleteBuffers(1, &forces_SSBO);         // Delete the buffer, freeing the memory
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->nodeMasses_SSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->nodes_SSBO);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);  // Unmap the persistent mapping
-    glDeleteBuffers(1, &nodeMasses_SSBO);         // Delete the buffer, freeing the memory
+    glDeleteBuffers(1, &nodes_SSBO);         // Delete the buffer, freeing the memory
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->centerOfMass_SSBO);
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);  // Unmap the persistent mapping
-    glDeleteBuffers(1, &centerOfMass_SSBO);         // Delete the buffer, freeing the memory
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->minBoundary_SSBO);
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);  // Unmap the persistent mapping
-    glDeleteBuffers(1, &minBoundary_SSBO);         // Delete the buffer, freeing the memory
 }
 
 void ParticleSimulation::draw() {
@@ -110,39 +103,22 @@ void ParticleSimulation::createBuffers(bool usesGPU) {
 
 void ParticleSimulation::configureBHBuffers() {
     // These SSBOs store nodes from the octree
-    glGenBuffers(1, &this->nodeMasses_SSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, this->nodeMasses_SSBO);
-
-    glGenBuffers(1, &this->centerOfMass_SSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, this->centerOfMass_SSBO);
-
-    glGenBuffers(1, &this->minBoundary_SSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, this->minBoundary_SSBO);
+    glGenBuffers(1, &this->nodes_SSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, this->nodes_SSBO);
 
     this->configureCpuBuffers();
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->forces_SSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * this->particleSystem->size(), this->particleSystem->getForces(), GL_DYNAMIC_DRAW);
 
-    // nodeMasses_SSBO, centerOfMass_SSBO, minBoundary_SSBO
-
     GLbitfield bufferStorageFlags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->nodeMasses_SSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->nodes_SSBO);
     Octree * octree = this->particleSolver->getOctree();
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * octree->getMaxNodes(), octree->getNodes()->mass, bufferStorageFlags);
-    glm::vec4* masses = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * octree->getMaxNodes(), bufferStorageFlags);
-    octree->getNodes()->setMasses(masses);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->centerOfMass_SSBO);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * octree->getMaxNodes(), octree->getNodes()->centerOfMass, bufferStorageFlags);
-    glm::vec4* c = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * octree->getMaxNodes(), bufferStorageFlags);
-    octree->getNodes()->setCenterOfMasses(c);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->minBoundary_SSBO);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * octree->getMaxNodes(), octree->getNodes()->minBoundary, bufferStorageFlags);
-    glm::vec4* m = (glm::vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * octree->getMaxNodes(), bufferStorageFlags);
-    octree->getNodes()->setMinBoundaries(m);
+    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(Node) * octree->getMaxNodes(), octree->getNodes(), bufferStorageFlags);
+    Node* nodes = static_cast<Node *>(glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Node) * octree->getMaxNodes(),
+                                                       bufferStorageFlags));
+    octree->setNodes(nodes);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }

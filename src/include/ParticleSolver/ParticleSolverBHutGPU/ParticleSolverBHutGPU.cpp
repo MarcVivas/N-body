@@ -1,16 +1,17 @@
 
-#include "ParticleSolverBHutGPUHybrid.h"
+#include "ParticleSolverBHutGPU.h"
 
 #include <chrono>
 #include <iostream>
 #include <glm/gtx/norm.hpp>
 #include <Octree.h>
+#include <ParallelOctreeCPU.h>
 
-ParticleSolverBHutGPUHybrid::ParticleSolverBHutGPUHybrid(float stepSize, float squaredSoft, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath): ParticleSolver() {
+ParticleSolverBHutGPU::ParticleSolverBHutGPU(float stepSize, float squaredSoft, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath): ParticleSolver() {
     this->squaredSoftening = squaredSoft;
     this->timeStep = stepSize;
     this->G = 1.0f;
-    this->octree = new Octree(n);
+    this->octree = new ParallelOctreeCPU(n);
 
     this->blockSize = 64.0;
 
@@ -23,25 +24,17 @@ ParticleSolverBHutGPUHybrid::ParticleSolverBHutGPUHybrid(float stepSize, float s
     this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
 }
 
-#include <chrono>
-void ParticleSolverBHutGPUHybrid::updateParticlePositions(ParticleSystem *particles){
+
+void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
     this->octree->reset(particles);
-    using namespace std::chrono;
-    // Overall timer for the loop
-    auto overallStart = high_resolution_clock::now();
-    for(size_t i = 0; i < particles->size(); i++){
-        this->octree->insert(particles->getPositions()[i], particles->getMasses()[i]);
-    }
+
+    this->octree->insert(particles);
 
 
     this->octree->propagate();
 
 
     this->octree->prune();
-    auto overallEnd = high_resolution_clock::now();
-
-    double overallLoopTime = duration<double, std::milli>(overallEnd - overallStart).count();
-    std::cout << "Overall loop time: " << overallLoopTime << " ms" << std::endl;
 
     // Dispatch Compute Shader
     this->forceCalculator->use();
@@ -80,27 +73,27 @@ void ParticleSolverBHutGPUHybrid::updateParticlePositions(ParticleSystem *partic
 
 
 
-bool ParticleSolverBHutGPUHybrid::usesBH() {
+bool ParticleSolverBHutGPU::usesBH() {
     return true;
 }
 
-Octree* ParticleSolverBHutGPUHybrid::getOctree() {
+Octree* ParticleSolverBHutGPU::getOctree() {
     return octree;
 }
 
 void
-ParticleSolverBHutGPUHybrid::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
+ParticleSolverBHutGPU::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
     particles->getForces()[particleId] = this->octree->computeGravityForce(particles->getPositions()[particleId], this->squaredSoftening, this->G);
 }
 
-bool ParticleSolverBHutGPUHybrid::usesGPU() {return false;}
+bool ParticleSolverBHutGPU::usesGPU() {return false;}
 
 
-float ParticleSolverBHutGPUHybrid::getSquaredSoftening() {
+float ParticleSolverBHutGPU::getSquaredSoftening() {
     return this->squaredSoftening;
 }
 
-ParticleSolverBHutGPUHybrid::~ParticleSolverBHutGPUHybrid() {
+ParticleSolverBHutGPU::~ParticleSolverBHutGPU() {
     delete this->octree;
     delete this->positionCalculator;
     delete this->forceCalculator;

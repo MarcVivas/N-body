@@ -3,17 +3,16 @@
 
 /**
  * Node constructor
- * @param capacity Max nodes of the tree
  */
-Node::Node(int capacity){
-  this->centerOfMass = new glm::vec4[capacity];
-  this->mass = new glm::vec4[capacity];
-  this->minBoundary = new glm::vec4[capacity];
+Node::Node(){
+  this->centerOfMass = glm::vec4(0.f);
+  this->mass = glm::vec4(0.f);
+  this->minBoundary = glm::vec4(0.f);
 }
 
 
 Node::~Node() {
-  // Not freeing memory because opengl does it for me
+  // Not freeing memory
 }
 
 

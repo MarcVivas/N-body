@@ -6,7 +6,7 @@ project(N-body)
 
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(FETCHCONTENT_QUIET FALSE)
@@ -46,7 +46,7 @@ FetchContent_Declare(
 # fetch dependencies
 #
 FetchContent_MakeAvailable(glfw glad glm)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -ffast-math")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -march=native -ffast-math")
 #
 # N-body source code
 #
@@ -79,13 +79,18 @@ set(
         src/include/WindowInputManager/WindowInputManager.cpp
         src/include/Bucket/Bucket.cpp
         src/include/Octree/Octree.cpp
+        src/include/Octree/ParallelOctreeCPU.cpp
+        src/include/Octree/ParallelOctreeGPU.cpp
         src/include/Octree/Node/Node.cpp
         src/include/Grid/GridCPU.cpp
         src/include/ParticleSystemSaver/ParticleSystemSaver.cpp
         src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
         src/include/ParticleSolver/ParticleSolverBHutCPUSeq/ParticleSolverBHutCPUSeq.cpp
+        src/include/ParticleSolver/ParticleSolverBHutCPUHybrid/ParticleSolverBHutCPUHybrid.cpp
+        src/include/ParticleSolver/ParticleSolverBHutGPUHybrid/ParticleSolverBHutGPUHybrid.cpp
         src/include/ParticleSolver/ParticleSolverBHutCPUParallel/ParticleSolverBHutCPUParallel.cpp
         src/include/ParticleSolver/ParticleSolverBHutGPU/ParticleSolverBHutGPU.cpp
+
 )
 
 # Include OpenMP
@@ -121,6 +126,8 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverGPU/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUGrid/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUSeq/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUHybrid/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPUHybrid/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUParallel/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPU/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
