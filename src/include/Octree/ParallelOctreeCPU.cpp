@@ -1,6 +1,4 @@
 #include "ParallelOctreeCPU.h"
-#include <numeric>
-#include <execution>
 #include <omp.h>
 #include <iostream>
 #include <glm/gtx/norm.hpp>
