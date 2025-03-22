@@ -95,14 +95,20 @@ set(
 )
 
 # Include OpenMP
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
     message("OpenMP found")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+  endif()
+
+
+
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-
+if (MSVC)
+   set(my_cxx_flags "/openmp:llvm")
+   target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${my_cxx_flags}> )
+endif()
 add_dependencies(${PROJECT_NAME} glfw glad glm)
 
 target_include_directories(

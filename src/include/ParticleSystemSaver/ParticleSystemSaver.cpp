@@ -1,5 +1,6 @@
 #include "ParticleSystemSaver.h"
 #include <fstream>
+#include <string>
 
 ParticleSystemSaver::ParticleSystemSaver(const std::string &customFileName) {
     this->fileName = customFileName;

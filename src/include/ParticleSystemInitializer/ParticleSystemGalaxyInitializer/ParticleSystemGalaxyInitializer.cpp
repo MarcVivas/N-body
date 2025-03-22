@@ -14,7 +14,7 @@ ParticleSystem* ParticleSystemGalaxyInitializer::generateParticles(glm::vec3 wor
     std::mt19937 mt(std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_real_distribution<float> randRadius(0.f, worldDimensions.x);
     std::uniform_real_distribution<float> randThickness(0.1f, worldDimensions.z / 5.f);
-    std::normal_distribution<float> randTheta(0.0f, M_PI * 50);
+    std::normal_distribution<float> randTheta(0.0f, 3.1415f * 50);
     float length = glm::length(worldDimensions) / 4.f;
 
     float worldVolume = worldDimensions.x * worldDimensions.y * worldDimensions.z;
