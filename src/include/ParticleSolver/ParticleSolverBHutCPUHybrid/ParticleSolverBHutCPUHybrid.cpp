@@ -25,7 +25,7 @@ void ParticleSolverBHutCPUHybrid::updateParticlePositions(ParticleSystem *partic
 
 
     for(size_t i = 0; i < particles->size(); i++){
-        this->octree->insert(particles->getPositions()[i], particles->getMasses()[i]);
+        this->octree->insert(particles->getPositions()[i], particles->getMasses()[i], 0);
     }
 
 

@@ -68,6 +68,8 @@ public:
     glm::vec4* getForces() const {
         return this->forces;
     }
+
+   
 protected:
 
     unsigned int numParticles;
@@ -76,7 +78,7 @@ protected:
     glm::vec4* velocities;
     glm::vec4* masses;
     glm::vec4* forces;
-
+  
     // Declare ParticleSimulation as a friend class
     friend class ParticleSimulation;
 

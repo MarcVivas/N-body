@@ -1,4 +1,3 @@
-
 #include "ParallelOctreeCPU.h"
 #include <numeric>
 #include <execution>
@@ -7,10 +6,13 @@
 #include <glm/gtx/norm.hpp>
 
 
-ParallelOctreeCPU::ParallelOctreeCPU(const int n): Octree(n) {
+ParallelOctreeCPU::ParallelOctreeCPU(int n): Octree(n) {
     this->numThreads = omp_get_max_threads();
     this->maxDepth = 2;
 
+    delete[] this->nodes;
+
+    this->maxNodesPerSubtree = n < 200 ?  n*8 : n*2;
 
     this->maxNodes = 0;
     for (int i = 0; i <= maxDepth; i++) {
@@ -23,54 +25,100 @@ ParallelOctreeCPU::ParallelOctreeCPU(const int n): Octree(n) {
         omp_init_lock(&nodeLocks[i]);
     }
     this->totalTasks = std::pow(8, maxDepth);
-    this->octrees = new Octree*[totalTasks];
+
+    this->nodes = new Node[this->maxNodesPerSubtree * this->totalTasks + this->maxNodes + n];
+
     this->tasks = new Task[totalTasks];
 
-    #pragma omp parallel for
-    for (int i = 0; i < totalTasks; i++) {
-        this->tasks[i] = Task(n/8);
-        this->octrees[i] = new Octree(n/2);
-    }
+    nodeCounts = new int[this->totalTasks];
+    subTreeParents = new int[this->totalTasks*this->maxNodesPerSubtree];
+    parentCounts = new int[this->totalTasks];
 
-    this->resetArrays(n, maxNodes);
+    this->maxParticlesPerTask = n < 200 ? n : n/2;
+    taskParticles = new int[this->totalTasks * maxParticlesPerTask];
+
+  
+
+    this->resetArrays();
 }
 
 ParallelOctreeCPU::~ParallelOctreeCPU() {
     delete[] tasks;
+    delete[] nodeCounts;
+    delete[] subTreeParents;
+    delete[] parentCounts;
+    delete[] taskParticles;
 
     for (int i = 0; i < maxNodes; ++i) {
         omp_destroy_lock(&nodeLocks[i]);
     }
-
-    for (int i = 0; i < totalTasks; i++) {
-        delete octrees[i];
-    }
-    delete[] octrees;
-
 }
-#include <chrono>
-#include <iostream>
+
 /**
- * Inserts the particles level by level
+ * Establishes the bounding box of the root node
+ * O(n)
+ * @param p Particles
+ */
+void ParallelOctreeCPU::reset(ParticleSystem *p) {
+    float min_x = std::numeric_limits<float>::max();
+    float min_y = min_x;
+    float min_z = min_x;
+    float max_x = std::numeric_limits<float>::min();
+    float max_y = max_x;
+    float max_z = max_x;
+
+    // Find the max and min positions
+    for (int i = 0;  i < p->size(); ++i){
+        const glm::vec4 pos = p->getPositions()[i];
+
+        if (pos.x < min_x){
+            min_x = pos.x;
+        }
+        if (pos.y < min_y){
+            min_y = pos.y;
+        }
+        if (pos.z < min_z){
+            min_z = pos.z;
+        }
+        if (pos.x > max_x){
+            max_x = pos.x;
+        }
+        if (pos.y > max_y){
+            max_y = pos.y;
+        }
+        if (pos.z > max_z){
+            max_z = pos.z;
+        }
+    }
+
+    // Set the bounding box of the root node
+    this->nodes[0].setBoundingBox(glm::vec4(min_x, min_y, min_z, 0.f), glm::vec4(max_x, max_y, max_z, 0.f));
+
+    Node &root = this->nodes[0];
+    root.setFirstChild(-1);
+    root.setMass(glm::vec4(-1.f, 0.f, 0.f, 0.f));
+    this->nodeCount = 1;
+    this->parentCount = 0;
+    root.setNext(-1);
+}
+
+/**
+ * Inserts the particles
  * @param p particles
  */
 void ParallelOctreeCPU::insert(ParticleSystem *p) {
-    int particleCount = p->size();
-
-    // Reset arrays
-    this->resetArrays(p->size(), nodeCount);
-
+       
     int root = 0;
+
     // Subdivide the tree
     while (nodeCount < maxNodes) {
-        this->subdivide(root, this->nodeCount);
-        this->nodeCount+=8;
+        Octree::subdivide(root);
         root+=1;
     }
-
+ 
     // Fill the tasks
     #pragma omp parallel for
-    for (int j = 0; j < particleCount; j++) {
+    for (int j = 0; j < p->size(); j++) {
         const glm::vec4 pos = p->getPositions()[j];
         int i = 0;
         int depth = 0;
@@ -81,141 +129,280 @@ void ParallelOctreeCPU::insert(ParticleSystem *p) {
             depth ++;
         }
         omp_set_lock(&nodeLocks[i]);  // Lock only for this node
-        this->tasks[i%totalTasks].insert(i, j);
+        taskParticles[i%totalTasks * maxParticlesPerTask + this->tasks[i%totalTasks].totalParticles] = j;
+        this->tasks[i%totalTasks].totalParticles++;
+        this->tasks[i%totalTasks].root = i;
         omp_unset_lock(&nodeLocks[i]);  // Unlock after insertion
     }
-
+      
     // Distribute work among threads
     #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < totalTasks; ++i) {
         // Execute task
         Task &task = this->tasks[i];
-        Octree *oct = this->octrees[i];
+        if (task.root < 0) continue;
+        
+        int root = getSubtree(i);
+        Node &oct = this->nodes[root];
+
 
         // Reset octrees
-        if (task.totalParticles > 0) {
-            oct->getNodes()[0].setBoundingBox(this->nodes[task.root].getMinBoundary(), this->nodes[task.root].getMaxBoundary());
-        }
-        oct->getNodes()[0].setFirstChild(-1);
-        oct->getNodes()[0].setMass(glm::vec4(-1.f, 0.f, 0.f, 0.f));
-        oct->nodeCount = 1;
-        oct->parentCount = 0;
-        oct->getNodes()[0].setNext(-1);
+        oct.setBoundingBox(this->nodes[task.root].getMinBoundary(), this->nodes[task.root].getMaxBoundary());
+        oct.setFirstChild(-1);
+        oct.setMass(glm::vec4(-1.f, 0.f, 0.f, 0.f));
+        nodeCounts[i] = 1;
+        parentCounts[i] = 0;
+        oct.setNext(-1);
+
 
         if (task.totalParticles <= 0) continue;
 
-        for (int j = 0; j < task.totalParticles; j++) {
-            const int particleId = task.particles[j];
-            oct->insert(p->getPositions()[particleId], p->getMasses()[particleId]);
-        }
+        oct.setNext(this->nodes[task.root].getNext());
+        this->nodes[task.root].setFirstChild(root);
 
-        oct->propagate();
-        oct->prune();
+        for (int j = 0; j < task.totalParticles; j++) {
+            const int particleId = taskParticles[i * maxParticlesPerTask + j];
+            this->insert(p->getPositions()[particleId], p->getMasses()[particleId], i);
+        }
+         
+        this->propagate(i);
+    }
+      
+    for(int i = maxNodes-totalTasks; i < maxNodes; i++){
+        if(this->tasks[i%totalTasks].totalParticles > 0){
+            this->parents[parentCount] = i;
+            parentCount++;
+        }
     }
 
+    this->propagate();
+       
+    this->prune();
+        
+}
+
+
+void ParallelOctreeCPU::prune() {
+    for (int i = 0; i < maxNodes-totalTasks; i++) {
+        const int parentIndex = parents[i];
+        Node &parent = this->nodes[parentIndex];
+        if(!parent.isOccupied()){
+            parent.setFirstChild(parent.getNext());
+            continue;
+        }
+
+        int firstChild = -1;
+        int lastChild = -1;
+
+
+        for (int j = 0; j < 8; j++) {
+            const int childIndex = parent.getFirstChild()+ j;
+            if (this->nodes[childIndex].isOccupied()) {
+                if (firstChild == -1) {
+                    firstChild = childIndex;
+                    lastChild = childIndex;
+                    continue;
+                }
+                this->nodes[lastChild].setNext(childIndex);
+                lastChild = childIndex;
+            }
+
+        }
+        this->nodes[lastChild].setNext(parent.getNext());
+        parent.setFirstChild(firstChild);
+    }
+
+    #pragma omp parallel for if (maxNodes > 1000)
+    for(int i = maxNodes-totalTasks; i < maxNodes; i++){
+        if(this->nodes[i].isOccupied()){
+            this->nodes[this->nodes[i].getFirstChild()].setNext(this->nodes[i].getNext());
+        }
+    }
+
+    #pragma omp parallel for 
+    for(int i = 0; i < totalTasks; i++){
+        Task &task = this->tasks[i];
+        if (task.totalParticles <= 0 || task.root < 0) continue;
+        this->prune(i);
+        // Reset the task
+        task.reset();
+    }
+}
+
+int ParallelOctreeCPU::getMaxNodes() {
+    return this->maxNodes + this->maxNodesPerSubtree * this->totalTasks;
+}
+
+void ParallelOctreeCPU::propagate() {
     // Propagate
-    for (int i = parentCount - 1; i >= 0; i--) {
+    #pragma omp parallel for if (maxNodes > 1000)
+    for(int i = parentCount -1; i >= maxNodes-totalTasks; i--){
+        const int parentIndex = parents[i];
+        const int childIndex = this->nodes[parentIndex].getFirstChild();
+        if (!this->nodes[childIndex].isOccupied())  continue; // The leaf is empty
+        this->nodes[parentIndex].setCenterOfMass(this->nodes[childIndex].getCenterOfMass());
+        this->nodes[parentIndex].setMass(glm::vec4(this->nodes[childIndex].getMass(), 0.f, 0.f, 0.f));
+    }
+
+    for (int i = maxNodes-totalTasks - 1; i >= 0; i--) {
         // Compute the center of mass and mass of the current parent node
         const int parentIndex = parents[i];
         glm::vec4 centerOfMass(0.f);
         glm::vec4 mass(0.f);
 
-        #pragma unroll
         for (int j = 0; j < 8; ++j) {
             const int childIndex = this->nodes[parentIndex].getFirstChild() + j;
-
-            if(childIndex >= parentCount){
-                Octree *child = this->octrees[childIndex%totalTasks];
-                if(!child->getNodes()[0].isOccupied()) continue;
-                centerOfMass += child->getNodes()[0].getCenterOfMass() * child->getNodes()[0].getMass();
-                mass.x += child->getNodes()[0].getMass();
-                this->nodes[childIndex].setMass(glm::vec4(child->getNodes()[0].getMass(), 0.f, 0.f, 0.f));
-                this->nodes[childIndex].setCenterOfMass(child->getNodes()[0].getCenterOfMass());
-                continue;
-            }
             if (!this->nodes[childIndex].isOccupied())  continue; // The leaf is empty
             centerOfMass += this->nodes[childIndex].getCenterOfMass() * this->nodes[childIndex].getMass();
             mass.x += this->nodes[childIndex].getMass();
 
         }
-
         this->nodes[parentIndex].setCenterOfMass(centerOfMass/mass.x);
         this->nodes[parentIndex].setMass(mass);
     }
-
-    //this->prune();
-
 }
 
-glm::vec4 ParallelOctreeCPU::computeGravityForce(glm::vec4 &pos, float squaredSoftening, float G) {
-    glm::vec4 force(0.f);
+void ParallelOctreeCPU::prune(int subTreeId) {
+    const int totalParentNodes = parentCounts[subTreeId];
 
-    int i = 0; // Root of the tree
+    for (int i = 0; i < totalParentNodes; i++) {
+        const int parentIndex = subTreeParents[i+subTreeId*this->maxNodesPerSubtree];
+        Node &parent = this->nodes[parentIndex];
+        if(!parent.isOccupied()){
+            parent.setFirstChild(parent.getNext());
+            continue;
+        }
+        int firstChild = -1;
+        int lastChild = -1;
 
-    while (i >= 0){
-        // We need to compute the size and the distance between the particle and the node
-        glm::vec4 size = this->nodes[i].getMaxBoundary() - this->nodes[i].getMinBoundary();
-        float s = glm::max(glm::max(size.x, size.y), size.z);
-        float s_squared = s*s;
 
-
-        glm::vec4 centerOfMass = this->nodes[i].getCenterOfMass();
-        const glm::vec4 vector_i_j = centerOfMass - pos;
-        const float dist_squared = glm::length2(vector_i_j);  // Squared distance
-
-        // If the node satisfies the criteria
-        if (s_squared < this->theta * dist_squared) {
-            // Compute the force
-            if (dist_squared > 0 && this->nodes[i].isOccupied()) {
-                const float effective_dist_squared = dist_squared + squaredSoftening; // Apply softening to avoid 0 division
-                const float inv_dist = 1.0f / std::pow(effective_dist_squared, 1.5f);
-                force += ((vector_i_j * (G * this->nodes[i].getMass())) * inv_dist);
+        for (int j = 0; j < 8; j++) {
+            const int childIndex = parent.getFirstChild()+ j;
+            if (this->nodes[childIndex].isOccupied()) {
+                if (firstChild == -1) {
+                    firstChild = childIndex;
+                    lastChild = childIndex;
+                    continue;
+                }
+                this->nodes[lastChild].setNext(childIndex);
+                lastChild = childIndex;
             }
 
-            // Go to the next sibling or parent
-            i = this->nodes[i].getNext();
         }
-        else if(i >= parentCount){
-            if (dist_squared > 0) {
-                Octree *oct = this->octrees[i % totalTasks];
-                force += oct->computeGravityForce(pos, squaredSoftening, G);
-            }
-
-            i = this->nodes[i].getNext();
-        }
-        else {
-            // Go down the tree
-            i = this->nodes[i].getFirstChild();
-        }
+        this->nodes[lastChild].setNext(parent.getNext());
+        parent.setFirstChild(firstChild);
     }
-    return force;
 }
 
+void ParallelOctreeCPU::propagate(int subTreeId) {
+    const int totalParentNodes = parentCounts[subTreeId];
 
 
+    for (int i = totalParentNodes - 1; i >= 0; i--) {
+
+        // Compute the center of mass and mass of the current parent node
+        int parentIndex = subTreeParents[i+subTreeId*this->maxNodesPerSubtree];
+        glm::vec4 centerOfMass(0.f);
+        glm::vec4 mass(0.f);
+
+        Node &parent = this->nodes[parentIndex];
+
+        for (int j = 0; j < 8; ++j) {
+            const int childIndex = parent.getFirstChild() + j;
+            Node &child = this->nodes[childIndex];
+            if (!child.isOccupied())  continue; // The leaf is empty
+            centerOfMass += child.getCenterOfMass() * child.getMass();
+            mass.x += child.getMass();
+        }
+        parent.setCenterOfMass(centerOfMass/mass.x);
+        parent.setMass(mass);
+    }
+}
 
 
 /**
- * Resets the arrays for the next iteration (or level of the tree)
+ * Resets the tasks
  */
-void ParallelOctreeCPU::resetArrays(int totalParticles, int totalNodes) {
-#pragma omp parallel for
+void ParallelOctreeCPU::resetArrays() {
+#pragma omp parallel for if (totalTasks > 1000)
     for (int i = 0; i < totalTasks; ++i) {
-        if (i < totalTasks) {
-            tasks[i].reset();
-        }
+        tasks[i].reset();    
     }
 }
 
-void ParallelOctreeCPU::subdivide(int i, int firstChild) {
+void ParallelOctreeCPU::insert(glm::vec4 pos, glm::vec4 mass, int subTreeId) {
+    // Start at the root of the octree
+    int i = getSubtree(subTreeId);
+
+    // Keep the root node
+    const int root = i; 
+
+    // Traverse the tree
+    while(i < i+maxNodesPerSubtree){
+        Node &node = this->nodes[i];
+   
+        // Case 1: The node is an empty leaf
+        if(node.isLeaf() && !node.isOccupied()){
+            // Proceed to insert the particle
+            this->insertParticle(pos, mass, i);
+            return;
+        }
+
+        // Case 2: The node is an occupied leaf.
+        if(node.isLeaf() && node.isOccupied()){
+            // Get the current particle's position and mass
+            glm::vec4 pos2 = node.getCenterOfMass();
+            glm::vec4 mass2 = glm::vec4(node.getMass(), 0.f, 0.f, 0.f);
+
+            // Subdivide the current node
+            this->subdivide(i, nodeCounts[subTreeId]+root, subTreeId);
+
+            // Get child indexes
+            int childIndex1 = this->getNextNode(pos, i);
+            int childIndex2 = this->getNextNode(pos2, i);
+            const float dist = glm::length2(pos2-pos);
+
+            // Edge case: Both particles are in the same position or very close
+            if (dist < 1e-3) {
+                this->insertParticle(pos, glm::vec4(mass2.x + mass.x, 0.f, 0.f, 0.f), childIndex1);  // In this case, insert both particles anyway
+                return;
+            }
+            // If both particles go to the same child node we need to keep subdividing
+            while (childIndex1 == childIndex2) {
+
+                // Keep subdividing
+                this->subdivide(childIndex1, nodeCounts[subTreeId]+root, subTreeId);
+
+
+                // Recalculate child indexes after further subdivisions
+                childIndex1 = this->getNextNode(pos, childIndex1);
+                childIndex2 = this->getNextNode(pos2, childIndex2);
+            }
+
+            // Once particles are in different children, insert them
+            this->insertParticle(pos, mass, childIndex1);
+            this->insertParticle(pos2, mass2, childIndex2);
+
+            return;
+        }
+
+        // Case 3: The node is internal
+        // Traverse the tree
+        i = this->getNextNode(pos, i);
+    }
+}
+
+
+void ParallelOctreeCPU::subdivide(int i, int firstChild, int subTreeId) {
     // Set the first child to the current node count
     this->nodes[i].setFirstChild(firstChild);
 
     // Mark this node as a parent
-    this->parents[this->parentCount] = i;
-    this->parentCount+=1;
+    this->subTreeParents[subTreeId * this->maxNodesPerSubtree + this->parentCounts[subTreeId]] = i;
+    this->parentCounts[subTreeId]++;
 
     // Create the next child nodes
+    this->nodeCounts[subTreeId] += 8;
 
     const glm::vec4 maxB = this->nodes[i].getMaxBoundary();
     const glm::vec4 minB = this->nodes[i].getMinBoundary();
@@ -226,7 +413,6 @@ void ParallelOctreeCPU::subdivide(int i, int firstChild) {
 
     int currentChild = firstChild;
 
-#pragma unroll
     for (int j = 0; j < 8; ++j) {
         // Create the boundaries for the new node
         glm::vec4 minBoundary(0.f);
@@ -262,6 +448,7 @@ void ParallelOctreeCPU::subdivide(int i, int firstChild) {
             maxBoundary.x = maxB.x;
         }
 
+
         this->nodes[currentChild].createEmptyNode(minBoundary, maxBoundary);
 
         // Set the next node
@@ -278,3 +465,10 @@ void ParallelOctreeCPU::subdivide(int i, int firstChild) {
     this->nodes[firstChild+7].setNext(this->nodes[i].getNext());
 }
 
+/**
+ * @param treeId
+ * @return root of the subtree
+ */
+int ParallelOctreeCPU::getSubtree(int treeId) {
+    return this->maxNodes + this->maxNodesPerSubtree * treeId;
+}

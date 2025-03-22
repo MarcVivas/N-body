@@ -20,7 +20,13 @@ ArgumentsParser::ArgumentsParser(int argc, char *argv[]) {
     std::cout << "-v 2 (Particle-Particle algorithm CPU parallel)\n";
     std::cout << "-v 3 (Particle-Particle algorithm GPU parallel)\n";
     std::cout << "-v 4 (Optimized version 3. GPU parallel Fast N-body Particle-Particle)\n";
-    std::cout << "-v 5 Fixed grid CPU\n\n";
+    std::cout << "-v 5 Fixed grid CPU\n";
+    std::cout << "-v 6 Barnes-Hut CPU Sequential\n";
+    std::cout << "-v 7 Barnes-Hut CPU Parallel Hybrid\n";
+    std::cout << "-v 8 Barnes-Hut GPU Parallel Hybrid\n";
+    std::cout << "-v 9 Barnes-Hut CPU Parallel\n";
+    std::cout << "-v 10 Barnes-Hut GPU Parallel Hybrid 2\n";
+    std::cout << "-v 11 Barnes-Hut GPU Parallel (Full GPU implementation)\n\n";
 
     std::cout << "Number of particles: \n";
     std::cout << "-n (Any positive number)\n\n";

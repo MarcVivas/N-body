@@ -46,7 +46,7 @@ FetchContent_Declare(
 # fetch dependencies
 #
 FetchContent_MakeAvailable(glfw glad glm)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -march=native -ffast-math")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O3 -march=native -ffast-math")
 #
 # N-body source code
 #
@@ -89,6 +89,7 @@ set(
         src/include/ParticleSolver/ParticleSolverBHutCPUHybrid/ParticleSolverBHutCPUHybrid.cpp
         src/include/ParticleSolver/ParticleSolverBHutGPUHybrid/ParticleSolverBHutGPUHybrid.cpp
         src/include/ParticleSolver/ParticleSolverBHutCPUParallel/ParticleSolverBHutCPUParallel.cpp
+        src/include/ParticleSolver/ParticleSolverBHutGPUHybrid2/ParticleSolverBHutGPUHybrid2.cpp
         src/include/ParticleSolver/ParticleSolverBHutGPU/ParticleSolverBHutGPU.cpp
 
 )
@@ -129,6 +130,7 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUHybrid/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPUHybrid/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUParallel/
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPUHybrid2/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPU/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
         ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bucket/

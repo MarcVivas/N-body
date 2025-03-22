@@ -19,7 +19,7 @@ void ParticleSolverBHutCPUSeq::updateParticlePositions(ParticleSystem *particles
         this->octree->reset(particles);
 
         for(size_t i = 0; i < particles->size(); i++){
-          this->octree->insert(particles->getPositions()[i], particles->getMasses()[i]);
+          this->octree->insert(particles->getPositions()[i], particles->getMasses()[i], 0);
         }
 
         this->octree->propagate();

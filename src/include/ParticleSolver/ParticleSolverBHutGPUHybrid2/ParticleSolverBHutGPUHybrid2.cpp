@@ -1,16 +1,17 @@
 
-#include "ParticleSolverBHutGPUHybrid.h"
+#include "ParticleSolverBHutGPUHybrid2.h"
 
 #include <chrono>
 #include <iostream>
 #include <glm/gtx/norm.hpp>
 #include <Octree.h>
+#include <ParallelOctreeCPU.h>
 
-ParticleSolverBHutGPUHybrid::ParticleSolverBHutGPUHybrid(float stepSize, float squaredSoft, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath): ParticleSolver() {
+ParticleSolverBHutGPUHybrid2::ParticleSolverBHutGPUHybrid2(float stepSize, float squaredSoft, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath): ParticleSolver() {
     this->squaredSoftening = squaredSoft;
     this->timeStep = stepSize;
     this->G = 1.0f;
-    this->octree = new Octree(n);
+    this->octree = new ParallelOctreeCPU(n);
 
     this->blockSize = 64.0;
 
@@ -23,26 +24,35 @@ ParticleSolverBHutGPUHybrid::ParticleSolverBHutGPUHybrid(float stepSize, float s
     this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
 }
 
-void ParticleSolverBHutGPUHybrid::updateParticlePositions(ParticleSystem *particles){
+#include <iostream>
+ #include <chrono>
+void ParticleSolverBHutGPUHybrid2::updateParticlePositions(ParticleSystem *particles){
+    auto start_reset = std::chrono::high_resolution_clock::now();
     this->octree->reset(particles);
-    // Overall timer for the loop
-    for(size_t i = 0; i < particles->size(); i++){
-        this->octree->insert(particles->getPositions()[i], particles->getMasses()[i], 0);
-    }
+    auto end_reset = std::chrono::high_resolution_clock::now();
+    auto duration_reset = std::chrono::duration_cast<std::chrono::microseconds>(end_reset - start_reset);
+    //std::cout << "Time for reset: " << duration_reset.count() << " microseconds" << std::endl;
+
+    auto start_insert = std::chrono::high_resolution_clock::now();
+    this->octree->insert(particles);
+    auto end_insert = std::chrono::high_resolution_clock::now();
+    auto duration_insert = std::chrono::duration_cast<std::chrono::microseconds>(end_insert - start_insert);
+    //std::cout << "Time for insert: " << duration_insert.count() << " microseconds" << std::endl;
 
 
-    this->octree->propagate();
 
-
-    this->octree->prune();
 
     // Dispatch Compute Shader
+    auto start_force = std::chrono::high_resolution_clock::now();
     this->forceCalculator->use();
     this->forceCalculator->setInt("numParticles", particles->size());
     this->forceCalculator->setFloat("G", this->G);
     this->forceCalculator->setFloat("theta", this->octree->theta);
     this->forceCalculator->setFloat("squaredSoftening", this->squaredSoftening);
     glDispatchCompute(ceil(particles->size() / this->blockSize), 1, 1);
+    auto end_force = std::chrono::high_resolution_clock::now();
+    auto duration_force = std::chrono::duration_cast<std::chrono::microseconds>(end_force - start_force);
+    //std::cout << "Time for force: " << duration_force.count() << " microseconds" << std::endl;  
 
     // Ensure GPU writes are complete before CPU reads
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -73,27 +83,27 @@ void ParticleSolverBHutGPUHybrid::updateParticlePositions(ParticleSystem *partic
 
 
 
-bool ParticleSolverBHutGPUHybrid::usesBH() {
+bool ParticleSolverBHutGPUHybrid2::usesBH() {
     return true;
 }
 
-Octree* ParticleSolverBHutGPUHybrid::getOctree() {
+Octree* ParticleSolverBHutGPUHybrid2::getOctree() {
     return octree;
 }
 
 void
-ParticleSolverBHutGPUHybrid::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
+ParticleSolverBHutGPUHybrid2::computeGravityForce(ParticleSystem *particles, const unsigned int particleId) {
     particles->getForces()[particleId] = this->octree->computeGravityForce(particles->getPositions()[particleId], this->squaredSoftening, this->G);
 }
 
-bool ParticleSolverBHutGPUHybrid::usesGPU() {return false;}
+bool ParticleSolverBHutGPUHybrid2::usesGPU() {return false;}
 
 
-float ParticleSolverBHutGPUHybrid::getSquaredSoftening() {
+float ParticleSolverBHutGPUHybrid2::getSquaredSoftening() {
     return this->squaredSoftening;
 }
 
-ParticleSolverBHutGPUHybrid::~ParticleSolverBHutGPUHybrid() {
+ParticleSolverBHutGPUHybrid2::~ParticleSolverBHutGPUHybrid2 () {
     delete this->octree;
     delete this->positionCalculator;
     delete this->forceCalculator;

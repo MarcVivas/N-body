@@ -26,6 +26,7 @@ void ParticleSolverBHutCPUParallel::updateParticlePositions(ParticleSystem *part
 
     using namespace std::chrono;
 
+    
     octree->reset(particles);
 
     // Time octree insert
@@ -47,7 +48,7 @@ void ParticleSolverBHutCPUParallel::updateParticlePositions(ParticleSystem *part
 
 
 
-    #pragma omp parallel for schedule(static) shared(particles)
+    #pragma omp parallel for schedule(static) 
     for(size_t i = 0; i<particles->size(); i++){
         particles->updateParticlePosition(i, this->timeStep);
     }

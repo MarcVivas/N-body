@@ -181,14 +181,11 @@ void ParticleSimulation::waitParticlesBuffer()
 {
     // Insert a memory barrier to ensure synchronization between CPU and GPU
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    if( this->gSync )
-    {
-        while(true)
-        {
-            GLenum waitReturn = glClientWaitSync( this->gSync, GL_SYNC_FLUSH_COMMANDS_BIT, 1 );
-            if (waitReturn == GL_ALREADY_SIGNALED || waitReturn == GL_CONDITION_SATISFIED)
-                return;
-        }
+    if (gSync) {
+        GLenum waitReturn;
+        do {
+            waitReturn = glClientWaitSync(gSync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000000); // 1-second timeout
+        } while (waitReturn == GL_TIMEOUT_EXPIRED);
     }
 }
 

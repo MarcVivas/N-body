@@ -18,7 +18,7 @@ class Octree {
       float theta;
       virtual void reset(ParticleSystem* p);
       virtual ~Octree();
-      virtual void insert(glm::vec4 pos, glm::vec4 mass);
+      virtual void insert(glm::vec4 pos, glm::vec4 mass, int root);
       virtual void propagate();
       virtual glm::vec4 computeGravityForce(glm::vec4& pos, float squaredSoftening, float G);
       virtual void prune();

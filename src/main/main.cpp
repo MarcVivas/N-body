@@ -18,6 +18,7 @@
 #include "ParticleSolverBHutGPUHybrid.h"
 #include "ParticleSolverBHutCPUParallel.h"
 #include "ParticleSolverBHutGPU.h"
+#include "ParticleSolverBHutGPUHybrid2.h"
 
 
 
@@ -109,10 +110,19 @@ int main(int argc, char *argv[])
         case Version::BARNES_HUT_CPU_PARALLEL:
             particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutCPUParallel(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles()), worldDimensions, windowDim, args.getSaveFileName());
             break;
+        case Version::BARNES_HUT_GPU_PARALLEL_HYBRID2:
+            positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
+            forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalcuBarnesHut.glsl";
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  
+                new ParticleSolverBHutGPUHybrid2(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles(), positionsCalculatorPath, forceCalculatorPath), 
+                worldDimensions, windowDim, args.getSaveFileName());
+            break;
         case Version::BARNES_HUT_GPU_PARALLEL:
             positionsCalculatorPath = "../src/shaders/ComputeShaders/updateParticles.glsl";
             forceCalculatorPath = "../src/shaders/ComputeShaders/forceCalcuBarnesHut.glsl";
-            particleSimulation = new ParticleSimulation(particleSystemInitializer,  new ParticleSolverBHutGPU(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles(), positionsCalculatorPath, forceCalculatorPath), worldDimensions, windowDim, args.getSaveFileName());
+            particleSimulation = new ParticleSimulation(particleSystemInitializer,  
+                new ParticleSolverBHutGPU(args.getTimeStep(), args.getSquaredSoftening(), args.getNumParticles(), positionsCalculatorPath, forceCalculatorPath), 
+                worldDimensions, windowDim, args.getSaveFileName());
             break;
     }
     WindowInputManager windowInputManager(&window, &renderLoop, particleSimulation);

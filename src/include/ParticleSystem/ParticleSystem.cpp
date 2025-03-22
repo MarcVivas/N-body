@@ -8,6 +8,7 @@ ParticleSystem::ParticleSystem(std::vector<Particle> &particles) {
     this->masses = new glm::vec4[this->numParticles]();
     this->forces = new glm::vec4[this->numParticles]();
 
+
     for (int i = 0; i < this->numParticles; i++) {
         this->velocities[i] = particles[i].velocity;
         this->accelerations[i] = particles[i].acceleration;
@@ -33,8 +34,6 @@ ParticleSystem::ParticleSystem(ParticleSystem * other) {
         this->forces[i] = other->forces[i];
     }
 }
-
-
 
 
 

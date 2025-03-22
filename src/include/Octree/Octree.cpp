@@ -7,7 +7,7 @@
  * @param n number of particles
  */
 Octree::Octree(int n){
-  this->maxNodes = n < 200 ? n*20 : n*8;
+  this->maxNodes = n < 200 ? n*200 : n*8;
   this->nodes = new Node[this->maxNodes];
   this->parents = new int[this->maxNodes];
   this->nodeCount = 0;
@@ -78,9 +78,9 @@ void Octree::reset(ParticleSystem* p){
  * @param pos Particle position
  * @param mass Particle mass
  */
-void Octree::insert(glm::vec4 pos, glm::vec4 mass){
+void Octree::insert(glm::vec4 pos, glm::vec4 mass, int root){
   // Start at the root of the octree
-  int i = 0;
+  int i = root;
 
   while(i < this->maxNodes){
     Node &node = this->nodes[i];
@@ -266,10 +266,14 @@ void Octree::propagate() {
 void Octree::prune() {
   for (int i = 0; i < parentCount; i++) {
     int parentIndex = parents[i];
+    Node &parent = this->nodes[parentIndex];
+    if(!parent.isOccupied()){
+      parent.setFirstChild(parent.getNext());
+      continue;
+    }
     int firstChild = -1;
     int lastChild = -1;
 
-    Node &parent = this->nodes[parentIndex];
 
     for (int j = 0; j < 8; j++) {
       const int childIndex = parent.getFirstChild()+ j;

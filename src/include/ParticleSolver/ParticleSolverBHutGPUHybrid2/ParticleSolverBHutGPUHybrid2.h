@@ -1,6 +1,8 @@
-#ifndef N_BODY_PARTICLESOLVERBHUTGPU_H
-#define N_BODY_PARTICLESOLVERBHUTGPU_H
 
+
+
+#ifndef N_BODY_PARTICLESOLVERBHUTGPUHYBRID2_H
+#define N_BODY_PARTICLESOLVERBHUTGPUHYBRID2_H
 #include <ParallelOctreeCPU.h>
 #include <ParallelOctreeGPU.h>
 #include <Shader.h>
@@ -8,10 +10,9 @@
 #include "ParticleSolverGPU.h"
 #include "Octree.h"
 
-
-class ParticleSolverBHutGPU: public ParticleSolver  {
+class ParticleSolverBHutGPUHybrid2: public ParticleSolver  {
 public:
-    ParticleSolverBHutGPU(float timeStep, float squaredSoftening, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
+    ParticleSolverBHutGPUHybrid2(float timeStep, float squaredSoftening, int n, std::string &positionCalculatorPath, std::string &forceCalculatorPath);
     void updateParticlePositions(ParticleSystem *particles) override;
     bool usesGPU() override;
     float getSquaredSoftening() override;
@@ -19,7 +20,7 @@ public:
     Octree* getOctree();
     GLsync gSync;
 
-    ~ParticleSolverBHutGPU();
+    ~ParticleSolverBHutGPUHybrid2();
 protected:
     ParallelOctreeCPU *octree;
     float squaredSoftening;
@@ -30,4 +31,5 @@ protected:
     void computeGravityForce(ParticleSystem *particles, const unsigned int particleId);
 };
 
-#endif //N_BODY_PARTICLESOLVERBHUTGPU_H
+
+#endif //N_BODY_PARTICLESOLVERBHUTGPUHYBRID2_H

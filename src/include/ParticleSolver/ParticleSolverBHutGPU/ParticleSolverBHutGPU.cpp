@@ -24,25 +24,33 @@ ParticleSolverBHutGPU::ParticleSolverBHutGPU(float stepSize, float squaredSoft, 
     this->forceCalculator->setFloat("squaredSoftening", squaredSoft);
 }
 
-
 void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
+    auto start_reset = std::chrono::high_resolution_clock::now();
     this->octree->reset(particles);
+    auto end_reset = std::chrono::high_resolution_clock::now();
+    auto duration_reset = std::chrono::duration_cast<std::chrono::microseconds>(end_reset - start_reset);
+    std::cout << "Time for reset: " << duration_reset.count() << " microseconds" << std::endl;
 
+    auto start_insert = std::chrono::high_resolution_clock::now();
     this->octree->insert(particles);
+    auto end_insert = std::chrono::high_resolution_clock::now();
+    auto duration_insert = std::chrono::duration_cast<std::chrono::microseconds>(end_insert - start_insert);
+    std::cout << "Time for insert: " << duration_insert.count() << " microseconds" << std::endl;
 
 
-    this->octree->propagate();
 
-
-    this->octree->prune();
 
     // Dispatch Compute Shader
+    auto start_force = std::chrono::high_resolution_clock::now();
     this->forceCalculator->use();
     this->forceCalculator->setInt("numParticles", particles->size());
     this->forceCalculator->setFloat("G", this->G);
     this->forceCalculator->setFloat("theta", this->octree->theta);
     this->forceCalculator->setFloat("squaredSoftening", this->squaredSoftening);
     glDispatchCompute(ceil(particles->size() / this->blockSize), 1, 1);
+    auto end_force = std::chrono::high_resolution_clock::now();
+    auto duration_force = std::chrono::duration_cast<std::chrono::microseconds>(end_force - start_force);
+    std::cout << "Time for force: " << duration_force.count() << " microseconds" << std::endl;  
 
     // Ensure GPU writes are complete before CPU reads
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -73,7 +81,7 @@ void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
 
 
 
-bool ParticleSolverBHutGPU::usesBH() {
+bool ParticleSolverBHutGPU  ::usesBH() {
     return true;
 }
 
@@ -93,7 +101,7 @@ float ParticleSolverBHutGPU::getSquaredSoftening() {
     return this->squaredSoftening;
 }
 
-ParticleSolverBHutGPU::~ParticleSolverBHutGPU() {
+ParticleSolverBHutGPU::~ParticleSolverBHutGPU () {
     delete this->octree;
     delete this->positionCalculator;
     delete this->forceCalculator;
