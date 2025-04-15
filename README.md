@@ -112,7 +112,6 @@ Run the compiled program.
 - `-t (decimalNumber)` Configure the step size. (Smaller the more precise)
 - `-s (decimalNumber)` Configure the squared softening. 
 - `-f (path/to/file)` Provide a [particle system file](#particle-system-file).
-- `-o (customFileName)` [Save the simulation](#save-simulations).
 
 The default arguments are:
 ```bash
@@ -133,13 +132,9 @@ These are the available versions you can try:
 | `-v 2`  | Parallelized version of `-v 1` using OpenMP for CPU multithreading, improving performance.                                                                                                                            | O(n^2)                                                            |
 | `-v 3`  | GPU-accelerated particle-particle interaction using compute shaders. Leverages massive parallelism but still follows a brute-force approach.                                                                                                      | O(n^2)                                                            |
 | `-v 4`  | Optimized version of `-v 3` based on [NVIDIA's Fast N-body Simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda), reducing memory bottlenecks and improving GPU efficiency. | O(n^2)                                                            |
-| `-v 5`  | Fixed grid algorithm for spatial partitioning, allowing more efficient force calculations by limiting interactions to nearby particles.                                                                                                           | This version can be further improved and has mistakes to be fixed |
-| `-v 6`  | Iterative, stackless Octree Barnes-Hut algorithm computed sequentially on the CPU. Approximates distant particle groups as single bodies to reduce complexity.                                                                                    | O(n log n)                                                        |
-| `-v 7`  | Hybrid version of `-v 6`. The octree is built sequentially on the CPU, but force calculations and particle updates are parallelized using CPU multithreading. Bottleneck: force calculation.                                                                                     | O(n log n)                                                        |
-| `-v 8`  | Hybrid approach: octree construction remains sequential on the CPU, while force computation and particle updates are offloaded to the GPU for parallel execution. Bottleneck: Tree construction.                                                                                 | O(n log n)                                                        |
-| `-v 9`  | Fully parallel CPU Barnes-Hut implementation. Both tree construction and force calculations are parallelized using OpenMP. Bottleneck: force calculation.                                                                                                                       | O(n log n)                                                        |
-| `-v 10` | Enhanced hybrid GPU-CPU Barnes-Hut implementation. Tree construction is parallel on CPU, force computation on GPU. Bottleneck: Tree construction.                                                                                               | O(n log n)                                                        |
-| `-v 11` | WORK IN PROGRESS. Fully parallel GPU Barnes-Hut implementation. Both tree construction and force calculations are performed on the GPU for maximum parallelism.                                                                                                     | O(n log n)                                                        |
+| `-v 5`  | Iterative, stackless Octree Barnes-Hut algorithm computed sequentially on the CPU. Approximates distant particle groups as single bodies to reduce complexity.                                                                                    | O(n log n)                                                        |
+| `-v 6`  | Fully parallel CPU Barnes-Hut implementation. Both tree construction and force calculations are parallelized using OpenMP.                                                                                                                        | O(n log n)                                                        |
+| `-v 7` | WORK IN PROGRESS. Fully parallel GPU Barnes-Hut implementation. Both tree construction and force calculations are performed on the GPU for maximum parallelism.                                                                                                     | O(n log n)                                                        |
 
 ## Available initializations
 You can try the next initializations:
@@ -181,21 +176,6 @@ This is how you can use the `-f` argument:
 ````bash
 ./N-body -f path/to/file
 ````
-
-### Save simulations 
-The program offers the ability to save various states of the simulation. It includes the following features:
-
-1. Saving the initial state: The program automatically saves the initial state at the start of the simulation.
-2. Saving the current state: By pressing the "S" key during the simulation, you can save the current state for later analysis.
-3. Saving the final state: At the end of the simulation, the program saves the final state.
-
-The saved states are stored in files located in the compiled directory of the program. To save the states, you need to provide a filename using the `-output` or `-o` argument when running the program.
-
-These saving functionalities allow capturing different moments of the simulation for further analysis and study.
-
-
-## Benchmark
-There's a benchmark (written in Python) available for measuring the performance of each version, which generates different plots for comparison. If you're interested, please read the readme file inside the `benchmark` directory.
 
 ## Program structure
 Here you can see the class diagram. It should be relativley easy to add new initializations and versions.  

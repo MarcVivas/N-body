@@ -10,6 +10,8 @@ cmake-build-debug/
 *.o
 *.out
 
+out/
+
 # CMake files
 CMakeCache.txt
 CMakeFiles/

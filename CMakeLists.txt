@@ -50,49 +50,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O3 -march=native -ffast-math")
 #
 # N-body source code
 #
-set(
-        PROJECT_SOURCES
-        src/main/main.cpp
-        src/include/ArgumentsParser/ArgumentsParser.cpp
-        src/include/Camera/Camera.cpp
-        src/include/Shader/abstract/Shader.cpp
-        src/include/Shader/ComputeShader/ComputeShader.cpp
-        src/include/Shader/VertexFragmentShader/VertexFragmentShader.cpp
-        src/include/Particle/Particle.cpp
-        src/include/ParticleSystem/ParticleSystem.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/ParticleSystemCubeInitializer.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/ParticleSystemGalaxyInitializer.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemSphere/ParticleSystemSphere.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemBall/ParticleSystemBall.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemCubeSurface/ParticleSystemCubeSurface.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemLagrange/ParticleSystemLagrange.cpp
-        src/include/ParticleSystemInitializer/ParticleSystemFile/ParticleSystemFile.cpp
-        src/include/ParticleSolver/ParticleSolverCPUSequential/ParticleSolverCPUSequential.cpp
-        src/include/ParticleSolver/ParticleSolverCPUParallel/ParticleSolverCPUParallel.cpp
-        src/include/ParticleSolver/ParticleSolverGPU/ParticleSolverGPU.cpp
-        src/include/Bloom/Bloom.cpp
-        src/include/Window/Window.cpp
-        src/include/RenderTimer/RenderTimer.cpp
-        src/include/ParticleDrawer/ParticleDrawer.cpp
-        src/include/ParticleSimulation/ParticleSimulation.cpp
-        src/include/RenderLoop/RenderLoop.cpp
-        src/include/WindowInputManager/WindowInputManager.cpp
-        src/include/Bucket/Bucket.cpp
-        src/include/Octree/Octree.cpp
-        src/include/Octree/ParallelOctreeCPU.cpp
-        src/include/Octree/ParallelOctreeGPU.cpp
-        src/include/Octree/Node/Node.cpp
-        src/include/Grid/GridCPU.cpp
-        src/include/ParticleSystemSaver/ParticleSystemSaver.cpp
-        src/include/ParticleSolver/ParticleSolverCPUGrid/ParticleSolverCPUGrid.cpp
-        src/include/ParticleSolver/ParticleSolverBHutCPUSeq/ParticleSolverBHutCPUSeq.cpp
-        src/include/ParticleSolver/ParticleSolverBHutCPUHybrid/ParticleSolverBHutCPUHybrid.cpp
-        src/include/ParticleSolver/ParticleSolverBHutGPUHybrid/ParticleSolverBHutGPUHybrid.cpp
-        src/include/ParticleSolver/ParticleSolverBHutCPUParallel/ParticleSolverBHutCPUParallel.cpp
-        src/include/ParticleSolver/ParticleSolverBHutGPUHybrid2/ParticleSolverBHutGPUHybrid2.cpp
-        src/include/ParticleSolver/ParticleSolverBHutGPU/ParticleSolverBHutGPU.cpp
 
-)
+file(GLOB PROJECT_SOURCES_CPP "src/*.cpp" "src/*/*.cpp" "src/*/*/*.cpp")
 
 # Include OpenMP
   find_package(OpenMP)
@@ -102,58 +61,14 @@ set(
   endif()
 
 
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES_CPP})
 
-
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 if (MSVC)
    set(my_cxx_flags "/openmp:llvm")
    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${my_cxx_flags}> )
 endif()
 add_dependencies(${PROJECT_NAME} glfw glad glm)
 
-target_include_directories(
-        ${PROJECT_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/enums/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ArgumentsParser/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Camera/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Shader/abstract/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Shader/ComputeShader/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Shader/VertexFragmentShader/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Particle/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystem/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/interface/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemCubeInitializer/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemGalaxyInitializer/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemSphere/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemBall/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemCubeSurface/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/interface/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUSequential/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUParallel/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverGPU/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverCPUGrid/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUSeq/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUHybrid/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPUHybrid/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutCPUParallel/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPUHybrid2/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSolver/ParticleSolverBHutGPU/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bloom/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Bucket/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Window/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderTimer/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleDrawer/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSimulation/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/RenderLoop/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Grid/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemSaver/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/WindowInputManager/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemLagrange/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/ParticleSystemInitializer/ParticleSystemFile/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Octree/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/include/Octree/Node/
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
-
-
-)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glad glm OpenMP::OpenMP_CXX)
