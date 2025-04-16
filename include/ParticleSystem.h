@@ -85,6 +85,7 @@ protected:
     glm::vec4* forces;
 
 	std::unique_ptr<Shader> mortonShader;
+    std::unique_ptr<Shader> rearrangeParticlesShader; 
     OpenGLBuffer mortonBuffer;
   
     // Declare ParticleSimulation as a friend class

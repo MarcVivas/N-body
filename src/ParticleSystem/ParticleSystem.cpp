@@ -1,5 +1,6 @@
 #include "ParticleSystem.h"
 #include "Helpers.h"
+#include <algorithm>
 using helpers::log;
 ParticleSystem::ParticleSystem(const std::vector<Particle> &particles) {
     this->numParticles = particles.size();
@@ -20,6 +21,7 @@ ParticleSystem::ParticleSystem(const std::vector<Particle> &particles) {
 
 	mortonBuffer.createBufferData(sizeof(glm::uvec2) * this->numParticles, nullptr, 16, GL_DYNAMIC_DRAW);
 	mortonShader = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/morton.glsl"));
+    rearrangeParticlesShader = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/rearrange.glsl"));
 }
 
 ParticleSystem::ParticleSystem(ParticleSystem * other) {
@@ -51,6 +53,13 @@ void ParticleSystem::gpuSort() {
 
 	auto mortonCodes = mortonBuffer.getDataVector<glm::uvec2>(0, sizeof(glm::uvec2) * this->numParticles);
 	
+    std::sort(mortonCodes.begin(), mortonCodes.end(), [](glm::uvec2 &v1, glm::uvec2 &v2){
+        return v1.x < v2.x;
+    });
+
+    mortonBuffer.destroy();
+	mortonBuffer.createBufferData(sizeof(glm::uvec2) * this->numParticles, mortonCodes.data(), 16, GL_DYNAMIC_DRAW);
+
     for (int i = 0; i < this->numParticles; i++) {
 		log(mortonCodes[i].x, mortonCodes[i].y);
 		log(this->positions[i].x, this->positions[i].y, this->positions[i].z);
