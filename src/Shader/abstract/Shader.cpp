@@ -14,7 +14,7 @@ Shader::~Shader(){
     glDeleteProgram(this->ID);
 }
 
-void Shader::fixPathSeparators(std::string &path) {
+void Shader::fixPathSeparators(const std::string &path) {
 #ifdef _WIN32
     std::replace(path.begin(), path.end(), '/', '\\');
 #endif
@@ -110,7 +110,7 @@ unsigned int Shader::compileShader(GLuint shaderType, const char *code) {
 }
 
 
-std::string Shader::readFileToString(std::string& filePath)
+std::string Shader::readFileToString(const std::string& filePath)
 {
     this->fixPathSeparators(filePath);
     std::ifstream file(filePath);

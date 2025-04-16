@@ -73,7 +73,7 @@ protected:
     * On Windows, it replaces forward slashes with backslashes.
     * @param path The path to fix the separators of.
     */
-    void fixPathSeparators(std::string &path);
+    void fixPathSeparators(const std::string &path);
 
 
     /**
@@ -90,7 +90,7 @@ protected:
     * @param filePath the path to the file to be read.
     * @return the contents of the file as a string.
     */
-    std::string readFileToString(std::string& filePath);
+    std::string readFileToString(const std::string& filePath);
 
 };
 #endif //N_BODY_SHADER_H

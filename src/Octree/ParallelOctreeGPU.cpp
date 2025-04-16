@@ -38,6 +38,7 @@ ParallelOctreeGPU::ParallelOctreeGPU(const int n){
 
 void ParallelOctreeGPU::initComputeShaders() {
     this->expander = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/expandOctree.glsl"));
+    
     this->inserter = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/insertParticles.glsl"));
     this->distributor = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/distributeParticles.glsl"));
     this->resetOctree = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/resetOctree.glsl"));
@@ -50,6 +51,7 @@ void ParallelOctreeGPU::initComputeShaders() {
     this->propagateFather = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/propagateFatherOctree.glsl"));
     this->pruneFather = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/pruneFather.glsl"));
     this->pruneSubtrees = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/pruneSubtrees.glsl"));
+    
 }
 
 void ParallelOctreeGPU::initSSBOs(const int n) {

@@ -21,7 +21,7 @@ layout(std430, binding=9) buffer tasksBuffer
 
 // Output for the sum of each block
 layout(std430, binding=11) buffer BlockSumOutputBuffer {
-    writeonly int blockSums[];
+    int blockSums[];
 };
 
 

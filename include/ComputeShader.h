@@ -6,7 +6,7 @@
 
 class ComputeShader: public Shader {
 public:
-    ComputeShader(std::string &computeShaderPath);
+    ComputeShader(const std::string &computeShaderPath);
 
 };
 

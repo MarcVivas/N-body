@@ -1,7 +1,7 @@
 #include "ComputeShader.h"
 
 
-ComputeShader::ComputeShader(std::string &computeShaderPath): Shader(){
+ComputeShader::ComputeShader(const std::string &computeShaderPath): Shader(){
     // Load vertex shader source code from file
     std::string code = this->readFileToString(computeShaderPath);
 

@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <cstddef> 
 #include <vector>  
+#include <cstdio>
 
 class OpenGLBuffer {
 public:
