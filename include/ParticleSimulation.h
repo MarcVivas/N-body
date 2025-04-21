@@ -33,13 +33,10 @@ protected:
 	std::unique_ptr<ParticleDrawer> particleDrawer;
     std::unique_ptr<ParticleSystem> particleSystem;
     GLsync gSync = nullptr;
-    OpenGLBuffer positions_SSBO, velocities_SSBO, accelerations_SSBO, masses_SSBO, forces_SSBO, nodes_SSBO;
 
     void lockParticlesBuffer();
     void waitParticlesBuffer();
-    void createBuffers(bool usesGPU);
-    void configureGpuBuffers();
-    void configureCpuBuffers();
+
 
 };
 #endif // PARTICLESIMULATION_H

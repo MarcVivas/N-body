@@ -7,7 +7,7 @@
 
 class ParticleSystemInitializer{
 public:
-    virtual std::unique_ptr<ParticleSystem> generateParticles(glm::vec3 worldDimensions) = 0;
+    virtual std::unique_ptr<ParticleSystem> generateParticles(glm::vec3 worldDimensions, const bool usesGPU) = 0;
     virtual ~ParticleSystemInitializer() = default;
 };
 

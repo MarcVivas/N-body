@@ -14,7 +14,12 @@ RenderTimer::RenderTimer(bool showFps, bool vSync) :
     if(!vSync){
         // Disable Vsync
         glfwSwapInterval(0);
+	}
+    else {
+        // Enable Vsync
+        glfwSwapInterval(1);
     }
+
 }
 
 void RenderTimer::setDeltaTime(double time) {

@@ -24,7 +24,8 @@ layout(std430, binding = 6) buffer InputBoundsBuffer { // Bound to partialA or p
     vec4 inputBounds[]; // inputBounds[0] = minBoundary; inputBounds[1] = maxBoundary
 };
 
-uniform int numParticles;
+uniform int actualNumParticles;
+uniform int paddedNumParticles;
 
 #define MORTON_CODE_BITS 10 // 10 bits for each dimension
 #define GRID_RESOLUTION 1024 // 2^10
@@ -77,9 +78,14 @@ vec3 normalizedPos(vec3 pos, vec3 minBoundary, vec3 maxBoundary){
 void main(){
 	int globalId = int(gl_GlobalInvocationID.x);
 
-	if(globalId >= numParticles) return;
+    if(globalId >= paddedNumParticles) return; 
+
+    if(globalId >= actualNumParticles) {
+        mortonCodes[globalId].mortonCode = 0xFFFFFFFFu; // Set Morton code to infinity
+        return; // Skip threads that are not needed
+    }	
 	
-	// Compute Morton code for the particle
+    // Compute Morton code for the particle
 
 	const vec3 pos = positions[globalId].xyz;
 	const vec3 minBoundary = inputBounds[0].xyz;

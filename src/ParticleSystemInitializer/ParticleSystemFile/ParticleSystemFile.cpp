@@ -7,7 +7,7 @@
 
 ParticleSystemFile::ParticleSystemFile(std::string filePath) : path(filePath){}
 
-std::unique_ptr<ParticleSystem> ParticleSystemFile::generateParticles(glm::vec3 worldDimensions) {
+std::unique_ptr<ParticleSystem> ParticleSystemFile::generateParticles(glm::vec3 worldDimensions, const bool usesGPU) {
     std::ifstream file(path);
     if (!file) {
         std::cerr << "Failed to open file: " << path << std::endl;
@@ -86,5 +86,5 @@ std::unique_ptr<ParticleSystem> ParticleSystemFile::generateParticles(glm::vec3 
     file.close();
 
 
-    return std::make_unique<ParticleSystem>(particles);
+    return std::make_unique<ParticleSystem>(particles, usesGPU);
 }

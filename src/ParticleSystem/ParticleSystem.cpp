@@ -2,7 +2,7 @@
 #include "Helpers.h"
 #include <algorithm>
 using helpers::log;
-ParticleSystem::ParticleSystem(const std::vector<Particle> &particles) {
+ParticleSystem::ParticleSystem(const std::vector<Particle> &particles, const bool usesGPU) {
     this->numParticles = particles.size();
     this->velocities = new glm::vec4[this->numParticles]();
     this->accelerations = new glm::vec4[this->numParticles]();
@@ -19,9 +19,14 @@ ParticleSystem::ParticleSystem(const std::vector<Particle> &particles) {
         this->forces[i] = glm::vec4(0.f);
     }
 
-	mortonBuffer.createBufferData(sizeof(glm::uvec2) * this->numParticles, nullptr, 16, GL_DYNAMIC_DRAW);
-	mortonShader = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/morton.glsl"));
+    this->createBuffers(usesGPU);
+	this->compileShaders();
+}
+
+void ParticleSystem::compileShaders() {
+    mortonShader = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/morton.glsl"));
     rearrangeParticlesShader = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/rearrange.glsl"));
+	bitonicSortShader = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/bitonicSort.glsl"));
 }
 
 ParticleSystem::ParticleSystem(ParticleSystem * other) {
@@ -41,30 +46,128 @@ ParticleSystem::ParticleSystem(ParticleSystem * other) {
     }
 }
 
+
+void ParticleSystem::createBuffers(bool usesGPU) {
+    if (usesGPU) {
+        this->configureGpuBuffers();
+    }
+    else {
+        this->configureCpuBuffers();
+    }
+}
+
+unsigned int ParticleSystem::nextPowerOfTwo(unsigned int n){
+    if (n == 0) return 1; // Or handle as needed
+    // Simple bit manipulation method 
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    return n;
+
+}
+
+void ParticleSystem::configureGpuBuffers() {
+	this->paddedNumParticles = nextPowerOfTwo(this->numParticles);
+    positions_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getPositions(), 0, GL_DYNAMIC_COPY);
+    velocities_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getVelocities(), 1, GL_DYNAMIC_COPY);
+    accelerations_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getAccelerations(), 2, GL_DYNAMIC_COPY);
+    masses_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getMasses(), 3, GL_STATIC_DRAW);
+    forces_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getForces(), 4, GL_DYNAMIC_COPY);
+    mortonBuffer.createBufferData(sizeof(glm::uvec2) * paddedNumParticles, nullptr, 16, GL_DYNAMIC_COPY);
+    positionsCopy.createBufferData(sizeof(glm::vec4) * this->size(), nullptr, 17, GL_DYNAMIC_COPY);
+    velocitiesCopy.createBufferData(sizeof(glm::vec4) * this->size(), nullptr, 18, GL_DYNAMIC_COPY);
+}
+
+/**
+ * Creates persistent mapped shader storage buffer objects
+ */
+void ParticleSystem::configureCpuBuffers() {
+    GLbitfield bufferStorageFlags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
+
+    positions_SSBO.createBufferStorage(sizeof(glm::vec4) * this->size(), this->getPositions(), 0, bufferStorageFlags);
+    glm::vec4* positions = (glm::vec4*)positions_SSBO.mapBufferRange(0, sizeof(glm::vec4) * this->size(), bufferStorageFlags);
+    this->setPositions(positions);
+
+    velocities_SSBO.createBufferStorage(sizeof(glm::vec4) * this->size(), this->getVelocities(), 1, bufferStorageFlags);
+    glm::vec4* velocities = (glm::vec4*)velocities_SSBO.mapBufferRange(0, sizeof(glm::vec4) * this->size(), bufferStorageFlags);
+    this->setVelocities(velocities);
+
+    accelerations_SSBO.createBufferStorage(sizeof(glm::vec4) * this->size(), this->getAccelerations(), 2, bufferStorageFlags);
+    glm::vec4* accelerations = (glm::vec4*)accelerations_SSBO.mapBufferRange(0, sizeof(glm::vec4) * this->size(), bufferStorageFlags);
+    this->setAccelerations(accelerations);
+}
+
 // Sort the particles in the GPU using the z-order curve
 // Why? Improve cache locality, memory access patterns and reduce warp divergence
 void ParticleSystem::gpuSort() {
-	int workGroups = (this->numParticles + 256 - 1) / 256;
-	
+	static bool pingPong = true;
+
+	OpenGLBuffer* readPositions = pingPong ? &positions_SSBO : &positionsCopy;
+	OpenGLBuffer* readVelocities = pingPong ? &velocities_SSBO : &velocitiesCopy;
+	OpenGLBuffer* writePositions = pingPong ? &positionsCopy : &positions_SSBO;
+	OpenGLBuffer* writeVelocities = pingPong ? &velocitiesCopy : &velocities_SSBO;
+    
+
+
+    // Calculate morton codes
     mortonShader->use();
-	mortonShader->setInt("numParticles", this->numParticles);
-	glDispatchCompute(workGroups, 1, 1);
+	readPositions->bindBufferBase(0);
+	readVelocities->bindBufferBase(1);
+	mortonBuffer.bindBufferBase(16);
+    mortonShader->setInt("actualNumParticles", this->numParticles);
+	mortonShader->setInt("paddedNumParticles", this->paddedNumParticles);
+	glDispatchCompute((this->paddedNumParticles + 256 - 1) / 256, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	auto mortonCodes = mortonBuffer.getDataVector<glm::uvec2>(0, sizeof(glm::uvec2) * this->numParticles);
-	
-    std::sort(mortonCodes.begin(), mortonCodes.end(), [](glm::uvec2 &v1, glm::uvec2 &v2){
-        return v1.x < v2.x;
-    });
+  
 
-    mortonBuffer.destroy();
-	mortonBuffer.createBufferData(sizeof(glm::uvec2) * this->numParticles, mortonCodes.data(), 16, GL_DYNAMIC_DRAW);
+	// Sort morton codes using bitonic sort (implement radix sort for better performance) 
+	bitonicSortShader->use();
+    readPositions->bindBufferBase(0);
+    readVelocities->bindBufferBase(1);
+    mortonBuffer.bindBufferBase(16);
+	bitonicSortShader->setInt("numParticles", this->paddedNumParticles);
+    
+    // Bitonic sort requires numParticles to be a power of 2 for the simplest
+    // implementation. If not, you either need to pad your buffers/particle count
+    // to the next power of two OR modify the shader/dispatch logic to handle
+    // the exact size (more complex bounds checking).
 
-    for (int i = 0; i < this->numParticles; i++) {
-		log(mortonCodes[i].x, mortonCodes[i].y);
-		log(this->positions[i].x, this->positions[i].y, this->positions[i].z);
+    const int N = this->paddedNumParticles; // Or use next power of 2 if padding
 
+    for (unsigned int k = 2; k <= N; k <<= 1) { // k = size of sequences being merged
+        bitonicSortShader->setInt("k", k);
+        for (unsigned int j = k >> 1; j > 0; j >>= 1) { // j = comparison distance
+            if (j < 1) continue; // Should not happen with k >= 2
+            bitonicSortShader->setInt("j", j);
+
+            glDispatchCompute((this->paddedNumParticles + 256 - 1) / 256, 1, 1);
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        }
     }
+   
+	
+	// Rearrange particles based on sorted morton codes
+	rearrangeParticlesShader->use();
+    readPositions->bindBufferBase(0);
+    readVelocities->bindBufferBase(1);
+    mortonBuffer.bindBufferBase(16);
+	writePositions->bindBufferBase(17);
+	writeVelocities->bindBufferBase(18);
+	rearrangeParticlesShader->setInt("numParticles", this->numParticles);
+	glDispatchCompute((this->numParticles + 256 - 1) / 256, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+	pingPong = !pingPong;
+	writePositions->bindBufferBase(0);
+	writeVelocities->bindBufferBase(1);
+	readPositions->bindBufferBase(17);
+	readVelocities->bindBufferBase(18); 
+            
 }
 
 

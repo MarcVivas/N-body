@@ -29,7 +29,7 @@ layout(std430, binding=9) buffer tasksBuffer
 
 layout(std430, binding=0) buffer positionsBuffer
 {
-	vec4 positions[];
+	readonly vec4 positions[];
 };
 
 layout(std430, binding=12) buffer taskParticlesIndexesBuffer
@@ -372,7 +372,6 @@ void insert(int particleId, int taskId, inout Task task){
         // Case 3: The node is internal
         // Traverse the tree
         i = getNextNode(pos, i);
-
     }
 
 }

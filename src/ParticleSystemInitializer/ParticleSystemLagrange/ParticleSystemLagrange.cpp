@@ -5,7 +5,7 @@ ParticleSystemLagrange::ParticleSystemLagrange() {
     this->totalParticles = 3;
 }
 
-std::unique_ptr<ParticleSystem> ParticleSystemLagrange::generateParticles(glm::vec3 worldDimensions) {
+std::unique_ptr<ParticleSystem> ParticleSystemLagrange::generateParticles(glm::vec3 worldDimensions, const bool usesGPU) {
     std::vector<Particle> particles;
     particles.reserve(this->totalParticles);
 
@@ -46,7 +46,7 @@ std::unique_ptr<ParticleSystem> ParticleSystemLagrange::generateParticles(glm::v
     particles[1].setVelocity(velocity2 * 0.5f);
     particles[2].setVelocity(velocity3 * 0.5f);
 
-    return std::make_unique<ParticleSystem>(particles);
+    return std::make_unique<ParticleSystem>(particles, usesGPU);
 }
 
 

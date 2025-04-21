@@ -47,10 +47,11 @@ FetchContent_Declare(
 #
 FetchContent_MakeAvailable(glfw glad glm)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O3 -march=native -ffast-math")
+
+
 #
 # N-body source code
 #
-
 file(GLOB PROJECT_SOURCES_CPP "src/*.cpp" "src/*/*.cpp" "src/*/*/*.cpp")
 
 # Include OpenMP
@@ -63,10 +64,38 @@ file(GLOB PROJECT_SOURCES_CPP "src/*.cpp" "src/*/*.cpp" "src/*/*/*.cpp")
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES_CPP})
 
-if (MSVC)
-   set(my_cxx_flags "/openmp:llvm")
-   target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${my_cxx_flags}> )
+# Add specific flags based on Compiler and Build Type
+if(MSVC)
+  message(STATUS "MSVC Compiler Detected - Adding MSVC specific flags")
+  target_compile_options(${PROJECT_NAME} PRIVATE
+      # Optimization: /O2 is generally equivalent to -O3 for Release builds
+      $<$<CONFIG:Release>:/O2>
+      # Fast Math: /fp:fast
+      $<$<CONFIG:Release>:/fp:fast>
+      # OpenMP: /openmp (ensure VS Installer included OpenMP support)
+      /openmp:llvm
+      # Add other MSVC flags as needed (e.g., /W4 for warnings)
+      /W4
+      /EHsc # Standard exception handling
+  )
+else() # Assuming GCC or Clang
+  message(STATUS "GCC/Clang Compiler Detected - Adding GCC/Clang specific flags")
+  target_compile_options(${PROJECT_NAME} PRIVATE
+      # Optimization: -O3 for Release builds
+      $<$<CONFIG:Release>:-O3>
+      # Architecture Specific (use if you know your target machine, otherwise omit for portability)
+      $<$<CONFIG:Release>:-march=native>
+      # Fast Math: -ffast-math
+      $<$<CONFIG:Release>:-ffast-math>
+      # OpenMP: Use the flag found by FindOpenMP
+      ${OpenMP_CXX_FLAGS}
+      # Add other GCC/Clang flags as needed (e.g., -Wall for warnings)
+      -Wall
+      -Wextra
+      -pedantic
+  )
 endif()
+
 add_dependencies(${PROJECT_NAME} glfw glad glm)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)

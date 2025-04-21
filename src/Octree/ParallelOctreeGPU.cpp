@@ -16,11 +16,11 @@ ParallelOctreeGPU::ParallelOctreeGPU(const int n){
     this->fatherMaxNodes = 0;
     
     int i = 0;
-    while (fatherMaxNodes < n && maxDepth < 8) {
+    while (maxDepth < 8) {
         const int tmp = fatherMaxNodes + ipow(8, i);
-        if (tmp >= n) break;
         fatherMaxNodes = tmp;
         maxDepth++;
+        if (static_cast<float>(n) / static_cast<float>(ipow(8, i)) < 2.f) break;
         i++;
     }   
 
@@ -38,7 +38,6 @@ ParallelOctreeGPU::ParallelOctreeGPU(const int n){
 
 void ParallelOctreeGPU::initComputeShaders() {
     this->expander = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/expandOctree.glsl"));
-    
     this->inserter = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/insertParticles.glsl"));
     this->distributor = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/distributeParticles.glsl"));
     this->resetOctree = std::make_unique<ComputeShader>(std::string("../src/shaders/ComputeShaders/resetOctree.glsl"));
@@ -232,26 +231,19 @@ void ParallelOctreeGPU::executeTasks() {
  * @param p particles
  */
 void ParallelOctreeGPU::insert(ParticleSystem* p) {
+    this->expandTree();
 
-    // Expand the tree
-	this->expandTree();
-   
-	this->prepareTasks(p);
-    
-  
+    this->prepareTasks(p);
+
 	
     this->executeTasks();
-    
 
     
     this->propagate();
     
 
 
-    this->prune();
-
-    
-    
+    this->prune(); 
 
 }
 

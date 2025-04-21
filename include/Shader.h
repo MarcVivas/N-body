@@ -73,7 +73,6 @@ protected:
     * On Windows, it replaces forward slashes with backslashes.
     * @param path The path to fix the separators of.
     */
-    void fixPathSeparators(const std::string &path);
 
 
     /**

@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     glm::vec2 windowDim(1300, 750);
     Window window(windowDim, "N-body simulation");
 
-    RenderLoop renderLoop(window, true, false);
+    RenderLoop renderLoop(window, true, true);
 
     std::unique_ptr<ParticleSystemInitializer> particleSystemInitializer;
 

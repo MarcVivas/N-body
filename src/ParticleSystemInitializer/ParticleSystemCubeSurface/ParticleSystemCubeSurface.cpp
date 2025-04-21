@@ -5,7 +5,7 @@
 
 ParticleSystemCubeSurface::ParticleSystemCubeSurface(size_t numParticles) : totalParticles(numParticles){}
 
-std::unique_ptr<ParticleSystem> ParticleSystemCubeSurface::generateParticles(glm::vec3 worldDimensions) {
+std::unique_ptr<ParticleSystem> ParticleSystemCubeSurface::generateParticles(glm::vec3 worldDimensions, const bool usesGPU) {
     std::vector<Particle> particles;
     particles.reserve(this->totalParticles);
 
@@ -45,5 +45,5 @@ std::unique_ptr<ParticleSystem> ParticleSystemCubeSurface::generateParticles(glm
 		particles.push_back(Particle(particlePos, initialVel, particleMass * mass(mt)));
     }
 
-    return std::make_unique<ParticleSystem>(particles);
+    return std::make_unique<ParticleSystem>(particles, usesGPU);
 }

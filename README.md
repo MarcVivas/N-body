@@ -1,4 +1,11 @@
-# N-body simulation
+# N-body Simulation
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A 3D N-body simulation project developed to explore C++, OpenGL graphics, and GPU parallel programming techniques (OpenMP & Compute Shaders). It simulates particle interactions (e.g., gravitational) using various algorithms from brute-force to Barnes-Hut, allowing for performance comparisons.
+
+![Simulation Showcase](media/overview.gif)
+*Demonstration of a simulation run with 37.000 particles*
 
 ## Overview
 ![Overview](media/overview.gif)
@@ -7,7 +14,6 @@
 
 
 ## Table of contents
-- [About this project](#about-this-project)  
 - [Controls](#controls)  
 - [How to run the project](#how-to-run-the-project)  
 - [Program arguments](#program-arguments)  
@@ -15,18 +21,13 @@
 - [Available initializations](#available-initializations)  
 - [Program structure](#program-structure)
 
-## About this project  
-This project was made to learn `C++`, `OpenGL` and `GPU programming`.
-
 ### Features
 - Different versions/algorithms can be tried.
 - Different initializations can be tried.
-- The number of bodies to simulate can be customized.
-- The simulation is in a 3D world.
+- 3D simulation.
 - Particles have bloom.
-- Leapfrog integrator.
 - Plummer softening.
-- Customizable step size and squared softening.
+- Customizable number of bodies, step size and squared softening.
 
 ## Controls
 | Key/Input      | Action                                   |
@@ -39,9 +40,6 @@ This project was made to learn `C++`, `OpenGL` and `GPU programming`.
 | I              | Increase bloom intensity                 |
 | D              | Decrease bloom intensity                 |
 | Q              | Enable/disable point size                |
-| S              | Save the current state of the simulation |
-
-  
 
 ## How to run the project
 
@@ -79,30 +77,28 @@ Run the compiled program.
 #### Previous requirements
 - `git`
 - `cmake`
-- `mingw`
+- `OpenMP`
 
-Since the program uses OpenMP, you also need to install this:
-```commandline
-mingw-get install mingw32-pthreads-w32
-```
-#### Run the program
+#### Compile and run the program
 These commands will create a new directory titled `build` and change the location to it.
 ```bash
 mkdir build 
 cd build
 ``` 
-Build a `Makefile` using `cmake`.
+
+Generate the build files.
 ```bash
-cmake -G "MinGW Makefiles" ..
-```
-Compile the program using the `Makefile`.
-```bash
- mingw32-make
+cmake ..
 ```
 
-Run the compiled program.
+Compile the program.
 ```bash
-.\N-body.exe  
+cmake --build . --config Release
+```
+
+Run the executable.
+```bash
+.\Release\N-body.exe
 ```
 
 ## Program arguments
@@ -134,7 +130,12 @@ These are the available versions you can try:
 | `-v 4`  | Optimized version of `-v 3` based on [NVIDIA's Fast N-body Simulation](https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-31-fast-n-body-simulation-cuda), reducing memory bottlenecks and improving GPU efficiency. | O(n^2)                                                            |
 | `-v 5`  | Iterative, stackless Octree Barnes-Hut algorithm computed sequentially on the CPU. Approximates distant particle groups as single bodies to reduce complexity.                                                                                    | O(n log n)                                                        |
 | `-v 6`  | Fully parallel CPU Barnes-Hut implementation. Both tree construction and force calculations are parallelized using OpenMP.                                                                                                                        | O(n log n)                                                        |
-| `-v 7` | WORK IN PROGRESS. Fully parallel GPU Barnes-Hut implementation. Both tree construction and force calculations are performed on the GPU for maximum parallelism.                                                                                                     | O(n log n)                                                        |
+| `-v 7` | Fully parallel GPU Barnes-Hut implementation. Both tree construction and force calculations are performed on the GPU for maximum parallelism.                                                                                                     | O(n log n)                                                        |
+
+**Important Note on Barnes-Hut Versions (-v 5, -v 6, -v 7):**
+
+These implementations have known stability issues and bugs. They are prone to crashing, especially with large particle counts (e.g., >700k) or when particles approach each other very closely. The performance may also be suboptimal compared to theoretical expectations. Due to the significant difficulty in debugging these complex parallel algorithms, these issues are unlikely to be fixed. For stable simulations, please use the brute-force versions (-v 1 to -v 4). 
+> If you want to learn how it works read `BarnesHutExplained.md`
 
 ## Available initializations
 You can try the next initializations:
@@ -188,8 +189,3 @@ An example of how a new simulation version can be added is by creating a new cla
 Similarly, to add a new initialization, a new class that implements the `ParticleSystemInitializer` interface can be created and the new option can be added to the list of initialization options in the `ArgumentsParser` class.   
 
 Finally, you would have to use the new initalization or version you created in `main.cpp`.
-
-
-
-
-

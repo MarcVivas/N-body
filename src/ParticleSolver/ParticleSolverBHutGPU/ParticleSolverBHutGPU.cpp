@@ -23,30 +23,23 @@ ParticleSolverBHutGPU::ParticleSolverBHutGPU(float stepSize, float squaredSoft, 
 }
 
 void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
-    auto start_reset = std::chrono::high_resolution_clock::now();
     this->octree->reset(particles);
-    glFinish();
 
-    auto end_reset = std::chrono::high_resolution_clock::now();
-    auto duration_reset = std::chrono::duration_cast<std::chrono::microseconds>(end_reset - start_reset);
-    std::cout << "Time for reset: " << duration_reset.count() << " microseconds" << std::endl;
 
+    // It doesn't work right now for large number of particles
+	// I think the problem is in the insert function (executeTasks)
+	// Don't know why it's happening and I am tired of debugging 
+	// In theory, if the particles are sorted, the performance should be better
+	// Reducing warp divergence and improving cache locality
     //particles->gpuSort();
 
 
-    auto start_insert = std::chrono::high_resolution_clock::now();
+
+
     this->octree->insert(particles);
-    glFinish();
-
-    auto end_insert = std::chrono::high_resolution_clock::now();
-    auto duration_insert = std::chrono::duration_cast<std::chrono::microseconds>(end_insert - start_insert);
-    std::cout << "Time for insert: " << duration_insert.count() << " microseconds" << std::endl;
 
 
-    
 
-    // Dispatch Compute Shader
-    auto start_force = std::chrono::high_resolution_clock::now();
     this->forceCalculator->use();
     this->forceCalculator->setInt("numParticles", particles->size());
     this->forceCalculator->setFloat("G", this->G);
@@ -55,10 +48,7 @@ void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
     this->forceCalculator->setInt("fatherTreeNodes", this->octree->getFatherTreeNodes());
     glDispatchCompute((particles->size()+1024-1) / 1024, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    glFinish();
-    auto end_force = std::chrono::high_resolution_clock::now();
-    auto duration_force = std::chrono::duration_cast<std::chrono::microseconds>(end_force - start_force);
-    std::cout << "Time for force: " << duration_force.count() << " microseconds" << std::endl;
+
 
   
 

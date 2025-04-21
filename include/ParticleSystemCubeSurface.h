@@ -9,7 +9,7 @@ class ParticleSystemCubeSurface: public ParticleSystemInitializer{
 
 public:
     ParticleSystemCubeSurface(size_t numParticles);
-    std::unique_ptr<ParticleSystem> generateParticles(glm::vec3 worldDimensions);
+    std::unique_ptr<ParticleSystem> generateParticles(glm::vec3 worldDimensions, const bool usesGPU);
 
 private:
     size_t totalParticles;

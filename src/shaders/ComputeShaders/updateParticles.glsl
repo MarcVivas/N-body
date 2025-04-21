@@ -20,6 +20,11 @@ layout(std430, binding=2) buffer accelerationsBuffer
     vec4 accelerations[];
 };
 
+layout(std430, binding=4) buffer massesBuffer
+{
+    vec4 masses[];
+};
+
 layout(std430, binding=4) buffer forcesBuffer
 {
     vec4 forces[];
@@ -31,23 +36,23 @@ void main() {
 
     if (index < numParticles) {
 
-        // Leapfrog integrator
+        vec3 pos_t = positions[index].xyz; // x(t)
+        vec3 vel_t = velocities[index].xyz; // v(t)
+        vec3 force_t = forces[index].xyz;   // F(t)
 
-        float dtDividedBy2 = deltaTime * 0.5;
+        // Calculate acceleration a(t) from force F(t)
+        vec3 acc_t = force_t; 
 
-        // Compute velocity (i + 1/2)
-        velocities[index].xyz += accelerations[index].xyz * dtDividedBy2;
+        // --- Semi-Implicit Euler ---
+        // 1. Update velocity first using a(t)
+        vec3 vel_next = vel_t + acc_t * deltaTime; // v(t+dt) = v(t) + a(t)*dt
 
-        // Compute next position (i+1)
-        positions[index].xyz += velocities[index].xyz * deltaTime;
+        // 2. Update position using the *new* velocity
+        vec3 pos_next = pos_t + vel_next * deltaTime; // x(t+dt) = x(t) + v(t+dt)*dt
 
-        // Update acceleration (i+1)
-        // F = M * A
-        // A = F/M; M is cancelled while calculating gravity
-        accelerations[index].xyz = forces[index].xyz;
-
-        // Compute next velocity (i + 1)
-        velocities[index].xyz += accelerations[index].xyz * dtDividedBy2;
+        // --- Update Buffers ---
+        positions[index].xyz = pos_next;
+        velocities[index].xyz = vel_next;
     }
 
 }

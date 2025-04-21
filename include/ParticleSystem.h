@@ -12,7 +12,7 @@
 
 class ParticleSystem {
 public:
-    ParticleSystem(const std::vector<Particle> &particles);
+    ParticleSystem(const std::vector<Particle> &particles, const bool usesGPU);
     ParticleSystem(ParticleSystem* other);
 
     void setMasses(glm::vec4* newMasses);
@@ -78,6 +78,7 @@ public:
 protected:
     // OPENGL OWNS THE POINTERS
     unsigned int numParticles;
+	unsigned int paddedNumParticles;
     glm::vec4* positions;
     glm::vec4* accelerations;
     glm::vec4* velocities;
@@ -86,10 +87,20 @@ protected:
 
 	std::unique_ptr<Shader> mortonShader;
     std::unique_ptr<Shader> rearrangeParticlesShader; 
-    OpenGLBuffer mortonBuffer;
-  
+    std::unique_ptr<Shader> bitonicSortShader;
+
+    OpenGLBuffer mortonBuffer, positionsCopy, velocitiesCopy;
+    OpenGLBuffer positions_SSBO, velocities_SSBO, accelerations_SSBO, masses_SSBO, forces_SSBO, nodes_SSBO;
+
     // Declare ParticleSimulation as a friend class
     friend class ParticleSimulation;
+    
+    
+    void configureGpuBuffers();
+    void configureCpuBuffers();
+    void createBuffers(bool usesGPU);
+	void compileShaders();
+    unsigned int nextPowerOfTwo(unsigned int n);
 
 };
 
