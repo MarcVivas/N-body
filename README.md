@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A 3D N-body simulation project developed to explore C++, OpenGL graphics, and GPU parallel programming techniques (OpenMP & Compute Shaders). It simulates particle interactions (e.g., gravitational) using various algorithms from brute-force to Barnes-Hut, allowing for performance comparisons.
+A 3D N-body simulation project developed to explore C++, OpenGL graphics, CPU and GPU parallel programming techniques (OpenMP & Compute Shaders). It simulates particle interactions (e.g., gravitational) using various algorithms from brute-force to Barnes-Hut, allowing for performance comparisons.
 
 ![Simulation Showcase](media/overview.gif)
 *Demonstration of a simulation run with 37.000 particles*
