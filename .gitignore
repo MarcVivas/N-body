@@ -19,4 +19,6 @@ cmake_install.cmake
 Makefile
 build/
 
+.cache/
+
 perf.*
