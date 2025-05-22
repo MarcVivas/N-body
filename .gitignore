@@ -2,23 +2,17 @@
 .idea/
 cmake-build-debug/
 .vs/
-
 # VSCode files and directories
 .vscode/
-
 # C++ object files
 *.o
 *.out
-
 out/
-
 # CMake files
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
 build/
-
 .cache/
-
 perf.*
