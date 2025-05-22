@@ -12,7 +12,7 @@ struct Task {
     int totalParticles;
     // Default Constructor
     Task() : root(-1), totalParticles(0){}
-  
+
     void reset() {
         totalParticles = 0;
     }
@@ -44,7 +44,7 @@ public:
         void prune() override;
         void propagate() override;
         int getSubtree(int treeId);
-        void subdivide(int i, int firstChild, int root);
+        void subdivideParallel(int i, int firstChild, int root);
         void resetArrays();
         void countParticlesPerNode(int particleCount);
         void copyActiveParticles(int particleCount);

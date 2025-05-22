@@ -10,7 +10,7 @@ ParallelOctreeCPU::ParallelOctreeCPU(const int n): Octree(n) {
 
     delete[] this->nodes;
 
-   
+
 
     this->maxNodes = 0;
     int i = 0;
@@ -27,7 +27,7 @@ ParallelOctreeCPU::ParallelOctreeCPU(const int n): Octree(n) {
 
 
     this->nodeLocks.resize(maxNodes);
-       
+
     #pragma omp parallel for
     for (int i = 0; i < maxNodes; ++i) {
         omp_init_lock(&nodeLocks[i]);
@@ -38,7 +38,7 @@ ParallelOctreeCPU::ParallelOctreeCPU(const int n): Octree(n) {
     this->nodes = new Node[this->maxNodesPerSubtree * this->totalTasks + this->maxNodes];
 
 
-    std::cout << getMaxNodes() << std::endl; 
+    std::cout << getMaxNodes() << std::endl;
 
     this->tasks = new Task[totalTasks];
 
@@ -51,7 +51,7 @@ ParallelOctreeCPU::ParallelOctreeCPU(const int n): Octree(n) {
 
     taskParticles = new int[this->totalTasks * maxParticlesPerTask];
 
-  
+
 
     this->resetArrays();
 }
@@ -83,7 +83,7 @@ void ParallelOctreeCPU::reset(ParticleSystem *p) {
 
     // Find the max and min positions
     #pragma omp parallel for reduction(min: min_x, min_y, min_z) reduction(max: max_x, max_y, max_z)
-    for (int i = 0;  i < p->size(); ++i){
+    for (unsigned int i = 0;  i < p->size(); ++i){
         const glm::vec4 pos = p->getPositions()[i];
 
         if (pos.x < min_x){
@@ -122,7 +122,7 @@ void ParallelOctreeCPU::reset(ParticleSystem *p) {
  * @param p particles
  */
 void ParallelOctreeCPU::insert(ParticleSystem *p) {
-       
+
     int root = 0;
 
     // Subdivide the tree
@@ -131,10 +131,10 @@ void ParallelOctreeCPU::insert(ParticleSystem *p) {
         root+=1;
     }
 
- 
+
     // Fill the tasks
     #pragma omp parallel for
-    for (int j = 0; j < p->size(); j++) {
+    for (unsigned int j = 0; j < p->size(); j++) {
         const glm::vec4 pos = p->getPositions()[j];
         int i = 0;
         int depth = 0;
@@ -152,7 +152,7 @@ void ParallelOctreeCPU::insert(ParticleSystem *p) {
     }
 
 
-      
+
 
     // Distribute work among threads
     #pragma omp parallel for schedule(dynamic)
@@ -160,7 +160,7 @@ void ParallelOctreeCPU::insert(ParticleSystem *p) {
         // Execute task
         Task &task = this->tasks[i];
         if (task.root < 0) continue;
-        
+
         int root = getSubtree(i);
         Node &oct = this->nodes[root];
 
@@ -183,14 +183,14 @@ void ParallelOctreeCPU::insert(ParticleSystem *p) {
             const int particleId = taskParticles[i * maxParticlesPerTask + j];
             this->insert(p->getPositions()[particleId], p->getMasses()[particleId], i);
         }
-        
+
         this->propagate(i);
 
     }
-    
 
 
-      
+
+
     for(int i = maxNodes-totalTasks; i < maxNodes; i++){
         if(this->tasks[i%totalTasks].totalParticles > 0){
             this->parents[parentCount] = i;
@@ -199,10 +199,10 @@ void ParallelOctreeCPU::insert(ParticleSystem *p) {
     }
 
     this->propagate();
-       
+
     this->prune();
-    
-        
+
+
 }
 
 
@@ -236,7 +236,7 @@ void ParallelOctreeCPU::prune() {
         parent.setFirstChild(firstChild);
     }
 
-    #pragma omp parallel for 
+    #pragma omp parallel for
     for(int i = maxNodes-totalTasks; i < maxNodes; i++){
         if(this->nodes[i].isOccupied()){
             this->nodes[this->nodes[i].getFirstChild()].setNext(this->nodes[i].getNext());
@@ -245,11 +245,11 @@ void ParallelOctreeCPU::prune() {
 
 
 
-    #pragma omp parallel for schedule(dynamic) 
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < totalTasks; i++) {
         Task& task = this->tasks[i];
         if (task.totalParticles <= 0 || task.root < 0) continue;
-       
+
         this->prune(i);
         // Reset the task
         task.reset();
@@ -353,9 +353,9 @@ void ParallelOctreeCPU::propagate(int subTreeId) {
  * Resets the tasks
  */
 void ParallelOctreeCPU::resetArrays() {
-#pragma omp parallel for 
+#pragma omp parallel for
     for (int i = 0; i < totalTasks; ++i) {
-        tasks[i].reset();    
+        tasks[i].reset();
     }
 }
 
@@ -364,12 +364,12 @@ void ParallelOctreeCPU::insert(glm::vec4 pos, glm::vec4 mass, int subTreeId) {
     int i = getSubtree(subTreeId);
 
     // Keep the root node
-    const int root = i; 
+    const int root = i;
 
     // Traverse the tree
     while(i < i+maxNodesPerSubtree){
         Node &node = this->nodes[i];
-   
+
         // Case 1: The node is an empty leaf
         if(node.isLeaf() && !node.isOccupied()){
             // Proceed to insert the particle
@@ -384,7 +384,7 @@ void ParallelOctreeCPU::insert(glm::vec4 pos, glm::vec4 mass, int subTreeId) {
             glm::vec4 mass2 = glm::vec4(node.getMass(), 0.f, 0.f, 0.f);
 
             // Subdivide the current node
-            this->subdivide(i, nodeCounts[subTreeId]+root, subTreeId);
+            this->subdivideParallel(i, nodeCounts[subTreeId]+root, subTreeId);
 
             // Get child indexes
             int childIndex1 = this->getNextNode(pos, i);
@@ -394,7 +394,7 @@ void ParallelOctreeCPU::insert(glm::vec4 pos, glm::vec4 mass, int subTreeId) {
             int count = 0;
             // If both particles go to the same child node we need to keep subdividing
             while (childIndex1 == childIndex2) {
-               
+
                 // Edge case: Both particles are in the same position or very close
                 if (dist < 1e-3 || count++ == 10) {
                     this->insertParticle(pos, glm::vec4(mass2.x + mass.x, 0.f, 0.f, 0.f), childIndex1);  // In this case, insert both particles anyway
@@ -402,7 +402,7 @@ void ParallelOctreeCPU::insert(glm::vec4 pos, glm::vec4 mass, int subTreeId) {
                 }
 
                 // Keep subdividing
-                this->subdivide(childIndex1, nodeCounts[subTreeId]+root, subTreeId);
+                this->subdivideParallel(childIndex1, nodeCounts[subTreeId]+root, subTreeId);
 
 
                 // Recalculate child indexes after further subdivisions
@@ -424,7 +424,7 @@ void ParallelOctreeCPU::insert(glm::vec4 pos, glm::vec4 mass, int subTreeId) {
 }
 
 
-void ParallelOctreeCPU::subdivide(int i, int firstChild, int subTreeId) {
+void ParallelOctreeCPU::subdivideParallel(int i, int firstChild, int subTreeId) {
     // Set the first child to the current node count
     this->nodes[i].setFirstChild(firstChild);
 

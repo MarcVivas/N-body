@@ -1,5 +1,6 @@
 
 #include "ParticleSolverBHutGPU.h"
+#include "ParallelOctreeGPU.h"
 
 #include <chrono>
 #include <iostream>
@@ -23,20 +24,30 @@ ParticleSolverBHutGPU::ParticleSolverBHutGPU(float stepSize, float squaredSoft, 
 }
 
 void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
+    auto start = std::chrono::high_resolution_clock::now();
     this->octree->reset(particles);
-
+    glFinish();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Octree reset time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
 
     // It doesn't work right now for large number of particles
 	// I think the problem is in the insert function (executeTasks)
-	// Don't know why it's happening and I am tired of debugging 
+	// Don't know why it's happening and I am tired of debugging
 	// In theory, if the particles are sorted, the performance should be better
 	// Reducing warp divergence and improving cache locality
-    //particles->gpuSort();
+
+	start = std::chrono::high_resolution_clock::now();
+    particles->gpuSort();
+    glFinish();
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "GPU sort time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
 
 
-
-
+    start = std::chrono::high_resolution_clock::now();
     this->octree->insert(particles);
+    glFinish();
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Octree insert time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
 
 
 
@@ -46,11 +57,11 @@ void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
     this->forceCalculator->setFloat("theta", this->theta);
     this->forceCalculator->setFloat("squaredSoftening", this->squaredSoftening);
     this->forceCalculator->setInt("fatherTreeNodes", this->octree->getFatherTreeNodes());
-    glDispatchCompute((particles->size()+1024-1) / 1024, 1, 1);
+    //glDispatchCompute((particles->size()+1024-1) / 1024, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 
-  
+
 
     // Update particles positions
     this->positionCalculator->use();

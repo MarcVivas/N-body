@@ -1,7 +1,11 @@
 #include "ParticleSystem.h"
 #include "Helpers.h"
-#include <algorithm>
+#include "MortonCode.h"
+#include <bitset>
 using helpers::log;
+
+
+
 ParticleSystem::ParticleSystem(const std::vector<Particle> &particles, const bool usesGPU) {
     this->numParticles = particles.size();
     this->velocities = new glm::vec4[this->numParticles]();
@@ -11,7 +15,7 @@ ParticleSystem::ParticleSystem(const std::vector<Particle> &particles, const boo
     this->forces = new glm::vec4[this->numParticles]();
 
 
-    for (int i = 0; i < this->numParticles; i++) {
+    for (unsigned int i = 0; i < this->numParticles; i++) {
         this->velocities[i] = particles[i].velocity;
         this->accelerations[i] = particles[i].acceleration;
         this->positions[i] = particles[i].position;
@@ -37,7 +41,7 @@ ParticleSystem::ParticleSystem(ParticleSystem * other) {
     this->masses = new glm::vec4[this->numParticles]();
     this->forces = new glm::vec4[this->numParticles]();
 
-    for (int i = 0; i < this->numParticles; i++) {
+    for (unsigned int i = 0; i < this->numParticles; i++) {
         this->velocities[i] = other->getVelocities()[i];
         this->accelerations[i] = other->getAccelerations()[i];
         this->positions[i] = other->positions[i];
@@ -58,7 +62,7 @@ void ParticleSystem::createBuffers(bool usesGPU) {
 
 unsigned int ParticleSystem::nextPowerOfTwo(unsigned int n){
     if (n == 0) return 1; // Or handle as needed
-    // Simple bit manipulation method 
+    // Simple bit manipulation method
     n--;
     n |= n >> 1;
     n |= n >> 2;
@@ -77,7 +81,7 @@ void ParticleSystem::configureGpuBuffers() {
     accelerations_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getAccelerations(), 2, GL_DYNAMIC_COPY);
     masses_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getMasses(), 3, GL_STATIC_DRAW);
     forces_SSBO.createBufferData(sizeof(glm::vec4) * this->size(), this->getForces(), 4, GL_DYNAMIC_COPY);
-    mortonBuffer.createBufferData(sizeof(glm::uvec2) * paddedNumParticles, nullptr, 16, GL_DYNAMIC_COPY);
+    mortonBuffer.createBufferData(sizeof(MortonCode) * paddedNumParticles, nullptr, 16, GL_DYNAMIC_COPY);
     positionsCopy.createBufferData(sizeof(glm::vec4) * this->size(), nullptr, 17, GL_DYNAMIC_COPY);
     velocitiesCopy.createBufferData(sizeof(glm::vec4) * this->size(), nullptr, 18, GL_DYNAMIC_COPY);
 }
@@ -110,7 +114,7 @@ void ParticleSystem::gpuSort() {
 	OpenGLBuffer* readVelocities = pingPong ? &velocities_SSBO : &velocitiesCopy;
 	OpenGLBuffer* writePositions = pingPong ? &positionsCopy : &positions_SSBO;
 	OpenGLBuffer* writeVelocities = pingPong ? &velocitiesCopy : &velocities_SSBO;
-    
+
 
 
     // Calculate morton codes
@@ -123,21 +127,21 @@ void ParticleSystem::gpuSort() {
 	glDispatchCompute((this->paddedNumParticles + 256 - 1) / 256, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-  
 
-	// Sort morton codes using bitonic sort (implement radix sort for better performance) 
+
+	// Sort morton codes using bitonic sort (implement radix sort for better performance)
 	bitonicSortShader->use();
     readPositions->bindBufferBase(0);
     readVelocities->bindBufferBase(1);
     mortonBuffer.bindBufferBase(16);
 	bitonicSortShader->setInt("numParticles", this->paddedNumParticles);
-    
+
     // Bitonic sort requires numParticles to be a power of 2 for the simplest
     // implementation. If not, you either need to pad your buffers/particle count
     // to the next power of two OR modify the shader/dispatch logic to handle
     // the exact size (more complex bounds checking).
 
-    const int N = this->paddedNumParticles; // Or use next power of 2 if padding
+    const static unsigned int N = this->paddedNumParticles; // Or use next power of 2 if padding
 
     for (unsigned int k = 2; k <= N; k <<= 1) { // k = size of sequences being merged
         bitonicSortShader->setInt("k", k);
@@ -149,8 +153,8 @@ void ParticleSystem::gpuSort() {
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
         }
     }
-   
-	
+
+
 	// Rearrange particles based on sorted morton codes
 	rearrangeParticlesShader->use();
     readPositions->bindBufferBase(0);
@@ -166,8 +170,17 @@ void ParticleSystem::gpuSort() {
 	writePositions->bindBufferBase(0);
 	writeVelocities->bindBufferBase(1);
 	readPositions->bindBufferBase(17);
-	readVelocities->bindBufferBase(18); 
-            
+	readVelocities->bindBufferBase(18);
+
+	auto morton = mortonBuffer.getDataVector<MortonCode>(0, size()*sizeof(MortonCode));
+	auto pos = readPositions->getDataVector<glm::vec4>(0, this->size()*sizeof(glm::vec4));
+	for(auto &i: morton){
+
+	    glm::vec4 p = pos[i.index];
+	    log(p, i.morton, i.index, std::bitset<64>(i.morton));
+	}
+
+
 }
 
 

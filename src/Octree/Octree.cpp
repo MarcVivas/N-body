@@ -29,7 +29,7 @@ void Octree::adjustBoundingBox(ParticleSystem* p){
   float max_z = max_x;
 
   // Find the max and min positions
-  for (int i = 0;  i < p->size(); ++i){
+  for (unsigned int i = 0;  i < p->size(); ++i){
     const glm::vec4 pos = p->getPositions()[i];
 
     if (pos.x < min_x){
