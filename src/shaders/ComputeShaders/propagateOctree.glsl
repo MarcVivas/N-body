@@ -13,13 +13,20 @@ struct Node {
     vec3 minBoundary;
     uint numChildren;
     vec3 maxBoundary;
-    float padding2;
-    int children[8];
 };
 
 layout(std430, binding = 5) buffer nodesBuffer
 {
     Node nodes[];
+};
+
+struct OctreeChildren {
+    int children[8];
+};
+
+layout(std430, binding = 15) buffer octreeChildrenBuffer
+{
+    OctreeChildren octreeChildren[];
 };
 
 // Prefix sum
@@ -50,6 +57,7 @@ void main() {
     int currentOctreeId = index;
     if (nodes[currentOctreeId].numChildren > 0) return;
     // Only leafs now
+    nodes[currentOctreeId].numChildren = 444; // Mark this node as a leaf (444)
     while (currentOctreeId != 0) { // While not root
         int parent = octreeParents[currentOctreeId];
         // Notify parent
@@ -58,7 +66,7 @@ void main() {
         // val = 0 -> All children have notified the ancestor
         // This thread becomes the parent
         currentOctreeId = parent;
-        Node p = nodes[currentOctreeId];
+        OctreeChildren p = octreeChildren[currentOctreeId];
         float mass = 0.f;
         vec3 centerOfMass = vec3(0.f);
         vec3 minBoundary = vec3(FLOAT_MAX);
@@ -69,7 +77,7 @@ void main() {
             // Child exists
             Node c = nodes[child];
             mass += c.mass;
-            centerOfMass += c.centerOfMass * c.mass;
+            centerOfMass += c.centerOfMass.xyz * c.mass;
             minBoundary.x = min(minBoundary.x, c.minBoundary.x);
             minBoundary.y = min(minBoundary.y, c.minBoundary.y);
             minBoundary.z = min(minBoundary.z, c.minBoundary.z);

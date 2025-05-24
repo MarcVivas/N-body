@@ -1,120 +1,92 @@
 #version 430 core
 
-#define BLOCK_SIZE 1024
+#define BLOCK_SIZE 256
 
-layout( local_size_x = BLOCK_SIZE, local_size_y =1, local_size_z = 1  ) in;
+layout(local_size_x = BLOCK_SIZE, local_size_y = 1, local_size_z = 1) in;
 
 uniform float squaredSoftening;
 uniform float G;
 uniform int numParticles;
 uniform float theta;
-uniform int fatherTreeNodes;
 
-struct Node{
-    vec4 mass; // mass = mass.x; firstChild=mass.y; next=mass.z; maxBoundary.x=mass.w
-    vec4 centerOfMass; // (x1*m1 + x2*m2) / (m1 + m2); maxBoundary.y = centerOfMass.w
-    vec4 minBoundary;  // maxBoundary.z = minBoundary.w
+struct Node {
+    vec3 centerOfMass; // (x1*m1 + x2*m2) / (m1 + m2)
+    float mass;
+    vec3 minBoundary;
+    uint numChildren;
+    vec3 maxBoundary;
 };
 
-layout(std430, binding=0) buffer positionsBuffer
+struct OctreeChildren {
+    int children[8];
+};
+
+layout(std430, binding = 15) buffer octreeChildrenBuffer
 {
-    vec4 positions[];
+    readonly OctreeChildren octreeChildren[];
 };
 
-
-layout(std430, binding=4) buffer forcesBuffer
+layout(std430, binding = 0) buffer positionsBuffer
 {
-    vec4 forces[];
+    readonly vec4 positions[];
 };
 
-layout(std430, binding=5) buffer nodesBuffer
+layout(std430, binding = 4) buffer forcesBuffer
 {
-    Node nodes[];
+    writeonly vec4 forces[];
 };
 
+layout(std430, binding = 5) buffer nodesBuffer
+{
+    readonly Node nodes[];
+};
 
-bool isLeaf(float firstChild){
-    return firstChild < 0.f;
-}
-
-bool isOccupied(float mass) {
-    return mass > 0.f;
-}
-shared Node sharedNodes[BLOCK_SIZE];
-
-void loadSharedNodes(uint threadId){
-    if(threadId < BLOCK_SIZE && threadId < fatherTreeNodes){
-        sharedNodes[threadId] = nodes[threadId];
-    }
-    groupMemoryBarrier(); // Ensure all threads have loaded their nodes before proceeding
-    barrier(); // Ensure all threads have completed their work before proceeding
-}
-
+#define STACK_SIZE 64
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
-    
-    loadSharedNodes(gl_LocalInvocationID.x);
+    if (index >= numParticles) return;
 
-    if (index < numParticles) {
+    vec3 force = vec3(0.f);
 
+    int stack[STACK_SIZE];
+    int stackTop = 0;
+    stack[0] = 0;
 
+    const vec3 particlePos = positions[index].xyz;
 
-        vec3 force = vec3(0.f);
+    while (stackTop >= 0 && stackTop < STACK_SIZE) {
+        // Pop elem
+        const int nodeId = stack[stackTop];
+        stackTop--;
 
-        int i = 0; // Root of the tree
+        const Node n = nodes[nodeId];
 
-        Node node; 
-        while (i >= 0){
-        
-            // Get node i
-            node = i < BLOCK_SIZE && i < fatherTreeNodes  ? sharedNodes[i] : nodes[i];
-            
-
-            const vec4 mass = node.mass;
-            const vec4 centerOfMass = node.centerOfMass;
-            const vec4 minBoundary = node.minBoundary;
-            const vec3 maxBoundary = vec3(mass.w, centerOfMass.w, minBoundary.w);
-
-            // We need to compute the size and the distance between the particle and the node
-            const vec3 size = maxBoundary - minBoundary.xyz;
-            const float s = max(max(size.x, size.y), size.z);
-            const float s_squared = s*s;
-
-            const vec3 vector_i_j = centerOfMass.xyz - positions[index].xyz;
-            const float dist_squared = dot(vector_i_j, vector_i_j);  // Squared distance
-
-            const float firstChild = mass.y;
-            const float next = mass.z;
-
-            // If the node is an occupied leaf OR satisfies the criteria
-            if (isLeaf(firstChild) || s_squared < theta * dist_squared) {
-                // Compute the force
-
-                if (isOccupied(mass.x) && dist_squared > 0.f) {
-                    const float effective_dist_squared = dist_squared + squaredSoftening;
-                    const float inv_sqrt_val = inversesqrt(effective_dist_squared); 
-                    const float inv_dist = inv_sqrt_val * inv_sqrt_val * inv_sqrt_val;
-
-                    force += ((vector_i_j * (G * mass.x)) * inv_dist);
-                }
-
-
-                // Go to the next sibling or parent
-                i = int(next);
-            }
-            else {
-                // Go down the tree
-                i = int(firstChild);
-            }
+        // Try compute force with this Node
+        const bool isLeaf = n.numChildren == 444;
+        const vec3 size = n.maxBoundary.xyz - n.minBoundary.xyz;
+        const float s = max(max(size.x, size.y), size.z);
+        const float s_squared = s * s;
+        const vec3 vec_i_j = n.centerOfMass.xyz - particlePos;
+        const float squared_distance = dot(vec_i_j, vec_i_j);
+        if (isLeaf || s_squared < theta * squared_distance && squared_distance > 0) {
+            // Compute the force with this node
+            const float effective_dist_squared = squared_distance + squaredSoftening;
+            const float inv_sqrt_val = inversesqrt(effective_dist_squared);
+            const float inv_dist = inv_sqrt_val * inv_sqrt_val * inv_sqrt_val;
+            force += ((vec_i_j * (G * n.mass)) * inv_dist);
+            continue;
         }
 
+        // Go down the tree
+        const OctreeChildren nodeChildren = octreeChildren[nodeId];
 
-
-        forces[index] = vec4(force, 0.f);
-
+        for (uint i = 0; i < 8; i++) {
+            const int childId = nodeChildren.children[i];
+            if (childId < 0) continue;
+            // Push childId
+            stack[++stackTop] = childId;
+        }
     }
-
+    forces[index] = vec4(force, 0.f);
 }
-
-

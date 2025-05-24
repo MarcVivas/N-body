@@ -29,8 +29,15 @@ struct Node {
     vec3 minBoundary;
     uint numChildren;
     vec3 maxBoundary;
-    float padding2;
+};
+
+struct OctreeChildren {
     int children[8];
+};
+
+layout(std430, binding = 15) buffer octreeChildrenBuffer
+{
+    OctreeChildren octreeChildren[];
 };
 
 layout(std430, binding = 5) buffer nodesBuffer
@@ -76,10 +83,7 @@ bool isLeaf(const BinaryTree binaryTreeNode, const int edgeIndex) {
 }
 
 Node createEmptyOctreeNode() {
-    return Node(vec3(0), 0.f, vec3(0), 0u, vec3(0), 0.f,
-        int[8](
-            -1, -1, -1, -1, -1, -1, -1, -1
-        ));
+    return Node(vec3(0), 0.f, vec3(0), 0u, vec3(0));
 }
 
 Node createLeafOctreeNode(const BinaryTree binaryTreeNode, const int edgeIndex) {
@@ -88,10 +92,7 @@ Node createLeafOctreeNode(const BinaryTree binaryTreeNode, const int edgeIndex) 
     const uint particleId = mortonCodes[mortonCodeId].particleIndex;
     const vec3 position = positions[particleId].xyz;
     const float mass = masses[particleId].x;
-    return Node(position, mass, position, 0u, position, 0.f,
-        int[8](
-            -1, -1, -1, -1, -1, -1, -1, -1
-        ));
+    return Node(position, mass, position, 0u, position);
 }
 
 /*
@@ -105,6 +106,9 @@ void main() {
     const int octreeNodeId = getValFromPrefixSum(index);
     if (index == 0) {
         nodes[0] = createEmptyOctreeNode();
+        octreeChildren[0].children = int[8](
+                -1, -1, -1, -1, -1, -1, -1, -1
+            );
     }
     if (!shouldCreateOctreeNode(octreeNodeId, getValFromPrefixSum(index - 1))) return;
 
@@ -113,4 +117,7 @@ void main() {
     // In case of an internal node, initialize it with its default values
     const BinaryTree binaryTreeNode = tree[uint(index / 2)];
     nodes[octreeNodeId] = isLeaf(binaryTreeNode, index) ? createLeafOctreeNode(binaryTreeNode, index) : createEmptyOctreeNode();
+    octreeChildren[octreeNodeId].children = int[8](
+            -1, -1, -1, -1, -1, -1, -1, -1
+        );
 }

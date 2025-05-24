@@ -16,26 +16,6 @@ ParallelOctreeGPU::ParallelOctreeGPU(const int n){
 
 	initComputeShaders();
 
-    this->maxDepth = -1;
-    this->fatherMaxNodes = 0;
-
-    int i = 0;
-    while (maxDepth < 8) {
-        const int tmp = fatherMaxNodes + ipow(8, i);
-        fatherMaxNodes = tmp;
-        maxDepth++;
-        if (static_cast<float>(n) / static_cast<float>(ipow(8, i)) < 2.f) break;
-        i++;
-    }
-
-    this->totalTasks = ipow(8, maxDepth);
-
-	log("Total tasks: " + std::to_string(totalTasks), "Father max nodes:", fatherMaxNodes, "Max depth:", maxDepth,
-        "MAX NODES:", getMaxNodes());
-
-
-
-
     initSSBOs(n);
 
 }
@@ -66,17 +46,18 @@ void ParallelOctreeGPU::initSSBOs(const int n) {
     intermediateBoundsBufferB.createBufferData(sizeof(glm::vec4) * ((static_cast<unsigned long long>(n) + blockSizeForReduction-1) / blockSizeForReduction) * 2, nullptr, 7, GL_DYNAMIC_DRAW);
     //nodesBuffer.createBufferData(sizeof(Node) * (getMaxNodes()), nullptr, 5, GL_DYNAMIC_DRAW);
 	//particlesOffsetsBuffer.createBufferData(sizeof(glm::ivec2) * n, nullptr, 10, GL_DYNAMIC_DRAW);
-	taskParticlesIndexesBuffer.createBufferData(sizeof(int) * n, nullptr, 12, GL_DYNAMIC_DRAW);
-	subTreeNodeCountsBuffer.createBufferData(sizeof(int) * this->totalTasks, nullptr, 14, GL_DYNAMIC_DRAW);
-	subTreeParentCountsBuffer.createBufferData(sizeof(int) * this->totalTasks, nullptr, 15, GL_DYNAMIC_DRAW);
+	// taskParticlesIndexesBuffer.createBufferData(sizeof(int) * n, nullptr, 12, GL_DYNAMIC_DRAW);
+	// subTreeNodeCountsBuffer.createBufferData(sizeof(int) * this->totalTasks, nullptr, 14, GL_DYNAMIC_DRAW);
+	//subTreeParentCountsBuffer.createBufferData(sizeof(int) * this->totalTasks, nullptr, 15, GL_DYNAMIC_DRAW);
 
 
-	gpuNodeBuffer.createBufferData(sizeof(GPUNode) * (getMaxNodes()), nullptr, 5, GL_DYNAMIC_DRAW);
+	gpuNodeBuffer.createBufferData(sizeof(GPUNode) * n*2, nullptr, 5, GL_DYNAMIC_DRAW);
 	binaryTreeBuffer.createBufferData(sizeof(glm::ivec3) * (n-1), nullptr, 9, GL_DYNAMIC_DRAW);
 	blockSumsBuffer.createBufferData(sizeof(int) * (((n-1) * 2 + (2*1024)-1) / (2*1024)) , nullptr, 11, GL_DYNAMIC_DRAW);
 	binaryTreeEdges.createBufferData(sizeof(int) * (n-1) * 2, nullptr, 13, GL_DYNAMIC_DRAW);
 	binaryParentsBuffer.createBufferData(sizeof(int) * n-1, nullptr, 8, GL_DYNAMIC_DRAW);
 	octreeParentsBuffer.createBufferData(sizeof(int) * n*2, nullptr, 10, GL_DYNAMIC_DRAW);
+	octreeChildrenBuffer.createBufferData(sizeof(OctreeChildren) * n*2, nullptr, 15, GL_DYNAMIC_DRAW);
 }
 
 /**
@@ -120,12 +101,6 @@ void ParallelOctreeGPU::computeBoundingBox(ParticleSystem *p) {
     The 'readBuffer' now holds the ID of the buffer containing the single final min/max pair at index 0.
     Copy this pair from the intermediate buffer to the final output buffer.
     */
-
-    // Set the bounding box of the root node
-    // this->resetOctree->use();
-    // this->resetOctree->setInt("numParticles", p->size());
-    // glDispatchCompute(1, 1, 1); // Just the root node :P
-    // glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 /**
@@ -135,8 +110,6 @@ void ParallelOctreeGPU::computeBoundingBox(ParticleSystem *p) {
  */
 void ParallelOctreeGPU::reset(ParticleSystem* p) {
 	this->computeBoundingBox(p);
-    this->nodeCount = 0;
-    this->parentCount = 0;
 }
 
 /*
@@ -243,17 +216,17 @@ void ParallelOctreeGPU::insert(ParticleSystem* p) {
     glDispatchCompute((p->size()-1 + 255)/ 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    auto v = binaryTreeBuffer.getDataVector<glm::ivec3>(0, sizeof(glm::ivec3) * (p->size()-1));
-    auto v4 = binaryParentsBuffer.getDataVector<int>(0, sizeof(int) * (p->size()-1));
+    // auto v = binaryTreeBuffer.getDataVector<glm::ivec3>(0, sizeof(glm::ivec3) * (p->size()-1));
+    // auto v4 = binaryParentsBuffer.getDataVector<int>(0, sizeof(int) * (p->size()-1));
 
-    int i = 0;
-    for(auto &s : v){
-        log(s.x, s.y, s.z, v4[i]);
-        i++;
-    }
+    // int i = 0;
+    // for(auto &s : v){
+    //     log(s.x, s.y, s.z, v4[i]);
+    //     i++;
+    // }
 
-    auto v2 = binaryTreeEdges.getDataVector<int>(0, sizeof(int) * (p->size()-1)*2);
-    log(v2);
+    // auto v2 = binaryTreeEdges.getDataVector<int>(0, sizeof(int) * (p->size()-1)*2);
+    // log(v2);
 
     // ============================================
 	// Prefix sum of the particles per task
@@ -279,60 +252,60 @@ void ParallelOctreeGPU::insert(ParticleSystem* p) {
     // ============================================
     //
 
-    auto v3 = binaryTreeEdges.getDataVector<int>(0, sizeof(int) * (p->size()-1)*2);
-    log(v3);
+    // auto v3 = binaryTreeEdges.getDataVector<int>(0, sizeof(int) * (p->size()-1)*2);
+    // log(v3);
 
     this->buildOctreeShader->use();
     this->buildOctreeShader->setInt("totalBinaryTreeEdges", (p->size()-1) * 2);
     glDispatchCompute(((p->size()-1) * 2 + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    auto v5 = gpuNodeBuffer.getDataVector<GPUNode>(0, sizeof(GPUNode) * p->size() * 2);
-    for(auto &n : v5){
-        log(n.children[0], n.mass, n.centerOfMass.x, n.centerOfMass.y, n.centerOfMass.z);
-    }
+    // auto v5 = gpuNodeBuffer.getDataVector<GPUNode>(0, sizeof(GPUNode) * p->size() * 2);
+    // for(auto &n : v5){
+    //     log(n.children[0], n.mass, n.centerOfMass.x, n.centerOfMass.y, n.centerOfMass.z);
+    // }
 
     this->assignParentsAndChildrenShader->use();
     this->assignParentsAndChildrenShader->setInt("totalBinaryTreeEdges", (p->size()-1) * 2);
     glDispatchCompute(((p->size()-1) * 2 + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    auto v6 = gpuNodeBuffer.getDataVector<GPUNode>(0, sizeof(GPUNode) * p->size() * 2);
-    auto v7 = octreeParentsBuffer.getDataVector<int>(0, sizeof(int) * p->size() * 2);
-    for(uint32_t i = 0; i < p->size() * 2; i ++){
-        log("Node", i);
-        log("Parent", v7[i]);
-        log("Total children", v6[i].numChildren);
-        log("Mass", v6[i].mass,
-            "Center of mass", v6[i].centerOfMass.x, v6[i].centerOfMass.y, v6[i].centerOfMass.z, ")",
-            "Min Boundary", v6[i].minBoundary.x, v6[i].minBoundary.y, v6[i].minBoundary.z, ")",
-            "Max Boundary", v6[i].maxBoundary.x, v6[i].maxBoundary.y, v6[i].maxBoundary.z, ")"
-        );
-        for(int j = 0; j < 8; j++){
-            log("Child", i, v6[i].children[j]);
-        }
+    // auto v6 = gpuNodeBuffer.getDataVector<GPUNode>(0, sizeof(GPUNode) * p->size() * 2);
+    // auto v7 = octreeParentsBuffer.getDataVector<int>(0, sizeof(int) * p->size() * 2);
+    // for(uint32_t i = 0; i < p->size() * 2; i ++){
+    //     log("Node", i);
+    //     log("Parent", v7[i]);
+    //     log("Total children", v6[i].numChildren);
+    //     log("Mass", v6[i].mass,
+    //         "Center of mass", v6[i].centerOfMass.x, v6[i].centerOfMass.y, v6[i].centerOfMass.z, ")",
+    //         "Min Boundary", v6[i].minBoundary.x, v6[i].minBoundary.y, v6[i].minBoundary.z, ")",
+    //         "Max Boundary", v6[i].maxBoundary.x, v6[i].maxBoundary.y, v6[i].maxBoundary.z, ")"
+    //     );
+    //     for(int j = 0; j < 8; j++){
+    //         log("Child", i, v6[i].children[j]);
+    //     }
 
-    }
+    // }
 
     this->propagateOctreeShader->use();
     this->assignParentsAndChildrenShader->setInt("totalBinaryTreeEdges", (p->size()-1) * 2);
     glDispatchCompute(((p->size()-1) * 2 + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    auto v8 = gpuNodeBuffer.getDataVector<GPUNode>(0, sizeof(GPUNode) * p->size() * 2);
-    for(uint32_t i = 0; i < p->size() * 2; i ++){
-        log("Node", i);
-        log("Total children", v8[i].numChildren);
-        log("Mass", v8[i].mass,
-            "Center of mass", v8[i].centerOfMass.x, v8[i].centerOfMass.y, v8[i].centerOfMass.z, ")",
-            "Min Boundary", v8[i].minBoundary.x, v8[i].minBoundary.y, v8[i].minBoundary.z, ")",
-            "Max Boundary", v8[i].maxBoundary.x, v8[i].maxBoundary.y, v8[i].maxBoundary.z, ")"
-        );
-        for(int j = 0; j < 8; j++){
-            log("Child", i, v8[i].children[j]);
-        }
+     //  auto v8 = gpuNodeBuffer.getDataVector<GPUNode>(0, sizeof(GPUNode) * p->size() * 2);
+     //  for(uint32_t i = 0; i < p->size() * 2; i ++){
+     //      log("Node", i);
+     //     ("Total children", v8[i].numChildren);
+     //      log("Mass", v8[i].mass,
+     //          "Center of mass", v8[i].centerOfMass.x, v8[i].centerOfMass.y, v8[i].centerOfMass.z, ")",
+     //          "Min Boundary", v8[i].minBoundary.x, v8[i].minBoundary.y, v8[i].minBoundary.z, ")",
+     //          "Max Boundary", v8[i].maxBoundary.x, v8[i].maxBoundary.y, v8[i].maxBoundary.z, ")"
+     //      );
+     //      for(int j = 0; j < 8; j++){
+     //          log("Child", i, v8[i].children[j]);
+     //      }
 
-    }
+     // }
 }
 
 void ParallelOctreeGPU::prune() {

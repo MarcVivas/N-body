@@ -50,15 +50,18 @@ void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
     std::cout << "Octree insert time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
 
 
+    start = std::chrono::high_resolution_clock::now();
 
     this->forceCalculator->use();
     this->forceCalculator->setInt("numParticles", particles->size());
     this->forceCalculator->setFloat("G", this->G);
     this->forceCalculator->setFloat("theta", this->theta);
     this->forceCalculator->setFloat("squaredSoftening", this->squaredSoftening);
-    this->forceCalculator->setInt("fatherTreeNodes", this->octree->getFatherTreeNodes());
-    //glDispatchCompute((particles->size()+1024-1) / 1024, 1, 1);
+    glDispatchCompute((particles->size()+255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    glFinish();
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Force time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
 
 
 
@@ -68,6 +71,7 @@ void ParticleSolverBHutGPU::updateParticlePositions(ParticleSystem *particles){
     this->positionCalculator->setInt("numParticles", particles->size());
     glDispatchCompute(ceil(particles->size() / 64.0), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    glFinish();
 
 }
 

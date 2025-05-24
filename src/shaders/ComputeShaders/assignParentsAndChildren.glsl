@@ -5,6 +5,15 @@
 
 layout(local_size_x = BLOCK_SIZE, local_size_y = 1, local_size_z = 1) in;
 
+struct OctreeChildren {
+    int children[8];
+};
+
+layout(std430, binding = 15) buffer octreeChildrenBuffer
+{
+    OctreeChildren octreeChildren[];
+};
+
 struct KeyIndex {
     uint64_t mortonCode;
     uint particleIndex;
@@ -29,8 +38,6 @@ struct Node {
     vec3 minBoundary;
     uint numChildren;
     vec3 maxBoundary;
-    float padding2;
-    int children[8];
 };
 
 layout(std430, binding = 5) buffer nodesBuffer
@@ -128,7 +135,7 @@ void main() {
     const int parentId = int(octreeParent.x);
     const uint binaryNodeParentId = octreeParent.y;
 
-    nodes[parentId].children[getOctant(index, binaryNodeParentId)] = octreeNodeId;
+    octreeChildren[parentId].children[getOctant(index, binaryNodeParentId)] = octreeNodeId;
     octreeParents[octreeNodeId] = parentId;
     atomicAdd(nodes[parentId].numChildren, 1);
 }

@@ -9,13 +9,18 @@
 #include <cstdint>
 #include <memory>
 
-struct GPUNode {
+struct alignas(16) GPUNode {
+
     glm::vec3 centerOfMass; // (x1*m1 + x2*m2) / (m1 + m2)
     float mass;
     glm::vec3 minBoundary;
     uint32_t numChildren;
     glm::vec3 maxBoundary;
-    float padding2;
+    int first;
+    int sibling;
+};
+
+struct alignas(16) OctreeChildren {
     int children[8];
 };
 
@@ -45,7 +50,7 @@ public:
 
 
     OpenGLBuffer intermediateBoundsBufferA, intermediateBoundsBufferB, nodesBuffer, tasksBuffer, particlesOffsetsBuffer, blockSumsBuffer, taskParticlesIndexesBuffer, subTreeNodeCountsBuffer, subTreeParentCountsBuffer, assertBuffer;
-    OpenGLBuffer gpuNodeBuffer, binaryTreeBuffer, binaryTreeEdges, binaryParentsBuffer, octreeParentsBuffer;
+    OpenGLBuffer gpuNodeBuffer, binaryTreeBuffer, binaryTreeEdges, binaryParentsBuffer, octreeParentsBuffer, octreeChildrenBuffer;
 private:
     void initSSBOs(int n);
 	void computeBoundingBox(ParticleSystem* p);

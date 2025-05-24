@@ -172,13 +172,13 @@ void ParticleSystem::gpuSort() {
 	readPositions->bindBufferBase(17);
 	readVelocities->bindBufferBase(18);
 
-	auto morton = mortonBuffer.getDataVector<MortonCode>(0, size()*sizeof(MortonCode));
-	auto pos = readPositions->getDataVector<glm::vec4>(0, this->size()*sizeof(glm::vec4));
-	for(auto &i: morton){
+	// auto morton = mortonBuffer.getDataVector<MortonCode>(0, size()*sizeof(MortonCode));
+	// auto pos = readPositions->getDataVector<glm::vec4>(0, this->size()*sizeof(glm::vec4));
+	// for(auto &i: morton){
 
-	    glm::vec4 p = pos[i.index];
-	    log(p, i.morton, i.index, std::bitset<64>(i.morton));
-	}
+	//     glm::vec4 p = pos[i.index];
+	//     log(p, i.morton, i.index, std::bitset<64>(i.morton));
+	// }
 
 
 }
